@@ -1,0 +1,12 @@
+{
+  "id": "{2C88856B-7D25-7502-1594-11F588E2C685}",
+  "author": "Ulrich Bittner",
+  "name": "Tado",
+  "url": "https://github.com/ubittner/SymconTado",
+  "compatibility": {
+    "version": "5.4"
+  },
+  "version": "1.00",
+  "build": 1,
+  "date": 1583600400
+}
