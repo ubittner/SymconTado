@@ -78,12 +78,12 @@ class TadoDiscovery extends IPSModule
                 $values[] = [
                     'IP'          => $bridge['ip'],
                     'BridgeName'  => $bridge['name'],
-                    'BridgeID'    => $bridge['id'],
+                    'BridgeID'    => $bridgeID,
                     'instanceID'  => $instanceID,
                     'create'      => [
                         'moduleID'      => TADO_SPLITTER_GUID,
                         'configuration' => [
-                            'BridgeID'        => (string) $bridge['deviceType']
+                            'BridgeID'        => (string) $bridgeID
                         ]
                     ]
                 ];
