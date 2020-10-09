@@ -20,7 +20,7 @@ trait tadoAPI
      */
     public function GetAccountInformation(): string
     {
-        $accessToken = $this->FetchAccessToken();
+        $accessToken = $this->GetBearerToken();
         // Send data to endpoint
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://my.tado.com/api/v1/me');
@@ -50,10 +50,14 @@ trait tadoAPI
      */
     public function GetHomeInformation(): string
     {
-        $accessToken = $this->FetchAccessToken();
-        $homeID = json_decode($this->ReadAttributeString('AccountInformation'), true)['homeId'];
-        if (empty($homeID)) {
-            return '';
+        $accessToken = $this->GetBearerToken();
+        $info = json_decode($this->ReadAttributeString('AccountInformation'), true);
+        if (!empty($info)) {
+            if (!array_key_exists('homeId', $info)) {
+                return '';
+            } else {
+                $homeID = $info['homeId'];
+            }
         }
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://my.tado.com/api/v2/homes/' . $homeID);
@@ -83,10 +87,14 @@ trait tadoAPI
      */
     public function GetZoneInformation(): string
     {
-        $accessToken = $this->FetchAccessToken();
-        $homeID = json_decode($this->ReadAttributeString('AccountInformation'), true)['homeId'];
-        if (empty($homeID)) {
-            return '';
+        $accessToken = $this->GetBearerToken();
+        $info = json_decode($this->ReadAttributeString('AccountInformation'), true);
+        if (!empty($info)) {
+            if (!array_key_exists('homeId', $info)) {
+                return '';
+            } else {
+                $homeID = $info['homeId'];
+            }
         }
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://my.tado.com/api/v2/homes/' . $homeID . '/zones');
@@ -126,9 +134,13 @@ trait tadoAPI
         $this->GetZoneInformation();
         $devices = [];
 
-        $homeID = json_decode($this->ReadAttributeString('AccountInformation'), true)['homeId'];
-        if (empty($homeID)) {
-            return [];
+        $info = json_decode($this->ReadAttributeString('AccountInformation'), true);
+        if (!empty($info)) {
+            if (!array_key_exists('homeId', $info)) {
+                return [];
+            } else {
+                $homeID = $info['homeId'];
+            }
         }
         $zones = json_decode($this->GetZoneInformation(), true);
         if (empty($zones)) {
@@ -271,5 +283,4 @@ trait tadoAPI
         $data = json_encode($data);
         $this->SendDataToChildren($data);
     }
-
 }

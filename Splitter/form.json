@@ -5,70 +5,37 @@
       "image": "data:image/png;base64,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"
     },
     {
-      "type": "ExpansionPanel",
-      "caption": "Tado Splitter",
-      "items": [
-        {
-          "type": "Label",
-          "caption": "This instance establishes a connection to my.tado.com.\nPlease refer to the documentation for further information.\n"
-        },
-        {
-          "type": "Label",
-          "caption": "Instance ID:"
-        },
-        {
-          "type": "Label",
-          "caption": "Module:"
-        },
-        {
-          "type": "Label",
-          "caption": "Version:"
-        },
-        {
-          "type": "Label",
-          "caption": "Date:"
-        },
-        {
-          "type": "Label",
-          "caption": "Time:"
-        },
-        {
-          "type": "Label",
-          "caption": "Developer:"
-        },
-        {
-          "type": "ValidationTextBox",
-          "name": "Note",
-          "caption": "Note"
-        }
-      ]
+      "type": "CheckBox",
+      "name": "Active",
+      "caption": "Active"
+    },
+    {
+      "type": "Label",
+      "caption": "Please enter your e-mail address and password for my.tado.com"
     },
     {
       "type": "ValidationTextBox",
       "name": "UserName",
-      "caption": "E-Mail Address"
+      "caption": "E-Mail Address",
+      "width": "600px"
     },
     {
       "type": "PasswordTextBox",
       "name": "Password",
-      "caption": "Password"
+      "caption": "Password",
+      "width": "600px"
     },
     {
       "type": "NumberSpinner",
       "name": "Timeout",
       "caption": "Timeout",
-      "suffix": "ms"
-    },
-    {
-      "type": "ValidationTextBox",
-      "name": "Token",
-      "caption": "Token"
+      "suffix": "milliseconds"
     },
     {
       "type": "NumberSpinner",
       "name": "UpdateInterval",
       "caption": "Update Interval",
-      "suffix": "s"
+      "suffix": "seconds"
     }
   ],
   "actions": [
@@ -214,7 +181,7 @@
               {
                 "type": "Button",
                 "caption": "Reset buffers",
-                "onClick": "TADO_ResetBuffers($id);"
+                "onClick": "TADO_InitializeBuffers($id);"
               }
             ]
           }
@@ -236,6 +203,37 @@
               }
             ]
           }
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Buffer",
+      "items": [
+        {
+          "type": "Label",
+          "caption": "ClientSecret:",
+          "name": "BufferClientSecret"
+        },
+        {
+          "type": "Label",
+          "caption": "AccessToken:",
+          "name": "BufferAccessToken"
+        },
+        {
+          "type": "Label",
+          "caption": "AccessToken Expires:",
+          "name": "BufferAccessTokenExpires"
+        },
+        {
+          "type": "Label",
+          "caption": "RefreshToken:",
+          "name": "BufferRefreshToken"
+        },
+        {
+          "type": "Label",
+          "caption": "Scope:",
+          "name": "BufferScope"
         }
       ]
     }

@@ -14,7 +14,7 @@ trait webOAuth
     {
         $clientSecret = '';
         $timeout = round($this->ReadPropertyInteger('Timeout') / 1000);
-        // Send data to endpoint
+        //Send data to endpoint
         $ch = curl_init();
         curl_setopt_array($ch, [
             CURLOPT_URL            => 'https://my.tado.com/webapp/env.js',
@@ -40,7 +40,7 @@ trait webOAuth
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if (!curl_errno($ch)) {
             switch ($http_code) {
-                case 200:  # OK
+                case 200:  #OK
                     $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
                     $header = substr($response, 0, $header_size);
                     $body = substr($response, $header_size);
@@ -51,6 +51,7 @@ trait webOAuth
                         $clientSecret = str_replace(["'", ' '], '', $matches[1]);
                         $this->SendDebug(__FUNCTION__, 'ClientSecret: ' . $clientSecret, 0);
                         $this->SetBuffer('ClientSecret', json_encode(['ClientSecret' => $clientSecret]));
+                        $this->UpdateParameters();
                     }
                     break;
 
@@ -60,35 +61,45 @@ trait webOAuth
         } else {
             $error_msg = curl_error($ch);
             $this->SendDebug(__FUNCTION__, 'An error has occurred: ' . json_encode($error_msg), 0);
-            $this->LogMessage(__FUNCTION__ . ', An error has occurred: ' . json_encode($error_msg), 10205);
+            $this->LogMessage('ID ' . $this->InstanceID . ', ' . __FUNCTION__ . ', ' . ', An error has occurred: ' . json_encode($error_msg), KL_WARNING);
         }
         curl_close($ch);
         return $clientSecret;
     }
 
-    public function FetchAccessToken()
+    /**
+     * Gets the Access and Refresh Token.
+     * The beamer token is needed for all requests.
+     * It is valid for 10 minutes, after this you can use the refresh token or just get a new bearer token.
+     *
+     * @return string
+     * Returns the access token.
+     */
+    public function GetBearerToken()
     {
-        $accessToken = '';
-        // Check if we already have a valid access token in cache
-        $data = $this->GetBuffer('AccessToken');
-        if ($data != '') {
-            $data = json_decode($data);
-            if (time() < $data->Expires) {
-                $this->SendDebug(__FUNCTION__, 'OK! Access Token is valid until ' . date('d.m.y H:i:s', $data->Expires), 0);
-                return $data->AccessToken;
+        $buffer = json_decode($this->GetBuffer('AccessToken'));
+        $accessToken = $buffer->AccessToken;
+        $accessTokenExpires = $buffer->Expires;
+        //Check if we already have a valid access token in cache
+        if (!empty($accessTokenExpires)) {
+            if (time() < $accessTokenExpires) {
+                $this->SendDebug(__FUNCTION__, 'OK! Access Token is valid until ' . date('d.m.y H:i:s', $accessTokenExpires), 0);
+                return $accessToken;
             }
         }
-        // If we slipped here we need to fetch the new access token
+        //If we slipped here we need to fetch the new access token
         $this->SendDebug(__FUNCTION__, 'Expired! Get new Access Token!', 0);
         $userName = urlencode($this->ReadPropertyString('UserName'));
         $password = urlencode($this->ReadPropertyString('Password'));
-        $clientSecret = $this->GetBuffer('ClientSecret');
+        if (empty($userName) || empty($password)) {
+            return $accessToken;
+        }
+        $clientSecret = json_decode($this->GetBuffer('ClientSecret'))->ClientSecret;
         if (empty($clientSecret)) {
             $clientSecret = $this->GetClientSecret();
-        } else {
-            $clientSecret = json_decode($this->GetBuffer('ClientSecret'))->ClientSecret;
         }
         $timeout = round($this->ReadPropertyInteger('Timeout') / 1000);
+        //Send data to endpoint
         $ch = curl_init();
         curl_setopt_array($ch, [
             CURLOPT_URL             => 'https://auth.tado.com/oauth/token',
@@ -111,7 +122,7 @@ trait webOAuth
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if (!curl_errno($ch)) {
             switch ($http_code) {
-                    case 200:  # OK
+                    case 200: #OK
                         $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
                         $header = substr($response, 0, $header_size);
                         $body = substr($response, $header_size);
@@ -121,17 +132,23 @@ trait webOAuth
                         if (!isset($data->token_type) || $data->token_type != 'bearer') {
                             die('Bearer Token expected');
                         }
-                        // Update parameters to properly cache it in the next step
+                        //Update parameters to properly cache it in the next step
+                        //Save current access token
                         $accessToken = $data->access_token;
                         $expires = time() + $data->expires_in;
                         $this->SendDebug(__FUNCTION__, 'AccessToken: ' . $accessToken, 0);
                         $this->SendDebug(__FUNCTION__, 'New Access Token is valid until ' . date('d.m.y H:i:s', $expires), 0);
-                        // Save current access token
                         $this->SetBuffer('AccessToken', json_encode(['AccessToken' => $accessToken, 'Expires' => $expires]));
-                        // Save refresh token
-                        $this->SetBuffer('RefreshToken', json_encode(['RefreshToken' => $data->refresh_token]));
-                        // Save scope
-                        $this->SetBuffer('Scope', json_encode(['Scope' => $data->scope]));
+                        //Save refresh token
+                        $refreshToken = $data->refresh_token;
+                        $this->SendDebug(__FUNCTION__, 'RefreshToken: ' . $refreshToken, 0);
+                        $this->SetBuffer('RefreshToken', json_encode(['RefreshToken' => $refreshToken]));
+                        //Save scope
+                        $scope = $data->scope;
+                        $this->SendDebug(__FUNCTION__, 'Scope: ' . $scope, 0);
+                        $this->SetBuffer('Scope', json_encode(['Scope' => $scope]));
+                        //Update parameters
+                        $this->UpdateParameters();
                         break;
 
                     default:
@@ -140,66 +157,10 @@ trait webOAuth
         } else {
             $error_msg = curl_error($ch);
             $this->SendDebug(__FUNCTION__, 'An error has occurred: ' . json_encode($error_msg), 0);
-            $this->LogMessage(__FUNCTION__ . ', An error has occurred: ' . json_encode($error_msg), 10205);
+            $this->LogMessage('ID ' . $this->InstanceID . ', ' . __FUNCTION__ . ', An error has occurred: ' . json_encode($error_msg), KL_ERROR);
         }
         curl_close($ch);
-        // Return current access token
+        //Return current access token
         return $accessToken;
     }
-
-    // ToDo: Rework necessary
-
-    /**
-     * Refreshes the tokens for authentication against my.tado.com.
-     * Writes the access token and the refresh token to their attributes.
-     *
-     * @return array
-     * Returns an array of the tokens.
-     *
-     */
-    private function RefreshTokens(): array
-    {
-        $clientSecret = $this->ReadAttributeString('ClientSecret');
-        $refreshToken = $this->ReadAttributeString('RefreshToken');
-        $scope = $this->ReadAttributeString('Scope');
-        if (empty($clientSecret) || empty($refreshToken) || empty($scope)) {
-            $this->SendDebug('RefreshTokens', 'Try to get tokens first!', 0);
-            $this->GetBearerToken();
-            return [];
-        }
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://auth.tado.com/oauth/token');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, 'grant_type=refresh_token&refresh_token=' . $refreshToken . '&client_id=tado-web-app&scope=' . $scope . '&client_secret=' . $clientSecret);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        $headers = [];
-        $headers[] = 'Content-Type: application/x-www-form-urlencoded';
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $result = curl_exec($ch);
-        $error = curl_error($ch);
-        curl_close($ch);
-        if ($error) {
-            $this->SendDebug('Error', 'RefreshTokens: ' . $error, 0);
-            $this->SetStatus(204);
-        } else {
-            $this->SendDebug('RefreshTokens', $result, 0);
-            $data = json_decode($result, true);
-            // Access token
-            $accessToken = $data['access_token'];
-            if (empty($accessToken)) {
-                $this->Setstatus(204);
-            }
-            $this->SendDebug('AccessToken', $accessToken, 0);
-            $this->WriteAttributeString('AccessToken', $accessToken);
-            $tokens[0]['accessToken'] = $accessToken;
-            // Refresh token
-            $refreshToken = $data['refresh_token'];
-            $this->SendDebug('RefreshToken', $refreshToken, 0);
-            $this->WriteAttributeString('RefreshToken', $refreshToken);
-            $tokens[0]['refreshToken'] = $refreshToken;
-        }
-        //$this->SetTimerInterval('RefreshTokens', 500000);
-        return $tokens;
-    }
 }
-

@@ -12,7 +12,7 @@
  * @license     CC BY-NC-SA 4.0
  *              https://creativecommons.org/licenses/by-nc-sa/4.0/
  *
- * @see         https://github.com/ubittner/SymconBoseSwitchboard/Splitter
+ * @see         https://github.com/ubittner/SymconTado/
  *
  * @guids       Library
  *              {2C88856B-7D25-7502-1594-11F588E2C685}
@@ -23,54 +23,57 @@
 
 declare(strict_types=1);
 
-// Include
-include_once __DIR__ . '/../libs/helper/autoload.php';
+include_once __DIR__ . '/../libs/constants.php';
 include_once __DIR__ . '/helper/autoload.php';
 
 class TadoSplitter extends IPSModule
 {
-    // Helper
-    use libs_helper_getModuleInfo;
+    //Helper
     use tadoAPI;
     use webOAuth;
 
     public function Create()
     {
-        // Never delete this line!
+        //Never delete this line!
         parent::Create();
         $this->RegisterProperties();
+        $this->InitializeBuffers();
         $this->RegisterAttributes();
         $this->RegisterTimers();
     }
 
     public function Destroy()
     {
-        // Never delete this line!
+        //Never delete this line!
         parent::Destroy();
     }
 
     public function ApplyChanges()
     {
-        // Wait until IP-Symcon is started
+        //Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
-        // Never delete this line!
+        //Never delete this line!
         parent::ApplyChanges();
-        // Check kernel runlevel
+        //Check kernel runlevel
         if (IPS_GetKernelRunlevel() != KR_READY) {
             return;
         }
-        $this->ResetBuffers();
-        $this->GetClientSecret();
-        $this->FetchAccessToken();
         $this->SetTimers();
-        $this->ResetAttributes();
+        $this->CheckInstanceActive();
         $this->ValidateConfiguration();
+        $this->GetBearerToken();
+
+        /*
+
+
+
 
         $this->GetAccountInformation();
         $this->GetHomeInformation();
         $this->GetZoneInformation();
         $this->GetDevices();
         //$this->GetAccountData();
+         */
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
@@ -91,13 +94,27 @@ class TadoSplitter extends IPSModule
     public function GetConfigurationForm()
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $moduleInfo = $this->GetModuleInfo(TADO_SPLITTER_GUID);
-        $formData['elements'][1]['items'][1]['caption'] = $this->Translate("Instance ID:\t\t") . $this->InstanceID;
-        $formData['elements'][1]['items'][2]['caption'] = $this->Translate("Module:\t\t\t") . $moduleInfo['name'];
-        $formData['elements'][1]['items'][3]['caption'] = "Version:\t\t\t" . $moduleInfo['version'];
-        $formData['elements'][1]['items'][4]['caption'] = $this->Translate("Date:\t\t\t") . $moduleInfo['date'];
-        $formData['elements'][1]['items'][5]['caption'] = $this->Translate("Time:\t\t\t") . $moduleInfo['time'];
-        $formData['elements'][1]['items'][6]['caption'] = $this->Translate("Developer:\t\t") . $moduleInfo['developer'];
+        //Buffer
+        $clientSecret = json_decode($this->GetBuffer('ClientSecret'))->ClientSecret;
+        $formData['actions'][1]['items'][0]['caption'] = "ClientSecret:\t\t\t\t" . $clientSecret;
+        $state = '';
+        $accessToken = json_decode($this->GetBuffer('AccessToken'))->AccessToken;
+        if (!empty($accessToken)) {
+            $state = 'OK';
+        }
+        $formData['actions'][1]['items'][1]['caption'] = "AccessToken:\t\t\t" . $state;
+        $accessTokenExpires = json_decode($this->GetBuffer('AccessToken'))->Expires;
+        if (!empty($accessTokenExpires)) {
+            $accessTokenExpires = date('d.m.y H:i:s', $accessTokenExpires);
+        }
+        $formData['actions'][1]['items'][2]['caption'] = "AccessToken Expires:\t\t" . $accessTokenExpires;
+        $refreshToken = json_decode($this->GetBuffer('RefreshToken'))->RefreshToken;
+        if (!empty($refreshToken)) {
+            $state = 'OK';
+        }
+        $formData['actions'][1]['items'][3]['caption'] = "RefreshToken:\t\t\t" . $state;
+        $scope = json_decode($this->GetBuffer('Scope'))->Scope;
+        $formData['actions'][1]['items'][4]['caption'] = "Scope:\t\t\t\t\t" . $scope;
         return json_encode($formData);
     }
 
@@ -185,18 +202,15 @@ class TadoSplitter extends IPSModule
         return $result;
     }
 
-    public function ResetBuffers()
+    public function InitializeBuffers()
     {
-        $this->SetBuffer('ClientSecret', '');
-        $this->SetBuffer('AccessToken', '');
-        $this->SetBuffer('RefreshToken', '');
-        $this->SetBuffer('Scope', '');
-
+        $this->SetBuffer('ClientSecret', json_encode(['ClientSecret' => '']));
+        $this->SetBuffer('AccessToken', json_encode(['AccessToken' => '', 'Expires' => '']));
+        $this->SetBuffer('RefreshToken', json_encode(['RefreshToken' => '']));
+        $this->SetBuffer('Scope', json_encode(['Scope' => '']));
+        $this->UpdateParameters();
     }
 
-    /**
-     * Resets the attributes.
-     */
     public function ResetAttributes()
     {
         $this->WriteAttributeString('AccountInformation', '');
@@ -215,12 +229,11 @@ class TadoSplitter extends IPSModule
 
     private function RegisterProperties(): void
     {
-        $this->RegisterPropertyString('Note', '');
+        $this->RegisterPropertyBoolean('Active', true);
         $this->RegisterPropertyString('UserName', '');
         $this->RegisterPropertyString('Password', '');
         $this->RegisterPropertyInteger('Timeout', 5000);
-        $this->RegisterPropertyInteger('UpdateInterval', 60);
-        $this->RegisterPropertyString('Token', '');
+        $this->RegisterPropertyInteger('UpdateInterval', 0);
     }
 
     private function RegisterAttributes(): void
@@ -240,11 +253,44 @@ class TadoSplitter extends IPSModule
     private function SetTimers()
     {
         $status = IPS_GetInstance($this->InstanceID)['InstanceStatus'];
-        if ($status == 102) {
-            // Update data
-            $updateInterval = $this->ReadPropertyInteger('UpdateInterval');
+        $updateInterval = $this->ReadPropertyInteger('UpdateInterval');
+        if ($status == 102 || $updateInterval == 0) {
             $this->SetTimerInterval('Update', $updateInterval * 1000);
         }
+    }
+
+    private function UpdateParameters(): void
+    {
+        //Buffer client secret
+        $clientSecret = json_decode($this->GetBuffer('ClientSecret'))->ClientSecret;
+        $caption = 'ClientSecret: ' . $clientSecret;
+        $this->UpdateFormField('BufferClientSecret', 'caption', $caption);
+        //Buffer access token
+        $state = '';
+        $accessToken = json_decode($this->GetBuffer('AccessToken'))->AccessToken;
+        if (!empty($accessToken)) {
+            $state = 'OK';
+        }
+        $caption = 'AccessToken: ' . $state;
+        $this->UpdateFormField('BufferAccessToken', 'caption', $caption);
+        //Buffer access token expires
+        $accessTokenExpires = json_decode($this->GetBuffer('AccessToken'))->Expires;
+        if (!empty($accessTokenExpires)) {
+            $accessTokenExpires = date('d.m.y H:i:s', $accessTokenExpires);
+        }
+        $caption = 'AccessToken Expires: ' . $accessTokenExpires;
+        $this->UpdateFormField('BufferAccessTokenExpires', 'caption', $caption);
+        //Buffer refresh token
+        $refreshToken = json_decode($this->GetBuffer('RefreshToken'))->RefreshToken;
+        if (!empty($refreshToken)) {
+            $state = 'OK';
+        }
+        $caption = 'RefreshToken: ' . $state;
+        $this->UpdateFormField('BufferRefreshToken', 'caption', $caption);
+        //Buffer scope
+        $scope = json_decode($this->GetBuffer('Scope'))->Scope;
+        $caption = 'Scope: ' . $scope;
+        $this->UpdateFormField('BufferScope', 'caption', $caption);
     }
 
     private function ValidateConfiguration(): void
@@ -263,5 +309,18 @@ class TadoSplitter extends IPSModule
             $status = 201;
         }
         $this->SetStatus($status);
+    }
+
+    private function CheckInstanceActive(): bool
+    {
+        $result = $this->ReadPropertyBoolean('Active');
+        $status = 102;
+        if (!$result) {
+            $status = 104;
+            $this->SendDebug(__FUNCTION__, 'Instance is inactive!', 0);
+        }
+        $this->SetStatus($status);
+        IPS_SetDisabled($this->InstanceID, !$result);
+        return $result;
     }
 }

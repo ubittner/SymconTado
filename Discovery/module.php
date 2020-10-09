@@ -1,5 +1,9 @@
 <?php
 
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUnused */
+/** @noinspection PhpUnusedPrivateMethodInspection */
+
 /*
  * @module      Tado Discovery
  *
@@ -12,7 +16,7 @@
  * @license     CC BY-NC-SA 4.0
  *              https://creativecommons.org/licenses/by-nc-sa/4.0/
  *
- * @see         https://github.com/ubittner/SymconBoseSwitchboard/Discovery
+ * @see         https://github.com/ubittner/SymconTado/
  *
  * @guids       Library
  *              {2C88856B-7D25-7502-1594-11F588E2C685}
@@ -23,35 +27,29 @@
 
 declare(strict_types=1);
 
-include_once __DIR__ . '/../libs/helper/autoload.php';
+include_once __DIR__ . '/../libs/constants.php';
 
 class TadoDiscovery extends IPSModule
 {
-    // Helper
-    use libs_helper_getModuleInfo;
-
     public function Create()
     {
-        // Never delete this line!
+        //Never delete this line!
         parent::Create();
-        // Properties
-        $this->RegisterPropertyString('Note', '');
-        $this->RegisterPropertyInteger('CategoryID', 0);
     }
 
     public function Destroy()
     {
-        // Never delete this line!
+        //Never delete this line!
         parent::Destroy();
     }
 
     public function ApplyChanges()
     {
-        // Wait until IP-Symcon is started
+        //Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
-        // Never delete this line!
+        //Never delete this line!
         parent::ApplyChanges();
-        // Check runlevel
+        //Check runlevel
         if (IPS_GetKernelRunlevel() != KR_READY) {
             return;
         }
@@ -60,11 +58,6 @@ class TadoDiscovery extends IPSModule
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
         $this->SendDebug(__FUNCTION__, $TimeStamp . ', SenderID: ' . $SenderID . ', Message: ' . $Message . ', Data: ' . print_r($Data, true), 0);
-        if (!empty($Data)) {
-            foreach ($Data as $key => $value) {
-                $this->SendDebug(__FUNCTION__, 'Data[' . $key . '] = ' . json_encode($value), 0);
-            }
-        }
         switch ($Message) {
             case IPS_KERNELSTARTED:
                 $this->KernelReady();
@@ -76,37 +69,19 @@ class TadoDiscovery extends IPSModule
     public function GetConfigurationForm()
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $moduleInfo = $this->GetModuleInfo(TADO_DISCOVERY_GUID);
-        $formData['elements'][1]['items'][1]['caption'] = $this->Translate("Instance ID:\t\t") . $this->InstanceID;
-        $formData['elements'][1]['items'][2]['caption'] = $this->Translate("Module:\t\t\t") . $moduleInfo['name'];
-        $formData['elements'][1]['items'][3]['caption'] = "Version:\t\t\t" . $moduleInfo['version'];
-        $formData['elements'][1]['items'][4]['caption'] = $this->Translate("Date:\t\t\t") . $moduleInfo['date'];
-        $formData['elements'][1]['items'][5]['caption'] = $this->Translate("Time:\t\t\t") . $moduleInfo['time'];
-        $formData['elements'][1]['items'][6]['caption'] = $this->Translate("Developer:\t\t") . $moduleInfo['developer'];
         $values = [];
-        $existingDevices = $this->DiscoverDevices();
-        if (!empty($existingDevices)) {
-            foreach ($existingDevices as $device) {
-                //$productID = $device['productID'];
-                //$instanceID = $this->GetDeviceInstances($productID);
-                $instanceID = 0;
-                $location = $this->GetCategoryPath($this->ReadPropertyInteger(('CategoryID')));
+        $devices = $this->DiscoverDevices();
+        if (!empty($devices)) {
+            foreach ($devices as $device) {
+                $instanceID = $this->GetBridgeInstanceID();
                 $values[] = [
                     'IP'          => $device['ip'],
                     'ProductName' => $device['name'],
                     'ProductID'   => $device['id'],
                     'instanceID'  => $instanceID,
-                    /*
                     'create'      => [
-                        'moduleID'      => BOSE_SWITCHBOARD_DEVICE_GUID,
-                        'configuration' => [
-                            'ProductID'   => (string) $productID,
-                            'ProductName' => (string) $device['productName'],
-                            'ProductType' => (string) $device['productType']
-                        ],
-                        'location' => $location
+                        'moduleID'      => TADO_SPLITTER_GUID
                     ]
-                     */
                 ];
             }
         }
@@ -114,28 +89,7 @@ class TadoDiscovery extends IPSModule
         return json_encode($formData);
     }
 
-    //#################### Private
-
-    private function KernelReady()
-    {
-        $this->ApplyChanges();
-    }
-
-    private function GetCategoryPath(int $CategoryID)
-    {
-        if ($CategoryID === 0) {
-            return [];
-        }
-        $path[] = IPS_GetName($CategoryID);
-        $parentID = IPS_GetObject($CategoryID)['ParentID'];
-        while ($parentID > 0) {
-            $path[] = IPS_GetName($parentID);
-            $parentID = IPS_GetObject($parentID)['ParentID'];
-        }
-        return array_reverse($path);
-    }
-
-    private function DiscoverDevices()
+    public function DiscoverDevices()
     {
         $ids = IPS_GetInstanceListByModuleID(CORE_DNS_SD_GUID);
         $devices = ZC_QueryServiceType($ids[0], '_hap._tcp.', '');
@@ -180,17 +134,21 @@ class TadoDiscovery extends IPSModule
         return $existingDevices;
     }
 
-    private function GetDeviceInstances($DeviceUID)
+    #################### Private
+
+    private function KernelReady()
     {
-        /*
-        $instanceID = 0;
-        $instanceIDs = IPS_GetInstanceListByModuleID(BOSE_SWITCHBOARD_DEVICE_GUID);
-        foreach ($instanceIDs as $id) {
-            if (IPS_GetProperty($id, 'ProductID') == $DeviceUID) {
-                $instanceID = $id;
-            }
+        $this->ApplyChanges();
+    }
+
+    private function GetBridgeInstanceID()
+    {
+        $id = 0;
+        $instances = IPS_GetInstanceListByModuleID(TADO_SPLITTER_GUID);
+        foreach ($instances as $instance) {
+            $id = $instance;
+
         }
-        return $instanceID;
-         */
+        return $id;
     }
 }

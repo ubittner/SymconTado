@@ -1,18 +1,13 @@
 {
   "translations": {
     "de": {
-      "This instance establishes a connection to my.tado.com.\nPlease refer to the documentation for further information.\n": "Diese Instanz stellt eine Verbindung zu my.tado.com her.\nWeitere Informationen entnehmen Sie bitte der Dokumentation.\n",
-      "Instance ID:\t\t": "Instanz ID:\t\t",
-      "Module:\t\t\t": "Modul:\t\t\t",
-      "Date:\t\t\t": "Datum:\t\t\t",
-      "Time:\t\t\t": "Uhrzeit:\t\t\t",
-      "Developer:\t\t": "Entwickler:\t\t",
-      "Note": "Notiz",
-      "Credentials": "Zugangsdaten",
+      "Active": "Aktiv",
+      "Please enter your e-mail address and password for my.tado.com": "Bitte geben Sie Ihre E-Mail Adresse und Kennwort für my.tado.com an",
       "E-Mail Address": "E-Mail Adresse",
       "Password": "Kennwort",
-      "Properties": "Eigenschaften",
+      "milliseconds": "Millisekunden",
       "Update Interval": "Aktualisierungsintervall",
+      "seconds": "Sekunden",
       "Development Area": "Entwicklerbereich",
       "Tado Splitter will be created": "Tado Splitter wird erstellt",
       "Tado Splitter is active": "Tado Splitter ist aktiv",
@@ -22,7 +17,8 @@
       "Please enter your credentials for my.tado.com!": "Bitte geben Sie Ihre Zugangsdaten für my.tado.com an!",
       "Please enter your E-Mail address!": "Bitte geben Sie Ihre E-Mail Adresse an!",
       "Please enter your password!": "Bitte geben Sie Ihre Kennwort an!",
-      "Token is missing or not valid!": "Fehlender oder ungültiger Token!"
+      "Token is missing or not valid!": "Fehlender oder ungültiger Token!",
+      "Instance is inactive!": "Instanz ist inaktiv!"
     }
   }
 }

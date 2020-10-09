@@ -12,7 +12,7 @@
  * @license     CC BY-NC-SA 4.0
  *              https://creativecommons.org/licenses/by-nc-sa/4.0/
  *
- * @see         https://github.com/ubittner/SymconTado/Device
+ * @see         https://github.com/ubittner/SymconTado/
  *
  * @guids       Library
  *              {2C88856B-7D25-7502-1594-11F588E2C685}
@@ -24,13 +24,10 @@
 declare(strict_types=1);
 
 // Include
-include_once __DIR__ . '/../libs/helper/autoload.php';
+include_once __DIR__ . '/../libs/constants.php';
 
 class TadoDevice extends IPSModule
 {
-    // Helper
-    use libs_helper_getModuleInfo;
-
     public function Create()
     {
         //Never delete this line!
@@ -38,24 +35,24 @@ class TadoDevice extends IPSModule
         $this->RegisterProperties();
         $this->CreateProfiles();
         $this->RegisterVariables();
-        // Connect to Tado Splitter
+        //Connect to Tado Splitter
         $this->ConnectParent(TADO_SPLITTER_GUID);
     }
 
     public function Destroy()
     {
-        // Never delete this line!
+        //Never delete this line!
         parent::Destroy();
         $this->DeleteProfiles();
     }
 
     public function ApplyChanges()
     {
-        // Wait until IP-Symcon is started
+        //Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
         //Never delete this line!
         parent::ApplyChanges();
-        // Check kernel runlevel
+        //Check kernel runlevel
         if (IPS_GetKernelRunlevel() != KR_READY) {
             return;
         }
@@ -68,19 +65,13 @@ class TadoDevice extends IPSModule
             case IPS_KERNELSTARTED:
                 $this->KernelReady();
                 break;
+
         }
     }
 
     public function GetConfigurationForm()
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $moduleInfo = $this->GetModuleInfo(TADO_DEVICE_GUID);
-        $formData['elements'][1]['items'][1]['caption'] = $this->Translate("Instance ID:\t\t") . $this->InstanceID;
-        $formData['elements'][1]['items'][2]['caption'] = $this->Translate("Module:\t\t\t") . $moduleInfo['name'];
-        $formData['elements'][1]['items'][3]['caption'] = "Version:\t\t\t" . $moduleInfo['version'];
-        $formData['elements'][1]['items'][4]['caption'] = $this->Translate("Date:\t\t\t") . $moduleInfo['date'];
-        $formData['elements'][1]['items'][5]['caption'] = $this->Translate("Time:\t\t\t") . $moduleInfo['time'];
-        $formData['elements'][1]['items'][6]['caption'] = $this->Translate("Developer:\t\t") . $moduleInfo['developer'];
         return json_encode($formData);
     }
 
@@ -107,47 +98,6 @@ class TadoDevice extends IPSModule
         }
     }
 
-    private function UpdateData(string $Data): void
-    {
-        $zoneID = $this->ReadPropertyString('ZoneID');
-        $zoneStates = json_decode($Data, true);
-        if (!empty($zoneStates)) {
-            foreach ($zoneStates as $ID => $state) {
-                if ($ID == $zoneID) {
-                    if (!empty($state)) {
-                        // Mode
-                        $mode = 1; // automatic
-                        if (array_key_exists('overlayType', $state)) {
-                            if ($state['overlayType'] == 'MANUAL') {
-                                $mode = 0;
-                            }
-                        }
-                        $this->SetValue('Mode', $mode);
-                        // Setpoint temperature
-                        if (array_key_exists('setting', $state)) {
-                            if (array_key_exists('temperature', $state['setting'])) {
-                                $setpointTemperature = $state['setting']['temperature']['celsius'];
-                                $this->SetValue('SetPointTemperature', (float) $setpointTemperature);
-                            }
-                        }
-                        if (array_key_exists('sensorDataPoints', $state)) {
-                            // Inside temperature
-                            if (array_key_exists('insideTemperature', $state['sensorDataPoints'])) {
-                                $insideTemperature = $state['sensorDataPoints']['insideTemperature']['celsius'];
-                                $this->SetValue('RoomTemperature', (float) $insideTemperature);
-                            }
-                            // Humidity
-                            if (array_key_exists('humidity', $state['sensorDataPoints'])) {
-                                $humidity = $state['sensorDataPoints']['humidity']['percentage'];
-                                $this->SetValue('AirHumidity', (float) $humidity);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     #################### Request action
 
     public function RequestAction($Ident, $Value)
@@ -163,6 +113,47 @@ class TadoDevice extends IPSModule
                 //$this->ToggleSetPointTemperature($Value);
                 break;
 
+        }
+    }
+
+    private function UpdateData(string $Data): void
+    {
+        $zoneID = $this->ReadPropertyString('ZoneID');
+        $zoneStates = json_decode($Data, true);
+        if (!empty($zoneStates)) {
+            foreach ($zoneStates as $ID => $state) {
+                if ($ID == $zoneID) {
+                    if (!empty($state)) {
+                        // Mode
+                        $mode = 1; #automatic
+                        if (array_key_exists('overlayType', $state)) {
+                            if ($state['overlayType'] == 'MANUAL') {
+                                $mode = 0;
+                            }
+                        }
+                        $this->SetValue('Mode', $mode);
+                        //Setpoint temperature
+                        if (array_key_exists('setting', $state)) {
+                            if (array_key_exists('temperature', $state['setting'])) {
+                                $setpointTemperature = $state['setting']['temperature']['celsius'];
+                                $this->SetValue('SetPointTemperature', (float) $setpointTemperature);
+                            }
+                        }
+                        if (array_key_exists('sensorDataPoints', $state)) {
+                            //Inside temperature
+                            if (array_key_exists('insideTemperature', $state['sensorDataPoints'])) {
+                                $insideTemperature = $state['sensorDataPoints']['insideTemperature']['celsius'];
+                                $this->SetValue('RoomTemperature', (float) $insideTemperature);
+                            }
+                            //Humidity
+                            if (array_key_exists('humidity', $state['sensorDataPoints'])) {
+                                $humidity = $state['sensorDataPoints']['humidity']['percentage'];
+                                $this->SetValue('AirHumidity', (float) $humidity);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -186,14 +177,14 @@ class TadoDevice extends IPSModule
 
     private function CreateProfiles()
     {
-        // Mode
+        //Mode
         $profile = 'TADO.' . $this->InstanceID . '.Mode';
         if (!IPS_VariableProfileExists($profile)) {
             IPS_CreateVariableProfile($profile, 0);
         }
         IPS_SetVariableProfileAssociation($profile, 0, $this->Translate('Manual'), 'Execute', -1);
         IPS_SetVariableProfileAssociation($profile, 1, $this->Translate('Automatic'), 'Temperature', 0x00FF00);
-        // Set point temperature
+        //Set point temperature
         $profile = 'TADO.' . $this->InstanceID . '.SetPointTemperature';
         if (!IPS_VariableProfileExists($profile)) {
             IPS_CreateVariableProfile($profile, 2);
@@ -217,17 +208,17 @@ class TadoDevice extends IPSModule
 
     private function RegisterVariables(): void
     {
-        // Mode
+        //Mode
         $profile = 'TADO.' . $this->InstanceID . '.Mode';
         $this->RegisterVariableBoolean('Mode', $this->Translate('Mode'), $profile, 10);
         $this->EnableAction('Mode');
-        // Set point temperature
+        //Set point temperature
         $profile = 'TADO.' . $this->InstanceID . '.SetPointTemperature';
         $this->RegisterVariableFloat('SetPointTemperature', $this->Translate('Setpoint temperature'), $profile, 20);
         $this->EnableAction('SetPointTemperature');
-        // Room temperature
+        //Room temperature
         $this->RegisterVariableFloat('RoomTemperature', $this->Translate('Room temperature'), '~Temperature', 30);
-        // Humidity
+        //Humidity
         $this->RegisterVariableFloat('AirHumidity', $this->Translate('Air humidity'), '~Humidity.F', 40);
     }
 }

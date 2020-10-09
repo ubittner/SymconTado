@@ -1,14 +1,6 @@
 {
   "translations": {
     "de": {
-      "This instance determines a tado° internet bridge present on your network.\nPlease refer to the documentation for further information.\n": "Diese Instanz ermittelt die in Ihrem Netzwerk vorhandenen tado° Internet-Bridges.\nWeitere Informationen entnehmen Sie bitte der Dokumentation.\n",
-      "Instance ID:\t\t": "Instanz ID:\t\t",
-      "Module:\t\t\t": "Modul:\t\t\t",
-      "Date:\t\t\t": "Datum:\t\t\t",
-      "Time:\t\t\t": "Uhrzeit:\t\t\t",
-      "Developer:\t\t": "Entwickler:\t\t",
-      "Note": "Notiz",
-      "Category": "Kategorie",
       "IP Address": "IP Adresse",
       "Product Name": "Produkt Name",
       "Product ID": "Produkt ID"

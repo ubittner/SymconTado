@@ -12,7 +12,7 @@
  * @license     CC BY-NC-SA 4.0
  *              https://creativecommons.org/licenses/by-nc-sa/4.0/
  *
- * @see         https://github.com/ubittner/SymconBoseSwitchboard/Discovery
+ * @see         https://github.com/ubittner/SymconTado/
  *
  * @guids       Library
  *              {2C88856B-7D25-7502-1594-11F588E2C685}
@@ -23,36 +23,33 @@
 
 declare(strict_types=1);
 
-include_once __DIR__ . '/../libs/helper/autoload.php';
+include_once __DIR__ . '/../libs/constants.php';
 
 class TadoConfigurator extends IPSModule
 {
-    // Helper
-    use libs_helper_getModuleInfo;
-
     public function Create()
     {
         //Never delete this line!
         parent::Create();
         // Register properties
         $this->RegisterPropertyInteger('CategoryID', 0);
-        // Connect to parent (Tado Splitter)
+        //Connect to parent (Tado Splitter)
         $this->ConnectParent(TADO_SPLITTER_GUID);
     }
 
     public function Destroy()
     {
-        // Never delete this line!
+        //Never delete this line!
         parent::Destroy();
     }
 
     public function ApplyChanges()
     {
-        // Wait until IP-Symcon is started
+        //Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
-        // Never delete this line!
+        //Never delete this line!
         parent::ApplyChanges();
-        // Check runlevel
+        //Check runlevel
         if (IPS_GetKernelRunlevel() != KR_READY) {
             return;
         }
@@ -60,12 +57,7 @@ class TadoConfigurator extends IPSModule
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
-        $this->SendDebug(__FUNCTION__, $TimeStamp . ', SenderID: ' . $SenderID . ', Message: ' . $Message . ', Data: ' . print_r($Data, true), 0);
-        if (!empty($Data)) {
-            foreach ($Data as $key => $value) {
-                $this->SendDebug(__FUNCTION__, 'Data[' . $key . '] = ' . json_encode($value), 0);
-            }
-        }
+        $this->SendDebug('MessageSink', 'SenderID: ' . $SenderID . ', Message: ' . $Message, 0);
         switch ($Message) {
             case IPS_KERNELSTARTED:
                 $this->KernelReady();
@@ -77,28 +69,21 @@ class TadoConfigurator extends IPSModule
     public function GetConfigurationForm(): string
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $moduleInfo = $this->GetModuleInfo(TADO_CONFIGURATOR_GUID);
-        $formData['elements'][1]['items'][1]['caption'] = $this->Translate("Instance ID:\t\t") . $this->InstanceID;
-        $formData['elements'][1]['items'][2]['caption'] = $this->Translate("Module:\t\t\t") . $moduleInfo['name'];
-        $formData['elements'][1]['items'][3]['caption'] = "Version:\t\t\t" . $moduleInfo['version'];
-        $formData['elements'][1]['items'][4]['caption'] = $this->Translate("Date:\t\t\t") . $moduleInfo['date'];
-        $formData['elements'][1]['items'][5]['caption'] = $this->Translate("Time:\t\t\t") . $moduleInfo['time'];
-        $formData['elements'][1]['items'][6]['caption'] = $this->Translate("Developer:\t\t") . $moduleInfo['developer'];
         $values = [];
-        $existingDevices = json_decode($this->GetExistingDevices(), true);
-        if (!empty($existingDevices)) {
-            $this->SendDebug(__FUNCTION__, print_r($existingDevices, true), 0);
+        $devices = json_decode($this->GetDevices(), true);
+        if (!empty($devices)) {
+            $this->SendDebug(__FUNCTION__, print_r($devices, true), 0);
             $location = $this->GetCategoryPath($this->ReadPropertyInteger(('CategoryID')));
-            foreach ($existingDevices as $key => $device) {
+            foreach ($devices as $key => $device) {
                 $serialNumber = (string) $device['shortSerialNo'];
-                $instanceID = $this->GetDeviceInstances($serialNumber);
+                $instanceID = $this->GetDeviceInstanceIDBySerialNumber($serialNumber);
                 if ($device['type'] === 'HEATING') {
                     $values[] = [
                         'DeviceType'   => $device['deviceType'],
                         'SerialNumber' => $device['shortSerialNo'],
                         'HomeID'       => $device['homeId'],
                         'ZoneID'       => $device['zoneId'],
-                        'ZoneName'     => $device['zoneName'],
+                        'name'         => $device['zoneName'],
                         'Type'         => $device['type'],
                         'instanceID'   => $instanceID,
                         'create'       => [
@@ -153,7 +138,7 @@ class TadoConfigurator extends IPSModule
         return array_reverse($path);
     }
 
-    private function GetExistingDevices()
+    private function GetDevices()
     {
         if (!$this->HasActiveParent()) {
             return '';
@@ -168,15 +153,15 @@ class TadoConfigurator extends IPSModule
         return $this->SendDataToParent($data);
     }
 
-    private function GetDeviceInstances(string $SerialNumber)
+    private function GetDeviceInstanceIDBySerialNumber(string $SerialNumber)
     {
-        $instanceID = 0;
-        $instanceIDs = IPS_GetInstanceListByModuleID(TADO_DEVICE_GUID);
-        foreach ($instanceIDs as $id) {
-            if (IPS_GetProperty($id, 'ShortSerialNumber') == $SerialNumber) {
-                $instanceID = $id;
+        $id = 0;
+        $instances = IPS_GetInstanceListByModuleID(TADO_DEVICE_GUID);
+        foreach ($instances as $instance) {
+            if (IPS_GetProperty($instance, 'ShortSerialNumber') == $SerialNumber) {
+                $id = $instance;
             }
         }
-        return $instanceID;
+        return $id;
     }
 }
