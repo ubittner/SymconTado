@@ -17,9 +17,13 @@
   ],
   "actions": [
     {
+      "type": "ProgressBar",
+      "name": "ScanProgress"
+    },
+    {
       "type": "Configurator",
       "name": "Devices",
-      "caption": "Tado Devices",
+      "caption": "tado° Devices",
       "delete": true,
       "sort": {
         "column": "DeviceType",
@@ -38,17 +42,17 @@
         },
         {
           "name": "HomeID",
-          "caption": "HomeID",
+          "caption": "Home ID",
           "width": "100px"
         },
         {
           "name": "ZoneID",
-          "caption": "ZoneID",
+          "caption": "Zone ID",
           "width": "100px"
         },
         {
           "name": "name",
-          "caption": "ZoneName",
+          "caption": "Zone",
           "width": "250px"
         },
         {

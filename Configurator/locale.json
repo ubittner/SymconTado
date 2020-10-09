@@ -3,7 +3,9 @@
     "de": {
       "Please select the category for the Tado devices": "Bitte wählen Sie die Kategorie für die Tado Geräte aus",
       "Category": "Kategorie",
-      "Tado Devices": "Tado Geräte",
+      "Progress": "Fortschritt",
+      "Please wait, searching for devices...": "Bitte warten, Geräte werden gesucht...",
+      "tado° Devices": "tado° Geräte",
       "Device Type": "Gerätetyp",
       "Serial Number": "Seriennummer",
       "Type": "Typ"

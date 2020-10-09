@@ -69,8 +69,15 @@ class TadoDiscovery extends IPSModule
     public function GetConfigurationForm()
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $formData['actions'][0]['current'] = 0;
+        $this->UpdateFormField('ScanProgress', 'indeterminate', false);
+        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Progress'));
+        $this->UpdateFormField('ScanProgress', 'current', 0);
+        $ScriptText = 'IPS_RequestAction(' . $this->InstanceID . ', \'StartDiscover\',true);';
+        IPS_RunScriptText($ScriptText);
+        return json_encode($formData);
+
         /*
+        $formData['actions'][0]['current'] = 0;
         $values = [];
         $bridges = $this->DiscoverBridges();
         if (!empty($bridges)) {
@@ -96,10 +103,18 @@ class TadoDiscovery extends IPSModule
         return json_encode($formData);
     }
 
-    public function DiscoverBridges()
+    public function RequestAction($Ident, $Value)
     {
+        if ($Ident == 'StartDiscover') {
+            $this->DiscoverBridges();
+        }
+    }
+
+    private function DiscoverBridges()
+    {
+        $this->UpdateFormField('ScanProgress', 'indeterminate', true);
+        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Please wait, searching for devices...'));
         $ids = IPS_GetInstanceListByModuleID(CORE_DNS_SD_GUID);
-        $this->UpdateFormField('ScanProgress', 'current', 0);
         $bridges = ZC_QueryServiceType($ids[0], '_hap._tcp.', '');
         $existingBridges = [];
         if (!empty($bridges)) {
@@ -160,8 +175,10 @@ class TadoDiscovery extends IPSModule
                 ];
             }
         }
-        $this->UpdateFormField('Bridges', 'values', json_encode($values));
-        return $existingBridges;
+        $this->UpdateFormField('ScanProgress', 'indeterminate', false);
+        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Progress'));
+        $this->UpdateFormField('ScanProgress', 'current', 100);
+        $this->UpdateFormField('Devices', 'values', json_encode($values));
     }
 
     #################### Private

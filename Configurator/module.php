@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpUnused */
+
 /*
  * @module      Tado Configurator
  *
@@ -69,14 +71,54 @@ class TadoConfigurator extends IPSModule
     public function GetConfigurationForm(): string
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
+        $this->UpdateFormField('ScanProgress', 'indeterminate', false);
+        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Progress'));
+        $this->UpdateFormField('ScanProgress', 'current', 0);
+        $ScriptText = 'IPS_RequestAction(' . $this->InstanceID . ', \'StartDiscover\',true);';
+        IPS_RunScriptText($ScriptText);
+        return json_encode($formData);
+    }
+
+    public function RequestAction($Ident, $Value)
+    {
+        if ($Ident == 'StartDiscover') {
+            $this->GetDevices();
+        }
+    }
+
+    #################### Private
+
+    private function KernelReady()
+    {
+        $this->ApplyChanges();
+    }
+
+    private function GetDevices()
+    {
+        if (!$this->HasActiveParent()) {
+            return;
+        }
+        $this->UpdateFormField('ScanProgress', 'indeterminate', true);
+        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Please wait, searching for devices...'));
+        $data = [];
+        $buffer = [];
+        $data['DataID'] = TADO_SPLITTER_DATA_GUID;
+        $buffer['Command'] = 'GetDevices';
+        $buffer['Params'] = '';
+        $data['Buffer'] = $buffer;
+        $data = json_encode($data);
+        $deviceList = $this->SendDataToParent($data);
+        $this->SendDebug(__FUNCTION__, $deviceList, 0);
+        $totalDevices = count(json_decode($deviceList, true));
+        $this->SendDebug(__FUNCTION__, 'Anzahl Geräte: ' . $totalDevices, 0);
+        $devices = json_decode($deviceList, true);
         $values = [];
-        $devices = json_decode($this->GetDevices(), true);
         if (!empty($devices)) {
             $this->SendDebug(__FUNCTION__, print_r($devices, true), 0);
             $location = $this->GetCategoryPath($this->ReadPropertyInteger(('CategoryID')));
             foreach ($devices as $key => $device) {
                 $serialNumber = (string) $device['shortSerialNo'];
-                $instanceID = $this->GetDeviceInstanceIDBySerialNumber($serialNumber);
+                $instanceID = $this->GetDeviceInstanceID($serialNumber);
                 if ($device['type'] === 'HEATING') {
                     $values[] = [
                         'DeviceType'   => $device['deviceType'],
@@ -113,15 +155,22 @@ class TadoConfigurator extends IPSModule
                 }
             }
         }
-        $formData['actions'][0]['values'] = $values;
-        return json_encode($formData);
+        $this->UpdateFormField('ScanProgress', 'indeterminate', false);
+        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Progress'));
+        $this->UpdateFormField('ScanProgress', 'current', 100);
+        $this->UpdateFormField('Devices', 'values', json_encode($values));
     }
 
-    #################### Private
-
-    private function KernelReady()
+    private function GetDeviceInstanceID(string $SerialNumber)
     {
-        $this->ApplyChanges();
+        $id = 0;
+        $instances = IPS_GetInstanceListByModuleID(TADO_DEVICE_GUID);
+        foreach ($instances as $instance) {
+            if (IPS_GetProperty($instance, 'ShortSerialNumber') == $SerialNumber) {
+                $id = $instance;
+            }
+        }
+        return $id;
     }
 
     private function GetCategoryPath(int $CategoryID)
@@ -136,32 +185,5 @@ class TadoConfigurator extends IPSModule
             $parentID = IPS_GetObject($parentID)['ParentID'];
         }
         return array_reverse($path);
-    }
-
-    private function GetDevices()
-    {
-        if (!$this->HasActiveParent()) {
-            return '';
-        }
-        $data = [];
-        $buffer = [];
-        $data['DataID'] = TADO_SPLITTER_DATA_GUID;
-        $buffer['Command'] = 'GetDevices';
-        $buffer['Params'] = '';
-        $data['Buffer'] = $buffer;
-        $data = json_encode($data);
-        return $this->SendDataToParent($data);
-    }
-
-    private function GetDeviceInstanceIDBySerialNumber(string $SerialNumber)
-    {
-        $id = 0;
-        $instances = IPS_GetInstanceListByModuleID(TADO_DEVICE_GUID);
-        foreach ($instances as $instance) {
-            if (IPS_GetProperty($instance, 'ShortSerialNumber') == $SerialNumber) {
-                $id = $instance;
-            }
-        }
-        return $id;
     }
 }
