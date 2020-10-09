@@ -12,7 +12,7 @@
     },
     {
       "type": "Configurator",
-      "name": "Devices",
+      "name": "Bridges",
       "caption": "tado° Internet Bridges",
       "delete": true,
       "sort": {

@@ -70,6 +70,7 @@ class TadoDiscovery extends IPSModule
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
         $formData['actions'][0]['current'] = 0;
+        /*
         $values = [];
         $bridges = $this->DiscoverBridges();
         if (!empty($bridges)) {
@@ -91,12 +92,12 @@ class TadoDiscovery extends IPSModule
             }
         }
         $formData['actions'][1]['values'] = $values;
+         */
         return json_encode($formData);
     }
 
     public function DiscoverBridges()
     {
-        $this->LogMessage($this->Translate('Background discovery of ONVIF devices started'), KL_NOTIFY);
         $ids = IPS_GetInstanceListByModuleID(CORE_DNS_SD_GUID);
         $this->UpdateFormField('ScanProgress', 'current', 0);
         $bridges = ZC_QueryServiceType($ids[0], '_hap._tcp.', '');
@@ -140,6 +141,26 @@ class TadoDiscovery extends IPSModule
                 }
             }
         }
+        $values = [];
+        if (!empty($existingBridges)) {
+            foreach ($existingBridges as $existingBridge) {
+                $existingBridgeID = (string) $existingBridge['id'];
+                $instanceID = $this->GetBridgeInstanceID($existingBridgeID);
+                $values[] = [
+                    'IP'          => $existingBridge['ip'],
+                    'BridgeName'  => $existingBridge['name'],
+                    'BridgeID'    => $existingBridgeID,
+                    'instanceID'  => $instanceID,
+                    'create'      => [
+                        'moduleID'      => TADO_SPLITTER_GUID,
+                        'configuration' => [
+                            'BridgeID'        => (string) $existingBridgeID
+                        ]
+                    ]
+                ];
+            }
+        }
+        $this->UpdateFormField('Bridges', 'values', json_encode($values));
         return $existingBridges;
     }
 
