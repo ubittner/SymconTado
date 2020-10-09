@@ -100,7 +100,7 @@ class TadoDiscovery extends IPSModule
         }
         $formData['actions'][1]['values'] = $values;
          */
-        return json_encode($formData);
+        //return json_encode($formData);
     }
 
     public function RequestAction($Ident, $Value)
@@ -178,7 +178,7 @@ class TadoDiscovery extends IPSModule
         $this->UpdateFormField('ScanProgress', 'indeterminate', false);
         $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Progress'));
         $this->UpdateFormField('ScanProgress', 'current', 100);
-        $this->UpdateFormField('Devices', 'values', json_encode($values));
+        $this->UpdateFormField('Bridges', 'values', json_encode($values));
     }
 
     #################### Private
