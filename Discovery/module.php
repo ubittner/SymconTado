@@ -193,7 +193,7 @@ class TadoDiscovery extends IPSModule
         $id = 0;
         $instances = IPS_GetInstanceListByModuleID(TADO_SPLITTER_GUID);
         foreach ($instances as $instance) {
-            if (IPS_GetProperty($instance, 'ShortSerialNumber') == $BridgeID) {
+            if (IPS_GetProperty($instance, 'BridgeID') == $BridgeID) {
                 $id = $instance;
             }
         }
