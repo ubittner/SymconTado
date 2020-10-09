@@ -70,18 +70,21 @@ class TadoDiscovery extends IPSModule
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
         $values = [];
-        $devices = $this->DiscoverDevices();
-        if (!empty($devices)) {
-            foreach ($devices as $device) {
-                $instanceID = $this->GetBridgeInstanceID();
+        $bridges = $this->DiscoverBridges();
+        if (!empty($bridges)) {
+            foreach ($bridges as $bridge) {
+                $bridgeID = (string) $bridge['id'];
+                $instanceID = $this->GetBridgeInstanceID($bridgeID);
                 $values[] = [
-                    'IP'          => $device['ip'],
-                    'ProductName' => $device['name'],
-                    'ProductID'   => $device['id'],
+                    'IP'          => $bridge['ip'],
+                    'BridgeName'  => $bridge['name'],
+                    'BridgeID'    => $bridge['id'],
                     'instanceID'  => $instanceID,
                     'create'      => [
                         'moduleID'      => TADO_SPLITTER_GUID,
-                        'configuration' => []
+                        'configuration' => [
+                            'BridgeID'        => (string) $bridge['deviceType']
+                        ]
                     ]
                 ];
             }
@@ -90,17 +93,17 @@ class TadoDiscovery extends IPSModule
         return json_encode($formData);
     }
 
-    public function DiscoverDevices()
+    public function DiscoverBridges()
     {
         $ids = IPS_GetInstanceListByModuleID(CORE_DNS_SD_GUID);
-        $devices = ZC_QueryServiceType($ids[0], '_hap._tcp.', '');
-        $existingDevices = [];
-        if (!empty($devices)) {
-            foreach ($devices as $device) {
+        $bridges = ZC_QueryServiceType($ids[0], '_hap._tcp.', '');
+        $existingBridges = [];
+        if (!empty($bridges)) {
+            foreach ($bridges as $bridge) {
                 $data = [];
-                $deviceInfos = ZC_QueryService($ids[0], $device['Name'], '_hap._tcp.', 'local.');
-                if (!empty($deviceInfos)) {
-                    foreach ($deviceInfos as $info) {
+                $bridgeInfos = ZC_QueryService($ids[0], $bridge['Name'], '_hap._tcp.', 'local.');
+                if (!empty($bridgeInfos)) {
+                    foreach ($bridgeInfos as $info) {
                         if (array_key_exists('TXTRecords', $info)) {
                             $txtRecords = $info['TXTRecords'];
                             foreach ($txtRecords as $record) {
@@ -124,7 +127,7 @@ class TadoDiscovery extends IPSModule
                                             $data['id'] = str_replace('id=', '', $value);
                                         }
                                     }
-                                    array_push($existingDevices, $data);
+                                    array_push($existingBridges, $data);
                                 }
                             }
                         }
@@ -132,7 +135,7 @@ class TadoDiscovery extends IPSModule
                 }
             }
         }
-        return $existingDevices;
+        return $existingBridges;
     }
 
     #################### Private
@@ -142,12 +145,14 @@ class TadoDiscovery extends IPSModule
         $this->ApplyChanges();
     }
 
-    private function GetBridgeInstanceID()
+    private function GetBridgeInstanceID(string $BridgeID)
     {
         $id = 0;
         $instances = IPS_GetInstanceListByModuleID(TADO_SPLITTER_GUID);
         foreach ($instances as $instance) {
-            $id = $instance;
+            if (IPS_GetProperty($instance, 'ShortSerialNumber') == $BridgeID) {
+                $id = $instance;
+            }
         }
         return $id;
     }

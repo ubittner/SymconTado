@@ -234,6 +234,7 @@ class TadoSplitter extends IPSModule
         $this->RegisterPropertyString('Password', '');
         $this->RegisterPropertyInteger('Timeout', 5000);
         $this->RegisterPropertyInteger('UpdateInterval', 0);
+        $this->RegisterPropertyString('BridgeID', '');
     }
 
     private function RegisterAttributes(): void

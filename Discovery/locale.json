@@ -1,9 +1,7 @@
 {
   "translations": {
     "de": {
-      "IP Address": "IP Adresse",
-      "Product Name": "Produkt Name",
-      "Product ID": "Produkt ID"
+      "IP Address": "IP Adresse"
     }
   }
 }

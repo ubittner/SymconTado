@@ -36,6 +36,12 @@
       "name": "UpdateInterval",
       "caption": "Update Interval",
       "suffix": "seconds"
+    },
+    {
+      "type": "ValidationTextBox",
+      "name": "BridgeID",
+      "caption": "Bridge ID (optional)",
+      "width": "600px"
     }
   ],
   "actions": [

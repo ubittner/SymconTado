@@ -9,7 +9,7 @@
     {
       "type": "Configurator",
       "name": "Devices",
-      "caption": "Tado Bridges",
+      "caption": "tado° Internet Bridges",
       "delete": true,
       "sort": {
         "column": "IP",
@@ -22,13 +22,13 @@
           "width": "350px"
         },
         {
-          "name": "ProductName",
-          "caption": "Product Name",
+          "name": "BridgeName",
+          "caption": "Name",
           "width": "350px"
         },
         {
-          "name": "ProductID",
-          "caption": "Product ID",
+          "name": "BridgeID",
+          "caption": "ID",
           "width": "auto"
         }
       ],
