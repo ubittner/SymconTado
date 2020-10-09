@@ -80,7 +80,8 @@ class TadoDiscovery extends IPSModule
                     'ProductID'   => $device['id'],
                     'instanceID'  => $instanceID,
                     'create'      => [
-                        'moduleID'      => TADO_SPLITTER_GUID
+                        'moduleID'      => TADO_SPLITTER_GUID,
+                        'configuration' => []
                     ]
                 ];
             }
@@ -147,7 +148,6 @@ class TadoDiscovery extends IPSModule
         $instances = IPS_GetInstanceListByModuleID(TADO_SPLITTER_GUID);
         foreach ($instances as $instance) {
             $id = $instance;
-
         }
         return $id;
     }
