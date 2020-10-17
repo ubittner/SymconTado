@@ -1,28 +1,13 @@
 {
   "translations": {
     "de": {
-      "This instance controls a smart thermostat or a smart radiator thermostat.\nPlease refer to the documentation for further information.\n": "Diese Instanz steuert ein Smartes Thermostat oder ein Smartes Heizkörper-Thermostat.\nWeitere Informationen entnehmen Sie bitte der Dokumentation.\n",
-      "Instance ID:\t\t": "Instanz ID:\t\t",
-      "Module:\t\t\t": "Modul:\t\t\t",
-      "Date:\t\t\t": "Datum:\t\t\t",
-      "Time:\t\t\t": "Uhrzeit:\t\t\t",
-      "Developer:\t\t": "Entwickler:\t\t",
-      "Note": "Notiz",
-      "Properties": "Eigenschaften",
-      "Device type": "Gerätetyp",
-      "Short serial number": "Sereinnummer",
-      "Type": "Typ",
-      "Tado Device will be created": "Tado Device wird erstellt",
-      "Tado Device is active": "Tado Device ist aktiv",
-      "Tado Device will be deleted": "Tado Device wird gelöscht",
-      "Tado Device is inactive": "Tado Device ist inaktiv",
+      "Update Device State": "Gerätestatus aktualisieren",
+      "Tado Device will be created": "Tado Gerät wird erstellt",
+      "Tado Device is active": "Tado Gerät ist aktiv",
+      "Tado Device will be deleted": "Tado Gerät wird gelöscht",
+      "Tado Device is inactive": "Tado Gerät ist inaktiv",
       "An error has occurred, for further information see messages, log file or debug": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug",
-      "Manual": "Manuell",
-      "Automatic": "Automatik",
-      "Mode": "Modus",
-      "Setpoint temperature": "Eingestellt auf",
-      "Room temperature": "Aktuell",
-      "Air humidity": "Luftfeuchtigkeit"
+      "Battery State": "Batteriestatus"
     }
   }
 }

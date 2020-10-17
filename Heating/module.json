@@ -1,12 +1,13 @@
 {
-  "id": "{55862B9A-A9E9-2A1D-2EA9-C195C18A42EA}",
-  "name": "Tado Configurator",
-  "type": 4,
+  "id": "{F6D924F8-0CAB-2EB7-725D-2640B8F5556B}",
+  "name": "Tado Heating",
+  "type": 3,
   "vendor": "Tado",
   "aliases": [
-    "Tado Configurator"
+    "Tado Heating",
+    "Tado Heizen"
   ],
-  "url": "https://github.com/ubittner/SymconTado/Configurator",
+  "url": "https://github.com/ubittner/SymconTado/Heating",
   "parentRequirements": [
     "{9B0CC551-1523-14B7-8C56-39869942CF02}"
   ],

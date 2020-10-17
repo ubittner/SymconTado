@@ -1,14 +1,19 @@
 {
   "translations": {
     "de": {
-      "Please select the category for the Tado devices": "Bitte wählen Sie die Kategorie für die Tado Geräte aus",
+      "Please select a category": "Bitte wählen Sie eine Kategorie aus",
       "Category": "Kategorie",
-      "Progress": "Fortschritt",
-      "Please wait, searching for devices...": "Bitte warten, Geräte werden gesucht...",
-      "tado° Devices": "tado° Geräte",
-      "Device Type": "Gerätetyp",
-      "Serial Number": "Seriennummer",
-      "Type": "Typ"
+      "Home": "Zuhause",
+      "Identifier": "Kennung",
+      "Type": "Typ",
+      "Heating": "Heizen",
+      "(Room)": "(Raum)",
+      "(Device)": "(Gerät)",
+      "Cooling": "Kühlen",
+      "Devices": "Geräte",
+      "Smart Thermostat": "Smartes Thermostat",
+      "Smart Radiator-Thermostat": "Smartes Heizkörper-Thermostat",
+      "Smart Air Conditioning Control": "Smarte Klimaanlagen-Steuerung"
     }
   }
 }

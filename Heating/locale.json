@@ -1,0 +1,18 @@
+{
+  "translations": {
+    "de": {
+      "Update Zone State": "Zonenstatus aktualisieren",
+      "Tado Heating will be created": "Tado Heizen wird erstellt",
+      "Tado Heating is active": "Tado Heizen ist aktiv",
+      "Tado Heating will be deleted": "Tado Heizen wird gelöscht",
+      "Tado Heating is inactive": "Tado Heizen ist inaktiv",
+      "An error has occurred, for further information see messages, log file or debug": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug",
+      "Manual": "Manuell",
+      "Automatic": "Automatik",
+      "Mode": "Modus",
+      "Setpoint temperature": "Soll-Temperatur",
+      "Room temperature": "Raum-Temperatur (Aktuell)",
+      "Air humidity": "Luftfeuchtigkeit"
+    }
+  }
+}

@@ -6,7 +6,7 @@
     },
     {
       "type": "Label",
-      "caption": "Please select the category for the Tado devices"
+      "caption": "Please select a category"
     },
     {
       "type": "SelectCategory",
@@ -17,48 +17,24 @@
   ],
   "actions": [
     {
-      "type": "ProgressBar",
-      "name": "ScanProgress"
-    },
-    {
       "type": "Configurator",
-      "name": "Devices",
-      "caption": "tado° Devices",
+      "name": "Configurator",
       "delete": true,
-      "sort": {
-        "column": "DeviceType",
-        "direction": "ascending"
-      },
       "columns": [
         {
-          "name": "DeviceType",
-          "caption": "Device Type",
-          "width": "230px"
-        },
-        {
-          "name": "SerialNumber",
-          "caption": "Serial Number",
-          "width": "180px"
-        },
-        {
-          "name": "HomeID",
-          "caption": "Home ID",
-          "width": "100px"
-        },
-        {
-          "name": "ZoneID",
-          "caption": "Zone ID",
-          "width": "100px"
-        },
-        {
           "name": "name",
-          "caption": "Zone",
+          "caption": "Home",
+          "width": "auto"
+        },
+        {
+          "name": "Identifier",
+          "caption": "Identifier",
           "width": "250px"
         },
         {
           "name": "Type",
           "caption": "Type",
-          "width": "auto"
+          "width": "250px"
         }
       ],
       "values": []

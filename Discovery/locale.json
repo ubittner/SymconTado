@@ -1,7 +1,7 @@
 {
   "translations": {
     "de": {
-      "Progress": "Fortschritt",
+      "Discovery finished": "Suche beendet",
       "Please wait, searching for devices...": "Bitte warten, Geräte werden gesucht...",
       "IP Address": "IP Adresse"
     }

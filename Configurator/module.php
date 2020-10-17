@@ -33,9 +33,9 @@ class TadoConfigurator extends IPSModule
     {
         //Never delete this line!
         parent::Create();
-        // Register properties
+        //Register properties
         $this->RegisterPropertyInteger('CategoryID', 0);
-        //Connect to parent (Tado Splitter)
+        //Connect to splitter
         $this->ConnectParent(TADO_SPLITTER_GUID);
     }
 
@@ -71,19 +71,9 @@ class TadoConfigurator extends IPSModule
     public function GetConfigurationForm(): string
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $this->UpdateFormField('ScanProgress', 'indeterminate', false);
-        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Progress'));
-        $this->UpdateFormField('ScanProgress', 'current', 0);
-        $ScriptText = 'IPS_RequestAction(' . $this->InstanceID . ', \'StartDiscover\',true);';
-        IPS_RunScriptText($ScriptText);
+        $values = $this->GetTadoSetup();
+        $formData['actions'][0]['values'] = $values;
         return json_encode($formData);
-    }
-
-    public function RequestAction($Ident, $Value)
-    {
-        if ($Ident == 'StartDiscover') {
-            $this->GetDevices();
-        }
     }
 
     #################### Private
@@ -93,72 +83,169 @@ class TadoConfigurator extends IPSModule
         $this->ApplyChanges();
     }
 
-    private function GetDevices()
+    private function GetTadoSetup()
     {
+        $values = [];
         if (!$this->HasActiveParent()) {
-            return;
+            return $values;
         }
-        $this->UpdateFormField('ScanProgress', 'indeterminate', true);
-        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Please wait, searching for devices...'));
+        $values = [];
+        $location = $this->GetCategoryPath($this->ReadPropertyInteger(('CategoryID')));
+        //Homes
         $data = [];
         $buffer = [];
         $data['DataID'] = TADO_SPLITTER_DATA_GUID;
-        $buffer['Command'] = 'GetDevices';
+        $buffer['Command'] = 'GetAccount';
         $buffer['Params'] = '';
         $data['Buffer'] = $buffer;
         $data = json_encode($data);
-        $deviceList = $this->SendDataToParent($data);
-        $this->SendDebug(__FUNCTION__, $deviceList, 0);
-        $totalDevices = count(json_decode($deviceList, true));
-        $this->SendDebug(__FUNCTION__, 'Anzahl Geräte: ' . $totalDevices, 0);
-        $devices = json_decode($deviceList, true);
-        $values = [];
-        if (!empty($devices)) {
-            $this->SendDebug(__FUNCTION__, print_r($devices, true), 0);
-            $location = $this->GetCategoryPath($this->ReadPropertyInteger(('CategoryID')));
-            foreach ($devices as $key => $device) {
-                $serialNumber = (string) $device['shortSerialNo'];
-                $instanceID = $this->GetDeviceInstanceID($serialNumber);
-                if ($device['type'] === 'HEATING') {
+        $homes = $this->SendDataToParent($data);
+        $this->SendDebug(__FUNCTION__, $homes, 0);
+        $homes = json_decode($homes, true);
+        if (!empty($homes)) {
+            if (array_key_exists('homes', $homes)) {
+                $homes = $homes['homes'];
+                //Zones
+                foreach ($homes as $home) {
+                    $homeID = $home['id'];
+                    $homeName = $home['name'];
                     $values[] = [
-                        'DeviceType'   => $device['deviceType'],
-                        'SerialNumber' => $device['shortSerialNo'],
-                        'HomeID'       => $device['homeId'],
-                        'ZoneID'       => $device['zoneId'],
-                        'name'         => $device['zoneName'],
-                        'Type'         => $device['type'],
-                        'instanceID'   => $instanceID,
-                        'create'       => [
-                            'moduleID'      => TADO_DEVICE_GUID,
-                            'configuration' => [
-                                'DeviceType'        => (string) $device['deviceType'],
-                                'ShortSerialNumber' => (string) $device['shortSerialNo'],
-                                'HomeID'            => (string) $device['homeId'],
-                                'ZoneID'            => (string) $device['zoneId'],
-                                'ZoneName'          => (string) $device['zoneName'],
-                                'Type'              => (string) $device['type'],
-                            ],
-                            'location' => $location
-                        ]
-                    ];
-                }
-                if ($device['type'] != 'HEATING') {
-                    $values[] = [
-                        'DeviceType'   => $device['deviceType'],
-                        'SerialNumber' => $device['shortSerialNo'],
-                        'HomeID'       => $device['homeId'],
-                        'ZoneID'       => $device['zoneId'],
-                        'ZoneName'     => $device['zoneName'],
-                        'Type'         => $device['type'],
-                        'instanceID'   => $instanceID
-                    ];
+                        'id'                    => $homeID,
+                        'name'                  => $homeName . ' (' . $this->Translate('Home') . ')',
+                        'Identifier'            => $homeID,
+                        'Type'                  => ''];
+                    $data = [];
+                    $buffer = [];
+                    $data['DataID'] = TADO_SPLITTER_DATA_GUID;
+                    $buffer['Command'] = 'GetZones';
+                    $buffer['Params'] = $homeID;
+                    $data['Buffer'] = $buffer;
+                    $data = json_encode($data);
+                    $zones = $this->SendDataToParent($data);
+                    $this->SendDebug(__FUNCTION__, $zones, 0);
+                    $zones = json_decode($zones, true);
+                    if (!empty($zones)) {
+                        foreach ($zones as $key => $zone) {
+                            $zoneID = (int) $zone['id'];
+                            $id = $homeID . $zoneID;
+                            if ($zone['type'] == 'HEATING') {
+                                $instanceID = $this->GetZoneInstanceID($zoneID, 0);
+                                $values[] = [
+                                    'id'                    => $id,
+                                    'parent'                => $homeID,
+                                    'name'                  => $zone['name'] . ' ' . $this->Translate('(Room)'),
+                                    'Identifier'            => $homeID . '-' . $zone['id'],
+                                    'Type'                  => $zone['type'],
+                                    'instanceID'            => $instanceID,
+                                    'create'                => [
+                                        'moduleID'      => TADO_HEATING_GUID,
+                                        'name'          => 'Tado ' . $zone['name'] . ' (' . $this->Translate('Heating') . ')',
+                                        'configuration' => [
+                                            'HomeID'                => (string) $homeID,
+                                            'HomeName'              => (string) $homeName,
+                                            'ZoneID'                => (string) $zone['id'],
+                                            'ZoneName'              => (string) $zone['name'],
+                                            'ZoneType'              => (string) $zone['type'],
+                                        ],
+                                        'location' => $location
+                                    ]
+                                ];
+                            }
+                            if ($zone['type'] == 'AIR_CONDITIONING') {
+                                $instanceID = $this->GetZoneInstanceID($zoneID, 1);
+                                $values[] = [
+                                    'id'                    => $id,
+                                    'parent'                => $homeID,
+                                    'name'                  => $zone['name'] . ' ' . $this->Translate('(Room)'),
+                                    'Identifier'            => $homeID . '-' . $zone['id'],
+                                    'Type'                  => $zone['type'],
+                                    'instanceID'            => $instanceID,
+                                    'create'                => [
+                                        'moduleID'      => TADO_HEATING_GUID, //ToDo: change to: TADO_COOLING_GUID,
+                                        'name'          => 'Tado ' . $zone['name'] . ' (' . $this->Translate('Cooling') . ')',
+                                        'configuration' => [
+                                            'HomeID'                => (string) $homeID,
+                                            'HomeName'              => (string) $homeName,
+                                            'ZoneID'                => (string) $zone['id'],
+                                            'ZoneName'              => (string) $zone['name'],
+                                            'ZoneType'              => (string) $zone['type'],
+                                        ],
+                                        'location' => $location
+                                    ]
+                                ];
+                            }
+                            if (array_key_exists('devices', $zone)) {
+                                $devices = $zone['devices'];
+                                foreach ($devices as $index => $device) {
+                                    $this->SendDebug(__FUNCTION__, 'DeviceType : ' . $device['deviceType'], 0);
+                                    switch ($device['deviceType']) {
+                                        case 'RU01':
+                                            $deviceName = $this->Translate('Smart Thermostat');
+                                            $deviceType = 'RU01';
+                                            break;
+
+                                        case 'VA02':
+                                            $deviceName = $this->Translate('Smart Radiator-Thermostat');
+                                            $deviceType = 'VA02';
+                                            break;
+
+                                        case 'WR02':
+                                            $deviceName = $this->Translate('Smart Air Conditioning Control');
+                                            $deviceType = 'WR02';
+                                            break;
+
+                                        default:
+                                            $deviceName = $device['deviceType'];
+                                            $deviceType = $device['deviceType'];
+
+                                    }
+                                    $deviceSerialNumber = $device['serialNo'];
+                                    $this->SendDebug(__FUNCTION__, 'DeviceSerialNumber: ' . $deviceSerialNumber, 0);
+                                    $deviceInstanceID = $this->GetDeviceInstanceID($deviceSerialNumber);
+                                    $this->SendDebug(__FUNCTION__, 'DeviceInstanceID: ' . $deviceInstanceID, 0);
+                                    $values[] = [
+                                        'parent'                => $id,
+                                        'name'                  => $deviceName . ' ' . $this->Translate('(Device)'),
+                                        'Identifier'            => $device['serialNo'],
+                                        'Type'                  => $deviceType,
+                                        'instanceID'            => $deviceInstanceID,
+                                        'create'                => [
+                                            'moduleID'      => TADO_DEVICE_GUID,
+                                            'name'          => 'Tado ' . $this->Translate($deviceName) . ' (' . $device['serialNo'] . ')',
+                                            'configuration' => [
+                                                'DeviceType'                  => (string) $device['deviceType'],
+                                                'DeviceName'                  => (string) $device['deviceType'],
+                                                'SerialNumber'                => (string) $device['serialNo'],
+                                                'ShortSerialNumber'           => (string) $device['shortSerialNo'],
+                                                'HomeID'                      => (string) $homeID
+                                            ],
+                                            'location' => $location
+                                        ]
+                                    ];
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-        $this->UpdateFormField('ScanProgress', 'indeterminate', false);
-        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Progress'));
-        $this->UpdateFormField('ScanProgress', 'current', 100);
-        $this->UpdateFormField('Devices', 'values', json_encode($values));
+        return $values;
+    }
+
+    private function GetZoneInstanceID(int $ZoneID, int $Type)
+    {
+        $id = 0;
+        $moduleID = TADO_HEATING_GUID;
+        if ($Type == 1) {
+            $moduleID = TADO_COOLING_GUID;
+        }
+        $instances = IPS_GetInstanceListByModuleID($moduleID);
+        foreach ($instances as $instance) {
+            if (IPS_GetProperty($instance, 'ZoneID') == $ZoneID) {
+                $id = $instance;
+            }
+        }
+        return $id;
     }
 
     private function GetDeviceInstanceID(string $SerialNumber)
@@ -166,7 +253,7 @@ class TadoConfigurator extends IPSModule
         $id = 0;
         $instances = IPS_GetInstanceListByModuleID(TADO_DEVICE_GUID);
         foreach ($instances as $instance) {
-            if (IPS_GetProperty($instance, 'ShortSerialNumber') == $SerialNumber) {
+            if (IPS_GetProperty($instance, 'SerialNumber') == $SerialNumber) {
                 $id = $instance;
             }
         }

@@ -18,12 +18,11 @@
  *              {2C88856B-7D25-7502-1594-11F588E2C685}
  *
  *              Tado Device
- *             	{F6D924F8-0CAB-2EB7-725D-2640B8F5556B}
+ *             	{07B0E642-8AF4-0E49-5A5E-DA70531CCF7F}
  */
 
 declare(strict_types=1);
 
-// Include
 include_once __DIR__ . '/../libs/constants.php';
 
 class TadoDevice extends IPSModule
@@ -33,9 +32,10 @@ class TadoDevice extends IPSModule
         //Never delete this line!
         parent::Create();
         $this->RegisterProperties();
-        $this->CreateProfiles();
+        //$this->CreateProfiles();
         $this->RegisterVariables();
-        //Connect to Tado Splitter
+        $this->RegisterTimers();
+        //Connect to splitter
         $this->ConnectParent(TADO_SPLITTER_GUID);
     }
 
@@ -43,7 +43,7 @@ class TadoDevice extends IPSModule
     {
         //Never delete this line!
         parent::Destroy();
-        $this->DeleteProfiles();
+        //$this->DeleteProfiles();
     }
 
     public function ApplyChanges()
@@ -56,6 +56,11 @@ class TadoDevice extends IPSModule
         if (IPS_GetKernelRunlevel() != KR_READY) {
             return;
         }
+        //Set update timer
+        $milliseconds = $this->ReadPropertyInteger('UpdateInterval') * 1000;
+        $this->SetTimerInterval('Update', $milliseconds);
+        //Update
+        $this->UpdateDeviceState();
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
@@ -75,81 +80,50 @@ class TadoDevice extends IPSModule
         return json_encode($formData);
     }
 
-    public function Send()
-    {
-        $this->SendDataToParent(json_encode(['DataID' => TADO_SPLITTER_DATA_GUID]));
-    }
-
     public function ReceiveData($JSONString)
     {
-        $this->SendDebug(__FUNCTION__ . ' Start', 'Incomming data', 0);
-        $this->SendDebug(__FUNCTION__ . ' String', $JSONString, 0);
-        $data = json_decode(utf8_decode($JSONString));
-        $dataID = $data->DataID;
-        $this->SendDebug(__FUNCTION__ . ' DataID', json_encode($dataID), 0);
-        $buffer = $data->Buffer;
-        $this->SendDebug(__FUNCTION__ . ' Buffer', json_encode($buffer), 0);
-        $this->SendDebug(__FUNCTION__ . ' End', 'Data received', 0);
-        $method = $buffer->Method;
-        if ($method == 'DataUpdate') {
-            $data = $data->Buffer->Data;
-            $this->SendDebug(__FUNCTION__, 'Buffer Data: ' . json_encode($data), 0);
-            $this->UpdateData(json_encode($data));
-        }
+        //Received data from splitter, not used at the moment
+        $data = json_decode($JSONString);
+        $this->SendDebug(__FUNCTION__, utf8_decode($data->Buffer), 0);
     }
 
-    #################### Request action
-
-    public function RequestAction($Ident, $Value)
+    public function UpdateDeviceState(): void
     {
-        switch ($Ident) {
-            case 'Mode':
-                echo 'Mode';
-                //$this->ToggleMode($Value);
-                break;
-
-            case 'SetPointTemperature':
-                echo 'SetPointTemperature';
-                //$this->ToggleSetPointTemperature($Value);
-                break;
-
+        if (!$this->HasActiveParent()) {
+            $this->SendDebug(__FUNCTION__, 'Parent splitter instance is inactive!', 0);
+            return;
         }
-    }
-
-    private function UpdateData(string $Data): void
-    {
-        $zoneID = $this->ReadPropertyString('ZoneID');
-        $zoneStates = json_decode($Data, true);
-        if (!empty($zoneStates)) {
-            foreach ($zoneStates as $ID => $state) {
-                if ($ID == $zoneID) {
-                    if (!empty($state)) {
-                        // Mode
-                        $mode = 1; #automatic
-                        if (array_key_exists('overlayType', $state)) {
-                            if ($state['overlayType'] == 'MANUAL') {
-                                $mode = 0;
+        $data = [];
+        $buffer = [];
+        $homeID = $this->ReadPropertyString('HomeID');
+        if (empty($homeID)) {
+            $this->SendDebug(__FUNCTION__, 'Error, no home id assigned!', 0);
+            return;
+        }
+        $serialNumber = $this->ReadPropertyString('SerialNumber');
+        if (empty($serialNumber)) {
+            $this->SendDebug(__FUNCTION__, 'Error, no serial number assigned!', 0);
+            return;
+        }
+        $data['DataID'] = TADO_SPLITTER_DATA_GUID;
+        $buffer['Command'] = 'GetDevices';
+        $buffer['Params'] = (int) $homeID;
+        $data['Buffer'] = $buffer;
+        $data = json_encode($data);
+        $devices = json_decode($this->SendDataToParent($data), true);
+        $this->SendDebug(__FUNCTION__, json_encode($devices), 0);
+        if (!empty($devices)) {
+            foreach ($devices as $key => $device) {
+                if (array_key_exists('serialNo', $device)) {
+                    $deviceSerialNumber = $device['serialNo'];
+                    if ($deviceSerialNumber == $serialNumber) {
+                        if (array_key_exists('batteryState', $device)) {
+                            $batteryState = $device['batteryState'];
+                            $state = false;
+                            if ($batteryState != 'NORMAL') {
+                                $state = true;
                             }
-                        }
-                        $this->SetValue('Mode', $mode);
-                        //Setpoint temperature
-                        if (array_key_exists('setting', $state)) {
-                            if (array_key_exists('temperature', $state['setting'])) {
-                                $setpointTemperature = $state['setting']['temperature']['celsius'];
-                                $this->SetValue('SetPointTemperature', (float) $setpointTemperature);
-                            }
-                        }
-                        if (array_key_exists('sensorDataPoints', $state)) {
-                            //Inside temperature
-                            if (array_key_exists('insideTemperature', $state['sensorDataPoints'])) {
-                                $insideTemperature = $state['sensorDataPoints']['insideTemperature']['celsius'];
-                                $this->SetValue('RoomTemperature', (float) $insideTemperature);
-                            }
-                            //Humidity
-                            if (array_key_exists('humidity', $state['sensorDataPoints'])) {
-                                $humidity = $state['sensorDataPoints']['humidity']['percentage'];
-                                $this->SetValue('AirHumidity', (float) $humidity);
-                            }
+                            $this->SetValue('BatteryState', $state);
                         }
                     }
                 }
@@ -166,59 +140,22 @@ class TadoDevice extends IPSModule
 
     private function RegisterProperties()
     {
-        $this->registerPropertyString('Note', '');
         $this->RegisterPropertyString('DeviceType', '');
+        $this->RegisterPropertyString('DeviceName', '');
+        $this->RegisterPropertyString('SerialNumber', '');
         $this->RegisterPropertyString('ShortSerialNumber', '');
         $this->RegisterPropertyString('HomeID', '');
-        $this->RegisterPropertyString('ZoneID', '');
-        $this->RegisterPropertyString('ZoneName', '');
-        $this->RegisterPropertyString('Type', '');
-    }
-
-    private function CreateProfiles()
-    {
-        //Mode
-        $profile = 'TADO.' . $this->InstanceID . '.Mode';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 0);
-        }
-        IPS_SetVariableProfileAssociation($profile, 0, $this->Translate('Manual'), 'Execute', -1);
-        IPS_SetVariableProfileAssociation($profile, 1, $this->Translate('Automatic'), 'Temperature', 0x00FF00);
-        //Set point temperature
-        $profile = 'TADO.' . $this->InstanceID . '.SetPointTemperature';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 2);
-        }
-        IPS_SetVariableProfileIcon($profile, 'Temperature');
-        IPS_SetVariableProfileValues($profile, 0, 25, 0.5);
-        IPS_SetVariableProfileDigits($profile, 1);
-        IPS_SetVariableProfileText($profile, '', ' °C');
-    }
-
-    private function DeleteProfiles(): void
-    {
-        $profiles = ['Mode', 'SetPointTemperature'];
-        foreach ($profiles as $profile) {
-            $profileName = 'TADO.' . $this->InstanceID . '.' . $profile;
-            if (@IPS_VariableProfileExists($profileName)) {
-                IPS_DeleteVariableProfile($profileName);
-            }
-        }
+        $this->RegisterPropertyInteger('UpdateInterval', 0);
     }
 
     private function RegisterVariables(): void
     {
-        //Mode
-        $profile = 'TADO.' . $this->InstanceID . '.Mode';
-        $this->RegisterVariableBoolean('Mode', $this->Translate('Mode'), $profile, 10);
-        $this->EnableAction('Mode');
-        //Set point temperature
-        $profile = 'TADO.' . $this->InstanceID . '.SetPointTemperature';
-        $this->RegisterVariableFloat('SetPointTemperature', $this->Translate('Setpoint temperature'), $profile, 20);
-        $this->EnableAction('SetPointTemperature');
-        //Room temperature
-        $this->RegisterVariableFloat('RoomTemperature', $this->Translate('Room temperature'), '~Temperature', 30);
-        //Humidity
-        $this->RegisterVariableFloat('AirHumidity', $this->Translate('Air humidity'), '~Humidity.F', 40);
+        //Battery state
+        $this->RegisterVariableBoolean('BatteryState', $this->Translate('Battery State'), '~Battery', 10);
+    }
+
+    private function RegisterTimers()
+    {
+        $this->RegisterTimer('Update', 0, 'TADO_UpdateDeviceState(' . $this->InstanceID . ');');
     }
 }

@@ -7,35 +7,46 @@
     {
       "type": "ValidationTextBox",
       "name": "DeviceType",
-      "caption": "Device type"
+      "caption": "DeviceType",
+      "width": "600px"
+    },
+    {
+      "type": "ValidationTextBox",
+      "name": "DeviceName",
+      "caption": "DeviceName",
+      "width": "600px"
+    },
+    {
+      "type": "ValidationTextBox",
+      "name": "SerialNumber",
+      "caption": "SerialNumber",
+      "width": "600px"
     },
     {
       "type": "ValidationTextBox",
       "name": "ShortSerialNumber",
-      "caption": "Short serial number"
+      "caption": "ShortSerialNumber",
+      "width": "600px"
     },
     {
       "type": "ValidationTextBox",
       "name": "HomeID",
-      "caption": "HomeID"
+      "caption": "HomeID",
+      "width": "600px"
     },
     {
-      "type": "ValidationTextBox",
-      "name": "ZoneID",
-      "caption": "ZoneID"
-    },
-    {
-      "type": "ValidationTextBox",
-      "name": "ZoneName",
-      "caption": "ZoneName"
-    },
-    {
-      "type": "ValidationTextBox",
-      "name": "Type",
-      "caption": "Type"
+      "type": "NumberSpinner",
+      "name": "UpdateInterval",
+      "caption": "Update Interval",
+      "suffix": "seconds"
     }
   ],
   "actions": [
+    {
+      "type": "Button",
+      "caption": "Update Device State",
+      "onClick": "echo TADO_UpdateDeviceState($id);"
+    }
   ],
   "status": [
     {

@@ -51,7 +51,6 @@ trait webOAuth
                         $clientSecret = str_replace(["'", ' '], '', $matches[1]);
                         $this->SendDebug(__FUNCTION__, 'ClientSecret: ' . $clientSecret, 0);
                         $this->SetBuffer('ClientSecret', json_encode(['ClientSecret' => $clientSecret]));
-                        $this->UpdateParameters();
                     }
                     break;
 
@@ -61,7 +60,7 @@ trait webOAuth
         } else {
             $error_msg = curl_error($ch);
             $this->SendDebug(__FUNCTION__, 'An error has occurred: ' . json_encode($error_msg), 0);
-            $this->LogMessage('ID ' . $this->InstanceID . ', ' . __FUNCTION__ . ', ' . ', An error has occurred: ' . json_encode($error_msg), KL_WARNING);
+            $this->LogMessage('ID ' . $this->InstanceID . ', ' . __FUNCTION__ . ', ' . ', An error has occurred: ' . json_encode($error_msg), KL_ERROR);
         }
         curl_close($ch);
         return $clientSecret;
@@ -69,7 +68,7 @@ trait webOAuth
 
     /**
      * Gets the Access and Refresh Token.
-     * The beamer token is needed for all requests.
+     * The bearer token is needed for all requests.
      * It is valid for 10 minutes, after this you can use the refresh token or just get a new bearer token.
      *
      * @return string
@@ -147,8 +146,6 @@ trait webOAuth
                         $scope = $data->scope;
                         $this->SendDebug(__FUNCTION__, 'Scope: ' . $scope, 0);
                         $this->SetBuffer('Scope', json_encode(['Scope' => $scope]));
-                        //Update parameters
-                        $this->UpdateParameters();
                         break;
 
                     default:

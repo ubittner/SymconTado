@@ -70,37 +70,11 @@ class TadoDiscovery extends IPSModule
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
         $this->UpdateFormField('ScanProgress', 'indeterminate', false);
-        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Progress'));
+        $this->UpdateFormField('ScanProgress', 'caption', '');
         $this->UpdateFormField('ScanProgress', 'current', 0);
         $ScriptText = 'IPS_RequestAction(' . $this->InstanceID . ', \'StartDiscover\',true);';
         IPS_RunScriptText($ScriptText);
         return json_encode($formData);
-
-        /*
-        $formData['actions'][0]['current'] = 0;
-        $values = [];
-        $bridges = $this->DiscoverBridges();
-        if (!empty($bridges)) {
-            foreach ($bridges as $bridge) {
-                $bridgeID = (string) $bridge['id'];
-                $instanceID = $this->GetBridgeInstanceID($bridgeID);
-                $values[] = [
-                    'IP'          => $bridge['ip'],
-                    'BridgeName'  => $bridge['name'],
-                    'BridgeID'    => $bridgeID,
-                    'instanceID'  => $instanceID,
-                    'create'      => [
-                        'moduleID'      => TADO_SPLITTER_GUID,
-                        'configuration' => [
-                            'BridgeID'        => (string) $bridgeID
-                        ]
-                    ]
-                ];
-            }
-        }
-        $formData['actions'][1]['values'] = $values;
-         */
-        //return json_encode($formData);
     }
 
     public function RequestAction($Ident, $Value)
@@ -176,7 +150,7 @@ class TadoDiscovery extends IPSModule
             }
         }
         $this->UpdateFormField('ScanProgress', 'indeterminate', false);
-        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Progress'));
+        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Discovery finished'));
         $this->UpdateFormField('ScanProgress', 'current', 100);
         $this->UpdateFormField('Bridges', 'values', json_encode($values));
     }
