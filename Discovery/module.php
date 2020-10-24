@@ -97,38 +97,38 @@ class TadoDiscovery extends IPSModule
                 $data = [];
                 $deviceInfos = ZC_QueryService($ids[0], $device['Name'], '_hap._tcp.', 'local.');
                 if (!empty($deviceInfos)) {
-                    foreach ($deviceInfos as $info) {
-                        if (array_key_exists('TXTRecords', $info)) {
-                            $txtRecords = $info['TXTRecords'];
+                    foreach ($deviceInfos as $deviceInfo) {
+                        if (array_key_exists('TXTRecords', $deviceInfo)) {
+                            $txtRecords = $deviceInfo['TXTRecords'];
                             foreach ($txtRecords as $record) {
                                 $match = false;
                                 //Internet bridge
                                 if (strpos($record, 'md=tado Internet Bridge') !== false) {
-                                    $this->SendDebug(__FUNCTION__, print_r($info, true), 0);
+                                    $this->SendDebug(__FUNCTION__, print_r($deviceInfo, true), 0);
                                     $match = true;
-                                    if (empty($info['IPv4'])) {
-                                        $data['ip'] = $info['IPv6'][0];
+                                    if (empty($deviceInfo['IPv4'])) {
+                                        $data['ip'] = $deviceInfo['IPv6'][0];
                                     } else {
-                                        $data['ip'] = $info['IPv4'][0];
+                                        $data['ip'] = $deviceInfo['IPv4'][0];
                                     }
-                                    if (array_key_exists('Name', $info)) {
+                                    if (array_key_exists('Name', $deviceInfo)) {
                                         $search = ['tado Internet Bridge ', '._hap._tcp.local'];
-                                        $data['name'] = str_replace($search, '', $info['Name']);
+                                        $data['name'] = str_replace($search, '', $deviceInfo['Name']);
                                     }
 
                                 }
                                 //Cooling thermostat
                                 if (strpos($record, 'md=AC02') !== false) {
-                                    $this->SendDebug(__FUNCTION__, print_r($info, true), 0);
+                                    $this->SendDebug(__FUNCTION__, print_r($deviceInfo, true), 0);
                                     $match = true;
-                                    if (empty($info['IPv4'])) {
-                                        $data['ip'] = $info['IPv6'][0];
+                                    if (empty($deviceInfo['IPv4'])) {
+                                        $data['ip'] = $deviceInfo['IPv6'][0];
                                     } else {
-                                        $data['ip'] = $info['IPv4'][0];
+                                        $data['ip'] = $deviceInfo['IPv4'][0];
                                     }
-                                    if (array_key_exists('Name', $info)) {
+                                    if (array_key_exists('Name', $deviceInfo)) {
                                         $search = ['Smart AC Control ', '._hap._tcp.local'];
-                                        $data['name'] = str_replace($search, '', $info['Name']);
+                                        $data['name'] = str_replace($search, '', $deviceInfo['Name']);
                                     }
                                 }
                                 if ($match) {
@@ -149,13 +149,12 @@ class TadoDiscovery extends IPSModule
         $values = [];
         if (!empty($existingDevices)) {
             foreach ($existingDevices as $existingDevice) {
-                $existingDeviceID = (string) $existingDevice['id'];
-                $instanceID = $this->GetSplitterInstanceID();
+                //$instanceID = $this->GetSplitterInstanceID();
                 $values[] = [
                     'IPAddress'     => $existingDevice['ip'],
                     'DeviceName'    => $existingDevice['name'],
-                    'MACAddress'    => $existingDeviceID,
-                    'instanceID'    => $instanceID,
+                    'MACAddress'    => $existingDevice['id'],
+                    //'instanceID'    => $instanceID,
                     'create'        => [
                         'moduleID'      => TADO_SPLITTER_GUID
                     ]
