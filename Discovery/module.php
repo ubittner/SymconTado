@@ -112,7 +112,7 @@ class TadoDiscovery extends IPSModule
                                         $data['ip'] = $info['IPv4'][0];
                                     }
                                     if (array_key_exists('Name', $info)) {
-                                        $search = ['tado Internet Bridge', '._hap._tcp.local'];
+                                        $search = ['tado Internet Bridge ', '._hap._tcp.local'];
                                         $data['name'] = str_replace($search, '', $info['Name']);
                                     }
 
@@ -127,7 +127,7 @@ class TadoDiscovery extends IPSModule
                                         $data['ip'] = $info['IPv4'][0];
                                     }
                                     if (array_key_exists('Name', $info)) {
-                                        $search = ['Smart AC Control', '._hap._tcp.local'];
+                                        $search = ['Smart AC Control ', '._hap._tcp.local'];
                                         $data['name'] = str_replace($search, '', $info['Name']);
                                     }
                                 }
