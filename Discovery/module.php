@@ -80,24 +80,24 @@ class TadoDiscovery extends IPSModule
     public function RequestAction($Ident, $Value)
     {
         if ($Ident == 'StartDiscover') {
-            $this->DiscoverBridges();
+            $this->DiscoverDevices();
         }
     }
 
-    private function DiscoverBridges()
+    private function DiscoverDevices()
     {
         $this->UpdateFormField('ScanProgress', 'indeterminate', true);
         $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Please wait, searching for devices...'));
         $ids = IPS_GetInstanceListByModuleID(CORE_DNS_SD_GUID);
-        $bridges = ZC_QueryServiceType($ids[0], '_hap._tcp.', '');
-        $existingBridges = [];
-        if (!empty($bridges)) {
+        $devices = ZC_QueryServiceType($ids[0], '_hap._tcp.', '');
+        $existingDevices = [];
+        if (!empty($devices)) {
             $i = 0;
-            foreach ($bridges as $bridge) {
+            foreach ($devices as $device) {
                 $data = [];
-                $bridgeInfos = ZC_QueryService($ids[0], $bridge['Name'], '_hap._tcp.', 'local.');
-                if (!empty($bridgeInfos)) {
-                    foreach ($bridgeInfos as $info) {
+                $deviceInfos = ZC_QueryService($ids[0], $device['Name'], '_hap._tcp.', 'local.');
+                if (!empty($deviceInfos)) {
+                    foreach ($deviceInfos as $info) {
                         if (array_key_exists('TXTRecords', $info)) {
                             $txtRecords = $info['TXTRecords'];
                             foreach ($txtRecords as $record) {
@@ -112,9 +112,11 @@ class TadoDiscovery extends IPSModule
                                         $data['ip'] = $info['IPv4'][0];
                                     }
                                     if (array_key_exists('Name', $info)) {
-                                        $search = ['tado Internet Bridge ', '._hap._tcp.local'];
-                                        $data['name'] = str_replace($search, '', $info['Name']);
+                                        //$search = ['tado Internet Bridge ', '._hap._tcp.local'];
+                                        //$data['name'] = str_replace($search, '', $info['Name']);
+                                        $data['name'] = $info['Name'];
                                     }
+
                                 }
                                 //Cooling thermostat
                                 if (strpos($record, 'md=AC02') !== false) {
@@ -126,8 +128,9 @@ class TadoDiscovery extends IPSModule
                                         $data['ip'] = $info['IPv4'][0];
                                     }
                                     if (array_key_exists('Name', $info)) {
-                                        $search = ['Smart AC Control ', '._hap._tcp.local'];
-                                        $data['name'] = str_replace($search, '', $info['Name']);
+                                        //$search = ['Smart AC Control ', '._hap._tcp.local'];
+                                        //$data['name'] = str_replace($search, '', $info['Name']);
+                                        $data['name'] = $info['Name'];
                                     }
                                 }
                                 if ($match) {
@@ -136,7 +139,7 @@ class TadoDiscovery extends IPSModule
                                             $data['id'] = str_replace('id=', '', $value);
                                         }
                                     }
-                                    array_push($existingBridges, $data);
+                                    array_push($existingDevices, $data);
                                     $this->UpdateFormField('ScanProgress', 'current', $i++);
                                 }
                             }
@@ -146,20 +149,17 @@ class TadoDiscovery extends IPSModule
             }
         }
         $values = [];
-        if (!empty($existingBridges)) {
-            foreach ($existingBridges as $existingBridge) {
-                $existingBridgeID = (string) $existingBridge['id'];
-                $instanceID = $this->GetBridgeInstanceID($existingBridgeID);
+        if (!empty($existingDevices)) {
+            foreach ($existingDevices as $existingDevice) {
+                $existingDeviceID = (string) $existingDevice['id'];
+                $instanceID = $this->GetSplitterInstanceID();
                 $values[] = [
-                    'IP'          => $existingBridge['ip'],
-                    'BridgeName'  => $existingBridge['name'],
-                    'BridgeID'    => $existingBridgeID,
-                    'instanceID'  => $instanceID,
-                    'create'      => [
-                        'moduleID'      => TADO_SPLITTER_GUID,
-                        'configuration' => [
-                            'BridgeID'        => (string) $existingBridgeID
-                        ]
+                    'IPAddress'     => $existingDevice['ip'],
+                    'DeviceName'    => $existingDevice['name'],
+                    'MACAddress'    => $existingDeviceID,
+                    'instanceID'    => $instanceID,
+                    'create'        => [
+                        'moduleID'      => TADO_SPLITTER_GUID
                     ]
                 ];
             }
@@ -167,7 +167,7 @@ class TadoDiscovery extends IPSModule
         $this->UpdateFormField('ScanProgress', 'indeterminate', false);
         $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Discovery finished'));
         $this->UpdateFormField('ScanProgress', 'current', 100);
-        $this->UpdateFormField('Bridges', 'values', json_encode($values));
+        $this->UpdateFormField('Devices', 'values', json_encode($values));
     }
 
     #################### Private
@@ -177,14 +177,12 @@ class TadoDiscovery extends IPSModule
         $this->ApplyChanges();
     }
 
-    private function GetBridgeInstanceID(string $BridgeID)
+    private function GetSplitterInstanceID()
     {
         $id = 0;
         $instances = IPS_GetInstanceListByModuleID(TADO_SPLITTER_GUID);
-        foreach ($instances as $instance) {
-            if (IPS_GetProperty($instance, 'BridgeID') == $BridgeID) {
-                $id = $instance;
-            }
+        if (!empty($instances)) {
+            $id = $instances[0];
         }
         return $id;
     }

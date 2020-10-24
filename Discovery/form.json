@@ -12,27 +12,26 @@
     },
     {
       "type": "Configurator",
-      "name": "Bridges",
-      "caption": "tado° Internet Bridges",
+      "name": "Devices",
       "delete": true,
       "sort": {
-        "column": "IP",
+        "column": "IPAddress",
         "direction": "ascending"
       },
       "columns": [
         {
-          "name": "IP",
+          "name": "IPAddress",
           "caption": "IP Address",
           "width": "350px"
         },
         {
-          "name": "BridgeName",
+          "name": "DeviceName",
           "caption": "Name",
           "width": "350px"
         },
         {
-          "name": "BridgeID",
-          "caption": "ID",
+          "name": "MACAddress",
+          "caption": "MAC Address",
           "width": "auto"
         }
       ],
