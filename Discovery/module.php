@@ -112,7 +112,8 @@ class TadoDiscovery extends IPSModule
                                         $data['ip'] = $deviceInfo['IPv4'][0];
                                     }
                                     if (array_key_exists('Name', $deviceInfo)) {
-                                        $search = ['tado Internet Bridge ', '._hap._tcp.local'];
+                                        $search = ['._hap._tcp.local'];
+                                        //$search = ['tado Internet Bridge ', '._hap._tcp.local'];
                                         $data['name'] = str_replace($search, '', $deviceInfo['Name']);
                                     }
 
@@ -127,7 +128,8 @@ class TadoDiscovery extends IPSModule
                                         $data['ip'] = $deviceInfo['IPv4'][0];
                                     }
                                     if (array_key_exists('Name', $deviceInfo)) {
-                                        $search = ['Smart AC Control ', '._hap._tcp.local'];
+                                        $search = ['._hap._tcp.local'];
+                                        //$search = ['Smart AC Control ', '._hap._tcp.local'];
                                         $data['name'] = str_replace($search, '', $deviceInfo['Name']);
                                     }
                                 }
@@ -157,8 +159,7 @@ class TadoDiscovery extends IPSModule
                     'instanceID'    => $instanceID,
                     'create'        => [
                         'moduleID'      => TADO_SPLITTER_GUID,
-                        'configuration' => []//,
-                        //'location' => $location
+                        'configuration' => []
                     ]
                 ];
             }
