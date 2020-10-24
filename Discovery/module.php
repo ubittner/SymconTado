@@ -149,14 +149,16 @@ class TadoDiscovery extends IPSModule
         $values = [];
         if (!empty($existingDevices)) {
             foreach ($existingDevices as $existingDevice) {
-                //$instanceID = $this->GetSplitterInstanceID();
+                $instanceID = $this->GetSplitterInstanceID();
                 $values[] = [
                     'IPAddress'     => $existingDevice['ip'],
                     'DeviceName'    => $existingDevice['name'],
                     'MACAddress'    => $existingDevice['id'],
-                    //'instanceID'    => $instanceID,
+                    'instanceID'    => $instanceID,
                     'create'        => [
-                        'moduleID'      => TADO_SPLITTER_GUID
+                        'moduleID'      => TADO_SPLITTER_GUID,
+                        'configuration' => []//,
+                        //'location' => $location
                     ]
                 ];
             }
@@ -181,6 +183,7 @@ class TadoDiscovery extends IPSModule
         if (!empty($instances)) {
             $id = $instances[0];
         }
+        $this->SendDebug(__FUNCTION__, 'Tado Splitter Instace ID:' . $id, 0);
         return $id;
     }
 }
