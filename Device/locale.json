@@ -2,10 +2,10 @@
   "translations": {
     "de": {
       "Update Device State": "Gerätestatus aktualisieren",
-      "Tado Device will be created": "Tado Gerät wird erstellt",
-      "Tado Device is active": "Tado Gerät ist aktiv",
-      "Tado Device will be deleted": "Tado Gerät wird gelöscht",
-      "Tado Device is inactive": "Tado Gerät ist inaktiv",
+      "Tado Device will be created": "Tado Device wird erstellt",
+      "Tado Device is active": "Tado Device ist aktiv",
+      "Tado Device will be deleted": "Tado Device wird gelöscht",
+      "Tado Device is inactive": "Tado Device ist inaktiv",
       "An error has occurred, for further information see messages, log file or debug": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug",
       "Battery State": "Batteriestatus"
     }

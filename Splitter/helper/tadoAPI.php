@@ -4,7 +4,28 @@ declare(strict_types=1);
 
 trait tadoAPI
 {
-    #################### GET
+    public function SetPresenceLock(int $HomeID, int $Mode): string
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/presenceLock';
+        //Auto
+        $request = 'DELETE';
+        $postfields = '';
+        switch ($Mode) {
+            //Home
+            case 1:
+                $request = 'PUT';
+                $postfields = json_encode(['homePresence' => 'HOME']);
+                break;
+
+            //Away
+            case 2:
+                $request = 'PUT';
+                $postfields = json_encode(['homePresence' => 'AWAY']);
+                break;
+
+        }
+        return $this->SendDataToTado($endpoint, $request, $postfields);
+    }
 
     /**
      * This GET endpoint provides general information about the authenticated users, the homes and the devices.
@@ -18,7 +39,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the selcted home.
+     * This GET endpoint provides information about the selected home.
      *
      * @param int $HomeID
      * @return string
@@ -26,6 +47,12 @@ trait tadoAPI
     public function GetHome(int $HomeID): string
     {
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID;
+        return $this->SendDataToTado($endpoint, 'GET', '');
+    }
+
+    public function GetHomeState(int $HomeID): string
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/state';
         return $this->SendDataToTado($endpoint, 'GET', '');
     }
 
@@ -207,28 +234,10 @@ trait tadoAPI
         return $this->SendDataToTado($endpoint, 'GET', '');
     }
 
-    #################### PUT
+    ########## Heating
 
     /**
-     * This PUT endpoint sets the early start for the selected zone of your home.
-     * Only supported for heating zones.
-     *
-     * @param int $HomeID
-     * @param int $ZoneID
-     * @param bool $State
-     * false    = disabled
-     * true     = enabled
-     * @return string
-     */
-    public function SetZoneEarlyStart(int $HomeID, int $ZoneID, bool $State): string
-    {
-        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/earlyStart';
-        $postfields = json_encode(['enabled' => $State]);
-        return $this->SendDataToTado($endpoint, 'PUT', $postfields);
-    }
-
-    /**
-     * This PUT endpoint will make it possible to set a manual temperature for the given zone of your home.
+     * This PUT endpoint will make it possible to set a manual temperature for the given heating zone of your home.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -238,7 +247,7 @@ trait tadoAPI
      * @param float $Temperature
      * @return false|string
      */
-    public function SetZoneTemperatureNoTimer(int $HomeID, int $ZoneID, string $PowerState, float $Temperature)
+    public function SetHeatingZoneTemperature(int $HomeID, int $ZoneID, string $PowerState, float $Temperature)
     {
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
         $postfields = json_encode(['setting' => ['type' => 'HEATING', 'power' => $PowerState, 'temperature' =>['celsius' => $Temperature]], 'termination' => ['type' => 'MANUAL']]);
@@ -246,7 +255,7 @@ trait tadoAPI
     }
 
     /**
-     * This PUT endpoint will make it possible to set a manual temperature for the given zone of your home for a selected time.
+     * This PUT endpoint will make it possible to set a manual temperature for the given heating zone of your home for a selected time.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -257,17 +266,87 @@ trait tadoAPI
      * @param int $DurationInSeconds
      * @return false|string
      */
-    public function SetZoneTemperatureTimer(int $HomeID, int $ZoneID, string $PowerState, int $Temperature, int $DurationInSeconds)
+    public function SetHeatingZoneTemperatureTimer(int $HomeID, int $ZoneID, string $PowerState, int $Temperature, int $DurationInSeconds)
     {
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
         $postfields = json_encode(['setting' => ['type' => 'HEATING', 'power' => $PowerState, 'temperature' =>['celsius' => $Temperature]], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]);
         return $this->SendDataToTado($endpoint, 'PUT', $postfields);
     }
 
-    // SetScheduleTimeTable to be created
-    // SetAwayTimeTable to be created
+    /**
+     * This PUT endpoint will make it possible to set a manual temperature for the given heating zone of your home till the next time block.
+     *
+     * @param int $HomeID
+     * @param int $ZoneID
+     * @param string $PowerState
+     * OFF  = power off
+     * ON   = power on
+     * @param int $Temperature
+     * @return false|string
+     */
+    public function SetHeatingZoneTemperatureTimerNextTimeBlock(int $HomeID, int $ZoneID, string $PowerState, int $Temperature)
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
+        $postfields = json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'HEATING', 'power' => $PowerState, 'temperature' => ['celsius' => $Temperature]], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]);
+        return $this->SendDataToTado($endpoint, 'PUT', $postfields);
+    }
 
-    #################### DEL
+    ########## Cooling
+
+    /**
+     * This PUT endpoint will make it possible to set a manual temperature for the given cooling zone of your home.
+     *
+     * @param int $HomeID
+     * @param int $ZoneID
+     * @param string $PowerState
+     * OFF  = power off
+     * ON   = power on
+     * @param float $Temperature
+     * @return false|string
+     */
+    public function SetCoolingZoneTemperature(int $HomeID, int $ZoneID, string $PowerState, float $Temperature)
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
+        $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => 'COOL', 'temperature' =>['celsius' => $Temperature]], 'termination' => ['type' => 'MANUAL']]);
+        return $this->SendDataToTado($endpoint, 'PUT', $postfields);
+    }
+
+    /**
+     * This PUT endpoint will make it possible to set a manual temperature for the given cooling zone of your home for a selected time.
+     *
+     * @param int $HomeID
+     * @param int $ZoneID
+     * @param string $PowerState
+     * OFF  = power off
+     * ON   = power on
+     * @param int $Temperature
+     * @param int $DurationInSeconds
+     * @return false|string
+     */
+    public function SetCoolingZoneTemperatureTimer(int $HomeID, int $ZoneID, string $PowerState, int $Temperature, int $DurationInSeconds)
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
+        $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => 'COOL', 'temperature' =>['celsius' => $Temperature]], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]);
+        return $this->SendDataToTado($endpoint, 'PUT', $postfields);
+    }
+
+    /**
+     * This PUT endpoint will make it possible to set a manual temperature for the given cooling zone of your home till the next time block.
+     *
+     * @param int $HomeID
+     * @param int $ZoneID
+     * @param string $PowerState
+     * OFF  = power off
+     * ON   = power on
+     * @param int $Temperature
+     * @return false|string
+     */
+    public function SetCoolingZoneTemperatureTimerNextTimeBlock(int $HomeID, int $ZoneID, string $PowerState, int $Temperature)
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
+        $postfields = json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => 'COOL', 'temperature' =>['celsius' => $Temperature]], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]);
+        return $this->SendDataToTado($endpoint, 'PUT', $postfields);
+    }
 
     /**
      * This DELETE endpoint will stop the manual heating settings.
@@ -276,13 +355,11 @@ trait tadoAPI
      * @param int $HomeID
      * @param int $ZoneID
      */
-    public function TurnZoneManualHeatingOff(int $HomeID, int $ZoneID)
+    public function StopManualMode(int $HomeID, int $ZoneID)
     {
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
         $this->SendDataToTado($endpoint, 'DELETE', '');
     }
-
-    #################### POST
 
     /**
      * This POST endpoint is displaying HI! on the selected device.
@@ -303,9 +380,14 @@ trait tadoAPI
     {
         $this->SendDebug(__FUNCTION__, 'Endpoint: ' . $Endpoint, 0);
         $this->SendDebug(__FUNCTION__, 'CustomRequest: ' . $CustomRequest, 0);
-        $accessToken = $this->GetBearerToken();
-        $timeout = round($this->ReadPropertyInteger('Timeout') / 1000);
         $body = '';
+        $accessToken = $this->GetBearerToken();
+        if (is_array(json_decode($accessToken, true))) {
+            if (array_key_exists('error', json_decode($accessToken, true))) {
+                return $body;
+            }
+        }
+        $timeout = round($this->ReadPropertyInteger('Timeout') / 1000);
         // Send data to endpoint
         $ch = curl_init();
         curl_setopt_array($ch, [

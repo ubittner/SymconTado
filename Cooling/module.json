@@ -1,12 +1,12 @@
 {
-  "id": "{F6D924F8-0CAB-2EB7-725D-2640B8F5556B}",
-  "name": "Tado Heating",
+  "id": "{374753E5-0048-7EF7-43C5-D8AAB5CB317B}",
+  "name": "Tado Cooling",
   "type": 3,
   "vendor": "Tado",
   "aliases": [
-    "Tado Heating"
+    "Tado Cooling"
   ],
-  "url": "https://github.com/ubittner/SymconTado/Heating",
+  "url": "https://github.com/ubittner/SymconTado/Cooling",
   "parentRequirements": [
     "{9B0CC551-1523-14B7-8C56-39869942CF02}"
   ],

@@ -72,9 +72,9 @@ trait webOAuth
      * It is valid for 10 minutes, after this you can use the refresh token or just get a new bearer token.
      *
      * @return string
-     * Returns the access token.
+     * Returns the access token or an error code
      */
-    public function GetBearerToken()
+    public function GetBearerToken(): string
     {
         $buffer = json_decode($this->GetBuffer('AccessToken'));
         $accessToken = $buffer->AccessToken;
@@ -150,11 +150,14 @@ trait webOAuth
 
                     default:
                         $this->SendDebug(__FUNCTION__, 'HTTP Code: ' . $http_code, 0);
+                        $accessToken = json_encode(array('error' => $http_code));
+
                 }
         } else {
             $error_msg = curl_error($ch);
             $this->SendDebug(__FUNCTION__, 'An error has occurred: ' . json_encode($error_msg), 0);
             $this->LogMessage('ID ' . $this->InstanceID . ', ' . __FUNCTION__ . ', An error has occurred: ' . json_encode($error_msg), KL_ERROR);
+            $accessToken = json_encode(array('error' => $error_msg));
         }
         curl_close($ch);
         //Return current access token

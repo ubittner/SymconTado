@@ -57,9 +57,7 @@ class TadoSplitter extends IPSModule
         if (IPS_GetKernelRunlevel() != KR_READY) {
             return;
         }
-        $this->CheckInstance();
         $this->ValidateConfiguration();
-        $this->GetBearerToken();
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
@@ -88,6 +86,14 @@ class TadoSplitter extends IPSModule
                 $response = $this->GetAccount();
                 break;
 
+            case 'GetHome':
+                $response = $this->GetHome($data->Buffer->Params);
+                break;
+
+            case 'GetHomeState':
+                $response = $this->GetHomeState($data->Buffer->Params);
+                break;
+
             case 'GetZones':
                 $response = $this->GetZones($data->Buffer->Params);
                 break;
@@ -101,24 +107,45 @@ class TadoSplitter extends IPSModule
                 $response = $this->GetDevices($data->Buffer->Params);
                 break;
 
-            case 'TurnZoneManualHeatingOff':
+            case 'StopManualMode':
                 $params = (array) $data->Buffer->Params;
-                $this->TurnZoneManualHeatingOff($params['homeID'], $params['zoneID']);
+                $this->StopManualMode($params['homeID'], $params['zoneID']);
                 $response = true;
                 break;
 
-            case 'SetZoneTemperatureNoTimer':
+            case 'SetHeatingZoneTemperature':
                 $params = (array) $data->Buffer->Params;
-                $response = $this->SetZoneTemperatureNoTimer($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
+                $response = $this->SetHeatingZoneTemperature($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
                 break;
 
-            case 'SetZoneTemperatureTimer':
+            case 'SetHeatingZoneTemperatureTimer':
                 $params = (array) $data->Buffer->Params;
-                $this->SendDebug(__FUNCTION__, 'HomeID: ' . $params['homeID'], 0);
-                $this->SendDebug(__FUNCTION__, 'ZoneID: ' . $params['zoneID'], 0);
-                $this->SendDebug(__FUNCTION__, 'Temp: ' . $params['temperature'], 0);
-                $this->SendDebug(__FUNCTION__, 'Duration: ' . $params['durationInSeconds'], 0);
-                $response = $this->SetZoneTemperatureTimer($params['homeID'], $params['zoneID'], $params['power'], $params['temperature'], $params['durationInSeconds']);
+                $response = $this->SetHeatingZoneTemperatureTimer($params['homeID'], $params['zoneID'], $params['power'], $params['temperature'], $params['durationInSeconds']);
+                break;
+
+            case 'SetHeatingZoneTemperatureTimerNextTimeBlock':
+                $params = (array) $data->Buffer->Params;
+                $response = $this->SetHeatingZoneTemperatureTimerNextTimeBlock($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
+                break;
+
+            case 'SetCoolingZoneTemperature':
+                $params = (array) $data->Buffer->Params;
+                $response = $this->SetCoolingZoneTemperature($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
+                break;
+
+            case 'SetCoolingZoneTemperatureTimer':
+                $params = (array) $data->Buffer->Params;
+                $response = $this->SetCoolingZoneTemperatureTimer($params['homeID'], $params['zoneID'], $params['power'], $params['temperature'], $params['durationInSeconds']);
+                break;
+
+            case 'SetCoolingZoneTemperatureTimerNextTimeBlock':
+                $params = (array) $data->Buffer->Params;
+                $response = $this->SetCoolingZoneTemperatureTimerNextTimeBlock($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
+                break;
+
+            case 'SetPresenceLock':
+                $params = (array) $data->Buffer->Params;
+                $response = $this->SetPresenceLock($params['homeID'], $params['awayMode']);
                 break;
 
             default:
@@ -127,15 +154,6 @@ class TadoSplitter extends IPSModule
         }
         $this->SendDebug(__FUNCTION__, $response, 0);
         return $response;
-    }
-
-    public function ResetAttributes()
-    {
-        $this->WriteAttributeString('AccountInformation', '');
-        $this->WriteAttributeString('HomeInformation', '');
-        $this->WriteAttributeString('ZoneInformation', '');
-        $this->WriteAttributeString('Devices', '');
-        $this->WriteAttributeString('ZoneState', '');
     }
 
     #################### Private
@@ -175,25 +193,39 @@ class TadoSplitter extends IPSModule
             $this->SendDebug(__FUNCTION__, 'Instance is inactive!', 0);
         }
         $this->SetStatus($status);
-        IPS_SetDisabled($this->InstanceID, !$result);
+        //IPS_SetDisabled($this->InstanceID, !$result);
         return $result;
     }
 
     private function ValidateConfiguration()
     {
+        $this->SendDebug(__FUNCTION__, 'Validate configuration', 0);
         $status = 102;
+        $userName = $this->ReadPropertyString('UserName');
+        $password = $this->ReadPropertyString('Password');
         // Check password
-        if (empty($this->ReadPropertyString('Password'))) {
+        if (empty($password)) {
             $status = 203;
         }
         // Check user name
-        if (empty($this->ReadPropertyString('UserName'))) {
+        if (empty($userName)) {
             $status = 202;
         }
         // Check user name and password
-        if (empty($this->ReadPropertyString('Password')) && empty($this->ReadPropertyString('UserName'))) {
+        if (empty($userName) && empty($password)) {
             $status = 201;
         }
-        $this->SetStatus($status);
+        if (!empty($userName) && !empty($password)) {
+            $token = $this->GetBearerToken();
+            if (is_array(json_decode($token, true))) {
+                if (array_key_exists('error', json_decode($token, true))) {
+                    $status = 204;
+                }
+            }
+        }
+        $active = $this->CheckInstance();
+        if ($active) {
+            $this->SetStatus($status);
+        }
     }
 }

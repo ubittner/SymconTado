@@ -102,6 +102,7 @@ class TadoDiscovery extends IPSModule
                             $txtRecords = $info['TXTRecords'];
                             foreach ($txtRecords as $record) {
                                 $match = false;
+                                //Internet bridge
                                 if (strpos($record, 'md=tado Internet Bridge') !== false) {
                                     $this->SendDebug(__FUNCTION__, print_r($info, true), 0);
                                     $match = true;
@@ -112,6 +113,20 @@ class TadoDiscovery extends IPSModule
                                     }
                                     if (array_key_exists('Name', $info)) {
                                         $search = ['tado Internet Bridge ', '._hap._tcp.local'];
+                                        $data['name'] = str_replace($search, '', $info['Name']);
+                                    }
+                                }
+                                //Cooling thermostat
+                                if (strpos($record, 'md=AC02') !== false) {
+                                    $this->SendDebug(__FUNCTION__, print_r($info, true), 0);
+                                    $match = true;
+                                    if (empty($info['IPv4'])) {
+                                        $data['ip'] = $info['IPv6'][0];
+                                    } else {
+                                        $data['ip'] = $info['IPv4'][0];
+                                    }
+                                    if (array_key_exists('Name', $info)) {
+                                        $search = ['Smart AC Control ', '._hap._tcp.local'];
                                         $data['name'] = str_replace($search, '', $info['Name']);
                                     }
                                 }

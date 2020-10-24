@@ -7,31 +7,31 @@
     {
       "type": "ValidationTextBox",
       "name": "HomeID",
-      "caption": "HomeID",
+      "caption": "Home ID",
       "width": "600px"
     },
     {
       "type": "ValidationTextBox",
       "name": "HomeName",
-      "caption": "HomeName",
+      "caption": "Home Name",
       "width": "600px"
     },
     {
       "type": "ValidationTextBox",
       "name": "ZoneID",
-      "caption": "ZoneID",
+      "caption": "Zone ID",
       "width": "600px"
     },
     {
       "type": "ValidationTextBox",
       "name": "ZoneName",
-      "caption": "ZoneName",
+      "caption": "Zone Name",
       "width": "600px"
     },
     {
       "type": "ValidationTextBox",
       "name": "ZoneType",
-      "caption": "ZoneType",
+      "caption": "Zone Type",
       "width": "600px"
     },
     {
@@ -43,9 +43,12 @@
   ],
   "actions": [
     {
+      "type": "TestCenter"
+    },
+    {
       "type": "Button",
-      "caption": "Update Zone State",
-      "onClick": "echo TADO_UpdateZoneState($id);"
+      "caption": "Update State",
+      "onClick": "echo TADO_UpdateHeatingZoneState($id);"
     }
   ],
   "status": [

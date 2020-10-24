@@ -6,6 +6,7 @@
   "aliases": [
     "Tado Discovery"
   ],
+  "url": "https://github.com/ubittner/SymconTado/Discovery",
   "parentRequirements": [
     "{9B0CC551-1523-14B7-8C56-39869942CF02}"
   ],
@@ -13,6 +14,5 @@
   "implemented": [
     "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
   ],
-  "prefix": "TADO",
-  "url": "https://github.com/ubittner/SymconTado/Discovery"
+  "prefix": "TADO"
 }

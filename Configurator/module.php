@@ -1,7 +1,5 @@
 <?php
 
-/** @noinspection PhpUnused */
-
 /*
  * @module      Tado Configurator
  *
@@ -105,15 +103,58 @@ class TadoConfigurator extends IPSModule
         if (!empty($homes)) {
             if (array_key_exists('homes', $homes)) {
                 $homes = $homes['homes'];
-                //Zones
                 foreach ($homes as $home) {
-                    $homeID = $home['id'];
-                    $homeName = $home['name'];
-                    $values[] = [
-                        'id'                    => $homeID,
-                        'name'                  => $homeName . ' (' . $this->Translate('Home') . ')',
-                        'Identifier'            => $homeID,
-                        'Type'                  => ''];
+                    $data = [];
+                    $buffer = [];
+                    $data['DataID'] = TADO_SPLITTER_DATA_GUID;
+                    $buffer['Command'] = 'GetHome';
+                    $buffer['Params'] = $home['id'];
+                    $data['Buffer'] = $buffer;
+                    $data = json_encode($data);
+                    $homes = $this->SendDataToParent($data);
+                    $this->SendDebug(__FUNCTION__, $homes, 0);
+                    $homeData = json_decode($homes, true);
+                    if (!empty($homeData)) {
+                        $homeID = $homeData['id'];
+                        $homeName = $homeData['name'];
+                        $contactName = $homeData['contactDetails']['name'];
+                        $contactEMail = $homeData['contactDetails']['email'];
+                        $contactPhone = $homeData['contactDetails']['phone'];
+                        $addressLine1 = $homeData['address']['addressLine1'];
+                        $addressLine2 = $homeData['address']['addressLine2'];
+                        $zipCode = $homeData['address']['zipCode'];
+                        $city = $homeData['address']['city'];
+                        $state = $homeData['address']['state'];
+                        $country = $homeData['address']['country'];
+                        $homeInstanceID = $this->GetHomeInstanceID($homeID);
+                        $values[] = [
+                            'id'         => $homeID,
+                            'name'       => $homeName . ' (' . $this->Translate('Home') . ')',
+                            'Identifier' => $homeID,
+                            'Type'       => '',
+                            'instanceID' => $homeInstanceID,
+                            'create'     => [
+                                'moduleID'      => TADO_HOME_GUID,
+                                'name'          => 'Tado ' . $home['name'] . ' (' . $this->Translate('Home') . ')',
+                                'configuration' => [
+                                    'HomeID'       => (string) $homeID,
+                                    'HomeName'     => (string) $homeName,
+                                    'ContactName'  => (string) $contactName,
+                                    'ContactEMail' => (string) $contactEMail,
+                                    'ContactPhone' => (string) $contactPhone,
+                                    'AddressLine1' => (string) $addressLine1,
+                                    'AddressLine2' => (string) $addressLine2,
+                                    'ZipCode'      => (string) $zipCode,
+                                    'City'         => (string) $city,
+                                    'State'        => (string) $state,
+                                    'Country'      => (string) $country,
+
+                                ],
+                                'location' => $location
+                            ]
+                        ];
+                    }
+                    //Zones
                     $data = [];
                     $buffer = [];
                     $data['DataID'] = TADO_SPLITTER_DATA_GUID;
@@ -161,7 +202,7 @@ class TadoConfigurator extends IPSModule
                                     'Type'                  => $zone['type'],
                                     'instanceID'            => $instanceID,
                                     'create'                => [
-                                        'moduleID'      => TADO_HEATING_GUID, //ToDo: change to: TADO_COOLING_GUID,
+                                        'moduleID'      => TADO_COOLING_GUID,
                                         'name'          => 'Tado ' . $zone['name'] . ' (' . $this->Translate('Cooling') . ')',
                                         'configuration' => [
                                             'HomeID'                => (string) $homeID,
@@ -174,6 +215,7 @@ class TadoConfigurator extends IPSModule
                                     ]
                                 ];
                             }
+                            //Devices
                             if (array_key_exists('devices', $zone)) {
                                 $devices = $zone['devices'];
                                 foreach ($devices as $index => $device) {
@@ -232,6 +274,33 @@ class TadoConfigurator extends IPSModule
         return $values;
     }
 
+    private function GetCategoryPath(int $CategoryID)
+    {
+        if ($CategoryID === 0) {
+            return [];
+        }
+        $path[] = IPS_GetName($CategoryID);
+        $parentID = IPS_GetObject($CategoryID)['ParentID'];
+        while ($parentID > 0) {
+            $path[] = IPS_GetName($parentID);
+            $parentID = IPS_GetObject($parentID)['ParentID'];
+        }
+        return array_reverse($path);
+    }
+
+    private function GetHomeInstanceID(int $HomeID)
+    {
+        $id = 0;
+        $moduleID = TADO_HOME_GUID;
+        $instances = IPS_GetInstanceListByModuleID($moduleID);
+        foreach ($instances as $instance) {
+            if (IPS_GetProperty($instance, 'HomeID') == $HomeID) {
+                $id = $instance;
+            }
+        }
+        return $id;
+    }
+
     private function GetZoneInstanceID(int $ZoneID, int $Type)
     {
         $id = 0;
@@ -258,19 +327,5 @@ class TadoConfigurator extends IPSModule
             }
         }
         return $id;
-    }
-
-    private function GetCategoryPath(int $CategoryID)
-    {
-        if ($CategoryID === 0) {
-            return [];
-        }
-        $path[] = IPS_GetName($CategoryID);
-        $parentID = IPS_GetObject($CategoryID)['ParentID'];
-        while ($parentID > 0) {
-            $path[] = IPS_GetName($parentID);
-            $parentID = IPS_GetObject($parentID)['ParentID'];
-        }
-        return array_reverse($path);
     }
 }
