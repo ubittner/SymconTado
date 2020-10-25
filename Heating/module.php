@@ -473,7 +473,6 @@ class TadoHeating extends IPSModule
             $data = json_encode($data);
             $result = json_decode($this->SendDataToParent($data), true);
             $this->SendDebug(__FUNCTION__, json_encode($result), 0);
-
         }
         //Timer
         if ($heatingTimer >= 300) {

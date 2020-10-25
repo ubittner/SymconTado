@@ -1,8 +1,7 @@
 <?php
 
-/** @noinspection DuplicatedCode */
 /** @noinspection PhpUnused */
-/** @noinspection PhpUnusedPrivateMethodInspection */
+/** @noinspection DuplicatedCode */
 
 /*
  * @module      Tado Discovery
@@ -69,30 +68,25 @@ class TadoDiscovery extends IPSModule
     public function GetConfigurationForm()
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        $this->UpdateFormField('ScanProgress', 'indeterminate', false);
-        $this->UpdateFormField('ScanProgress', 'caption', '');
-        $this->UpdateFormField('ScanProgress', 'current', 0);
-        $ScriptText = 'IPS_RequestAction(' . $this->InstanceID . ', \'StartDiscover\',true);';
-        IPS_RunScriptText($ScriptText);
+        $values = $this->DiscoverDevices();
+        $formData['actions'][0]['values'] = $values;
         return json_encode($formData);
     }
 
-    public function RequestAction($Ident, $Value)
+    #################### Private
+
+    private function KernelReady(): void
     {
-        if ($Ident == 'StartDiscover') {
-            $this->DiscoverDevices();
-        }
+        $this->ApplyChanges();
     }
 
-    private function DiscoverDevices()
+    private function DiscoverDevices(): array
     {
-        $this->UpdateFormField('ScanProgress', 'indeterminate', true);
-        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Please wait, searching for devices...'));
+        $values = [];
         $ids = IPS_GetInstanceListByModuleID(CORE_DNS_SD_GUID);
         $devices = ZC_QueryServiceType($ids[0], '_hap._tcp.', '');
         $existingDevices = [];
         if (!empty($devices)) {
-            $i = 0;
             foreach ($devices as $device) {
                 $data = [];
                 $deviceInfos = ZC_QueryService($ids[0], $device['Name'], '_hap._tcp.', 'local.');
@@ -113,10 +107,8 @@ class TadoDiscovery extends IPSModule
                                     }
                                     if (array_key_exists('Name', $deviceInfo)) {
                                         $search = ['._hap._tcp.local'];
-                                        //$search = ['tado Internet Bridge ', '._hap._tcp.local'];
                                         $data['name'] = str_replace($search, '', $deviceInfo['Name']);
                                     }
-
                                 }
                                 //Cooling thermostat
                                 if (strpos($record, 'md=AC02') !== false) {
@@ -129,7 +121,6 @@ class TadoDiscovery extends IPSModule
                                     }
                                     if (array_key_exists('Name', $deviceInfo)) {
                                         $search = ['._hap._tcp.local'];
-                                        //$search = ['Smart AC Control ', '._hap._tcp.local'];
                                         $data['name'] = str_replace($search, '', $deviceInfo['Name']);
                                     }
                                 }
@@ -140,7 +131,6 @@ class TadoDiscovery extends IPSModule
                                         }
                                     }
                                     array_push($existingDevices, $data);
-                                    $this->UpdateFormField('ScanProgress', 'current', $i++);
                                 }
                             }
                         }
@@ -148,7 +138,6 @@ class TadoDiscovery extends IPSModule
                 }
             }
         }
-        $values = [];
         if (!empty($existingDevices)) {
             foreach ($existingDevices as $existingDevice) {
                 $instanceID = $this->GetSplitterInstanceID();
@@ -164,27 +153,17 @@ class TadoDiscovery extends IPSModule
                 ];
             }
         }
-        $this->UpdateFormField('ScanProgress', 'indeterminate', false);
-        $this->UpdateFormField('ScanProgress', 'caption', $this->Translate('Discovery finished'));
-        $this->UpdateFormField('ScanProgress', 'current', 100);
-        $this->UpdateFormField('Devices', 'values', json_encode($values));
+        return $values;
     }
 
-    #################### Private
-
-    private function KernelReady()
-    {
-        $this->ApplyChanges();
-    }
-
-    private function GetSplitterInstanceID()
+    private function GetSplitterInstanceID(): int
     {
         $id = 0;
         $instances = IPS_GetInstanceListByModuleID(TADO_SPLITTER_GUID);
         if (!empty($instances)) {
             $id = $instances[0];
         }
-        $this->SendDebug(__FUNCTION__, 'Tado Splitter Instace ID:' . $id, 0);
+        $this->SendDebug(__FUNCTION__, 'Tado Splitter Instance ID: ' . $id, 0);
         return $id;
     }
 }

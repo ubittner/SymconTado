@@ -7,10 +7,6 @@
   ],
   "actions": [
     {
-      "type": "ProgressBar",
-      "name": "ScanProgress"
-    },
-    {
       "type": "Configurator",
       "name": "Devices",
       "delete": true,
