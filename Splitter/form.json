@@ -78,7 +78,7 @@
     {
       "code": 204,
       "icon": "error",
-      "caption": "Check credentials. Token is missing or not valid!"
+      "caption": "Check credentials. Token is missing or invalid!"
     }
   ]
 }

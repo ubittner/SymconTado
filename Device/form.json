@@ -7,31 +7,31 @@
     {
       "type": "ValidationTextBox",
       "name": "DeviceType",
-      "caption": "DeviceType",
+      "caption": "Device Type",
       "width": "600px"
     },
     {
       "type": "ValidationTextBox",
       "name": "DeviceName",
-      "caption": "DeviceName",
+      "caption": "Device Name",
       "width": "600px"
     },
     {
       "type": "ValidationTextBox",
       "name": "SerialNumber",
-      "caption": "SerialNumber",
+      "caption": "Serial Number",
       "width": "600px"
     },
     {
       "type": "ValidationTextBox",
       "name": "ShortSerialNumber",
-      "caption": "ShortSerialNumber",
+      "caption": "Short Serial Number",
       "width": "600px"
     },
     {
       "type": "ValidationTextBox",
       "name": "HomeID",
-      "caption": "HomeID",
+      "caption": "Home ID",
       "width": "600px"
     },
     {

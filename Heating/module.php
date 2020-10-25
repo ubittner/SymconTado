@@ -1,5 +1,8 @@
 <?php
 
+/** @noinspection PhpUnused */
+/** @noinspection DuplicatedCode */
+
 /*
  * @module      Tado Heating
  *
@@ -58,7 +61,7 @@ class TadoHeating extends IPSModule
         }
         //Set timer
         $milliseconds = $this->ReadPropertyInteger('UpdateInterval') * 1000;
-        $this->SetTimerInterval('Update', $milliseconds);
+        $this->SetTimerInterval('UpdateHeatingState', $milliseconds);
         //Update state
         $this->UpdateHeatingZoneState();
     }
@@ -164,7 +167,7 @@ class TadoHeating extends IPSModule
         $this->UpdateHeatingZoneState();
     }
 
-    public function SetHeatingTimer(float $Duration)
+    public function SetHeatingTimer(int $Duration): void
     {
         $this->SendDebug(__FUNCTION__, 'The method was executed with parameter $Duration: ' . json_encode($Duration) . ' (' . microtime(true) . ')', 0);
         //Check parent
@@ -268,12 +271,12 @@ class TadoHeating extends IPSModule
 
     #################### Private
 
-    private function KernelReady()
+    private function KernelReady(): void
     {
         $this->ApplyChanges();
     }
 
-    private function RegisterProperties()
+    private function RegisterProperties(): void
     {
         $this->RegisterPropertyString('HomeID', '');
         $this->RegisterPropertyString('HomeName', '');
@@ -283,7 +286,7 @@ class TadoHeating extends IPSModule
         $this->RegisterPropertyInteger('UpdateInterval', 0);
     }
 
-    private function CreateProfiles()
+    private function CreateProfiles(): void
     {
         //Mode
         $profile = 'TADO.' . $this->InstanceID . '.Mode';
@@ -408,7 +411,7 @@ class TadoHeating extends IPSModule
 
     private function RegisterTimers(): void
     {
-        $this->RegisterTimer('Update', 0, 'TADO_UpdateHeatingZoneState(' . $this->InstanceID . ');');
+        $this->RegisterTimer('UpdateHeatingState', 0, 'TADO_UpdateHeatingZoneState(' . $this->InstanceID . ');');
     }
 
     private function CheckParent(): bool

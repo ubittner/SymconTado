@@ -6,8 +6,11 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">../Configurator</directory>
+            <directory suffix=".php">../Cooling</directory>
             <directory suffix=".php">../Device</directory>
             <directory suffix=".php">../Discovery</directory>
+            <directory suffix=".php">../Heating</directory>
+            <directory suffix=".php">../Home</directory>
             <directory suffix=".php">../Splitter</directory>
         </whitelist>
     </filter>

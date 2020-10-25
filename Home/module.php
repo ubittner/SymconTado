@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpUnused */
+
 /*
  * @module      Tado Home
  *
@@ -58,7 +60,7 @@ class TadoHome extends IPSModule
         }
         //Set timer
         $milliseconds = $this->ReadPropertyInteger('UpdateInterval') * 1000;
-        $this->SetTimerInterval('UpdateState', $milliseconds);
+        $this->SetTimerInterval('UpdateHomeState', $milliseconds);
         //Update state
         $this->UpdateHomeState();
     }
@@ -168,12 +170,12 @@ class TadoHome extends IPSModule
 
     #################### Private
 
-    private function KernelReady()
+    private function KernelReady(): void
     {
         $this->ApplyChanges();
     }
 
-    private function RegisterProperties()
+    private function RegisterProperties(): void
     {
         $this->RegisterPropertyString('HomeID', '');
         $this->RegisterPropertyString('HomeName', '');
@@ -189,7 +191,7 @@ class TadoHome extends IPSModule
         $this->RegisterPropertyInteger('UpdateInterval', 0);
     }
 
-    private function CreateProfiles()
+    private function CreateProfiles(): void
     {
         //Mode
         $profile = 'TADO.' . $this->InstanceID . '.GeofencingMode';
@@ -222,7 +224,7 @@ class TadoHome extends IPSModule
 
     private function RegisterTimers(): void
     {
-        $this->RegisterTimer('UpdateState', 0, 'TADO_UpdateHomeState(' . $this->InstanceID . ');');
+        $this->RegisterTimer('UpdateHomeState', 0, 'TADO_UpdateHomeState(' . $this->InstanceID . ');');
     }
 
     private function CheckParent(): bool

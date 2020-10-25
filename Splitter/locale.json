@@ -14,7 +14,7 @@
       "Please enter your credentials!": "Bitte geben Sie Ihre Zugangsdaten an!",
       "Please enter your E-Mail address!": "Bitte geben Sie Ihre E-Mail Adresse an!",
       "Please enter your password!": "Bitte geben Sie Ihre Kennwort an!",
-      "Check credentials. Token is missing or not valid!": "Bitte Anmeldedaten prüfen. Fehlender oder ungültiger Token!",
+      "Check credentials. Token is missing or invalid!": "Bitte Anmeldedaten prüfen. Fehlender oder ungültiger Token!",
       "Instance is inactive!": "Instanz ist inaktiv!"
     }
   }

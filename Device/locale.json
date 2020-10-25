@@ -1,6 +1,13 @@
 {
   "translations": {
     "de": {
+      "Device Type": "Gerätetyp",
+      "Device Name": "Gerätename",
+      "Serial Number": "Seriennummer",
+      "Short Serial Number": "Seriennummer (kurz)",
+      "Home ID": "Zuhause ID",
+      "Update Interval": "Aktualisierungsintervall",
+      "seconds": "Sekunden",
       "Update Device State": "Gerätestatus aktualisieren",
       "Tado Device will be created": "Tado Device wird erstellt",
       "Tado Device is active": "Tado Device ist aktiv",

@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpUnused */
+
 /*
  * @module      Tado Splitter
  *
@@ -94,6 +96,15 @@ class TadoSplitter extends IPSModule
                 $response = $this->GetHomeState($data->Buffer->Params);
                 break;
 
+            case 'GetDevices':
+                $response = $this->GetDevices($data->Buffer->Params);
+                break;
+
+            case 'SetPresenceLock':
+                $params = (array) $data->Buffer->Params;
+                $response = $this->SetPresenceLock($params['homeID'], $params['awayMode']);
+                break;
+
             case 'GetZones':
                 $response = $this->GetZones($data->Buffer->Params);
                 break;
@@ -101,10 +112,6 @@ class TadoSplitter extends IPSModule
             case 'GetZoneState':
                 $params = (array) $data->Buffer->Params;
                 $response = $this->GetZoneState($params['homeID'], $params['zoneID']);
-                break;
-
-            case 'GetDevices':
-                $response = $this->GetDevices($data->Buffer->Params);
                 break;
 
             case 'StopManualMode':
@@ -143,11 +150,6 @@ class TadoSplitter extends IPSModule
                 $response = $this->SetCoolingZoneTemperatureTimerNextTimeBlock($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
                 break;
 
-            case 'SetPresenceLock':
-                $params = (array) $data->Buffer->Params;
-                $response = $this->SetPresenceLock($params['homeID'], $params['awayMode']);
-                break;
-
             default:
                 $this->SendDebug(__FUNCTION__, 'Invalid Command: ' . $data->Buffer->Command, 0);
                 $response = '';
@@ -158,7 +160,7 @@ class TadoSplitter extends IPSModule
 
     #################### Private
 
-    private function KernelReady()
+    private function KernelReady(): void
     {
         $this->ApplyChanges();
     }
@@ -184,34 +186,21 @@ class TadoSplitter extends IPSModule
         $this->SetBuffer('Scope', json_encode(['Scope' => '']));
     }
 
-    private function CheckInstance(): bool
-    {
-        $result = $this->ReadPropertyBoolean('Active');
-        $status = 102;
-        if (!$result) {
-            $status = 104;
-            $this->SendDebug(__FUNCTION__, 'Instance is inactive!', 0);
-        }
-        $this->SetStatus($status);
-        //IPS_SetDisabled($this->InstanceID, !$result);
-        return $result;
-    }
-
-    private function ValidateConfiguration()
+    private function ValidateConfiguration(): void
     {
         $this->SendDebug(__FUNCTION__, 'Validate configuration', 0);
         $status = 102;
         $userName = $this->ReadPropertyString('UserName');
         $password = $this->ReadPropertyString('Password');
-        // Check password
+        //Check password
         if (empty($password)) {
             $status = 203;
         }
-        // Check user name
+        //Check user name
         if (empty($userName)) {
             $status = 202;
         }
-        // Check user name and password
+        //Check user name and password
         if (empty($userName) && empty($password)) {
             $status = 201;
         }
@@ -224,8 +213,18 @@ class TadoSplitter extends IPSModule
             }
         }
         $active = $this->CheckInstance();
-        if ($active) {
-            $this->SetStatus($status);
+        if (!$active) {
+            $status = 104;
         }
+        $this->SetStatus($status);
+    }
+
+    private function CheckInstance(): bool
+    {
+        $result = $this->ReadPropertyBoolean('Active');
+        if (!$result) {
+            $this->SendDebug(__FUNCTION__, 'Instance is inactive!', 0);
+        }
+        return $result;
     }
 }

@@ -16,6 +16,11 @@ class SymconTadoValidationTest extends TestCaseSymconValidation
         $this->validateModule(__DIR__ . '/../Configurator');
     }
 
+    public function testValidateCoolingModule(): void
+    {
+        $this->validateModule(__DIR__ . '/../Cooling');
+    }
+
     public function testValidateDeviceModule(): void
     {
         $this->validateModule(__DIR__ . '/../Device');
@@ -24,6 +29,16 @@ class SymconTadoValidationTest extends TestCaseSymconValidation
     public function testValidateDiscoveryModule(): void
     {
         $this->validateModule(__DIR__ . '/../Discovery');
+    }
+
+    public function testValidateHeatingModule(): void
+    {
+        $this->validateModule(__DIR__ . '/../Heating');
+    }
+
+    public function testValidateHomeModule(): void
+    {
+        $this->validateModule(__DIR__ . '/../Home');
     }
 
     public function testValidateSplitterModule(): void

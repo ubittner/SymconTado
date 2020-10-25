@@ -12,16 +12,19 @@
 Folgende Module beinhaltet das Repository `SymconTado`:
 
 - __Configurator__ ([Dokumentation](Configurator))  
-	Ein Konfigurator für die Räume oder Zonen und Geräte.
+	Ein Konfigurator für das Zuhause (Home), die Räume (Zone) und Geräte.
 
 - __Cooling__ ([Dokumentation](Cooling))  
-	Der Raum oder die Zone zum Kühlen.  
+	Der Raum (Zone) zum Kühlen.  
 	
 - __Device__ ([Dokumentation](Device))  
 	Das verwendete Tado Gerät (Smartes Thermostat, Smartes Heizkörper-Thermostat, Smarte Klimaanlagen-Steuerung). 
 	
 - __Heating__ ([Dokumentation](Heating))  
-	Der Raum oder die Zone zum Heizen.  
+	Der Raum (Zone) zum Heizen.  
+	
+- __Home__ ([Dokumentation](Home))  
+	Das Zuhause (Home).  
 	  
 - __Discovery__ ([Dokumentation](Discovery))  
 	Sucht im Netzwerk nach einer vorhandenen Internet Bridge oder Smarten Klimaanlagen-Steuerung. 

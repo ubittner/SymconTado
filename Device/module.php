@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpUnused */
+
 /*
  * @module      Tado Device
  *
@@ -32,7 +34,6 @@ class TadoDevice extends IPSModule
         //Never delete this line!
         parent::Create();
         $this->RegisterProperties();
-        //$this->CreateProfiles();
         $this->RegisterVariables();
         $this->RegisterTimers();
         //Connect to splitter
@@ -43,7 +44,6 @@ class TadoDevice extends IPSModule
     {
         //Never delete this line!
         parent::Destroy();
-        //$this->DeleteProfiles();
     }
 
     public function ApplyChanges()
@@ -58,8 +58,8 @@ class TadoDevice extends IPSModule
         }
         //Set update timer
         $milliseconds = $this->ReadPropertyInteger('UpdateInterval') * 1000;
-        $this->SetTimerInterval('Update', $milliseconds);
-        //Update
+        $this->SetTimerInterval('UpdateDeviceState', $milliseconds);
+        //Update state
         $this->UpdateDeviceState();
     }
 
@@ -133,12 +133,12 @@ class TadoDevice extends IPSModule
 
     #################### Private
 
-    private function KernelReady()
+    private function KernelReady(): void
     {
         $this->ApplyChanges();
     }
 
-    private function RegisterProperties()
+    private function RegisterProperties(): void
     {
         $this->RegisterPropertyString('DeviceType', '');
         $this->RegisterPropertyString('DeviceName', '');
@@ -154,8 +154,8 @@ class TadoDevice extends IPSModule
         $this->RegisterVariableBoolean('BatteryState', $this->Translate('Battery State'), '~Battery', 10);
     }
 
-    private function RegisterTimers()
+    private function RegisterTimers(): void
     {
-        $this->RegisterTimer('Update', 0, 'TADO_UpdateDeviceState(' . $this->InstanceID . ');');
+        $this->RegisterTimer('UpdateDeviceState', 0, 'TADO_UpdateDeviceState(' . $this->InstanceID . ');');
     }
 }

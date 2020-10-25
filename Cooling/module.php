@@ -1,5 +1,8 @@
 <?php
 
+/** @noinspection PhpUnused */
+/** @noinspection DuplicatedCode */
+
 /*
  * @module      Tado Cooling
  *
@@ -58,7 +61,7 @@ class TadoCooling extends IPSModule
         }
         //Set timer
         $milliseconds = $this->ReadPropertyInteger('UpdateInterval') * 1000;
-        $this->SetTimerInterval('Update', $milliseconds);
+        $this->SetTimerInterval('UpdateCoolingState', $milliseconds);
         //Update state
         $this->UpdateCoolingZoneState();
     }
@@ -164,7 +167,7 @@ class TadoCooling extends IPSModule
         $this->UpdateCoolingZoneState();
     }
 
-    public function SetCoolingTimer(float $Duration)
+    public function SetCoolingTimer(int $Duration): void
     {
         $this->SendDebug(__FUNCTION__, 'The method was executed with parameter $Duration: ' . json_encode($Duration) . ' (' . microtime(true) . ')', 0);
         //Check parent
@@ -238,13 +241,13 @@ class TadoCooling extends IPSModule
                             if (array_key_exists('typeSkillBasedApp', $termination)) {
                                 $type = $termination['typeSkillBasedApp'];
                                 $this->SendDebug(__FUNCTION__, 'Timer type: ' . $type, 0);
-                                $heatingTimer = 0;
+                                $coolingTimer = 0;
                                 if ($type == 'TIMER' || $type == 'NEXT_TIME_BLOCK') {
                                     if (array_key_exists('remainingTimeInSeconds', $termination)) {
-                                        $heatingTimer = $termination['remainingTimeInSeconds'];
+                                        $coolingTimer = $termination['remainingTimeInSeconds'];
                                     }
                                 }
-                                $this->SetValue('HeatingTimer', $heatingTimer);
+                                $this->SetValue('CoolingTimer', $coolingTimer);
                             }
                         }
                     }
@@ -268,12 +271,12 @@ class TadoCooling extends IPSModule
 
     #################### Private
 
-    private function KernelReady()
+    private function KernelReady(): void
     {
         $this->ApplyChanges();
     }
 
-    private function RegisterProperties()
+    private function RegisterProperties(): void
     {
         $this->RegisterPropertyString('HomeID', '');
         $this->RegisterPropertyString('HomeName', '');
@@ -283,7 +286,7 @@ class TadoCooling extends IPSModule
         $this->RegisterPropertyInteger('UpdateInterval', 0);
     }
 
-    private function CreateProfiles()
+    private function CreateProfiles(): void
     {
         //Mode
         $profile = 'TADO.' . $this->InstanceID . '.Mode';
@@ -374,7 +377,7 @@ class TadoCooling extends IPSModule
 
     private function RegisterTimers(): void
     {
-        $this->RegisterTimer('Update', 0, 'TADO_UpdateCoolingZoneState(' . $this->InstanceID . ');');
+        $this->RegisterTimer('UpdateCoolingState', 0, 'TADO_UpdateCoolingZoneState(' . $this->InstanceID . ');');
     }
 
     private function CheckParent(): bool
@@ -442,10 +445,9 @@ class TadoCooling extends IPSModule
         }
         //Timer
         if ($coolingTimer >= 300) {
-            $duration = $coolingTimer * 3600;
-            $this->SendDebug(__FUNCTION__, 'Use cooling timer, set temperature for ' . $duration . 'seconds.', 0);
+            $this->SendDebug(__FUNCTION__, 'Use cooling timer, set temperature for ' . $coolingTimer . 'seconds.', 0);
             $buffer['Command'] = 'SetCoolingZoneTemperatureTimer';
-            $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'type' => 'AIR_CONDITIONING', 'power' => $power, 'temperature' => $temperature, 'durationInSeconds' => $duration];
+            $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'type' => 'AIR_CONDITIONING', 'power' => $power, 'temperature' => $temperature, 'durationInSeconds' => $coolingTimer];
             $data['Buffer'] = $buffer;
             $data = json_encode($data);
             $result = json_decode($this->SendDataToParent($data), true);

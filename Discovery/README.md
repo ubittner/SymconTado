@@ -44,7 +44,7 @@ Es werden keine Statusvariablen und Profile verwendet.
 
 ### 6. WebFront
 
-Die Konfigurator Instanz ist im WebFront nicht verfügbar. 
+Die Discovery Instanz ist im WebFront nicht verfügbar. 
 
 ### 7. PHP-Befehlsreferenz
 
