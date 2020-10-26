@@ -26,11 +26,6 @@ class SymconTadoValidationTest extends TestCaseSymconValidation
         $this->validateModule(__DIR__ . '/../Device');
     }
 
-    public function testValidateDiscoveryModule(): void
-    {
-        $this->validateModule(__DIR__ . '/../Discovery');
-    }
-
     public function testValidateHeatingModule(): void
     {
         $this->validateModule(__DIR__ . '/../Heating');
