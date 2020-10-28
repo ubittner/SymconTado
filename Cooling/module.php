@@ -233,6 +233,7 @@ class TadoCooling extends IPSModule
             }
             //Timer
             if (array_key_exists('overlay', $result)) {
+                $coolingTimer = 0;
                 $overlay = $result['overlay'];
                 if (is_array($overlay)) {
                     if (array_key_exists('termination', $overlay)) {
@@ -241,17 +242,16 @@ class TadoCooling extends IPSModule
                             if (array_key_exists('typeSkillBasedApp', $termination)) {
                                 $type = $termination['typeSkillBasedApp'];
                                 $this->SendDebug(__FUNCTION__, 'Timer type: ' . $type, 0);
-                                $coolingTimer = 0;
                                 if ($type == 'TIMER' || $type == 'NEXT_TIME_BLOCK') {
                                     if (array_key_exists('remainingTimeInSeconds', $termination)) {
                                         $coolingTimer = $termination['remainingTimeInSeconds'];
                                     }
                                 }
-                                $this->SetValue('CoolingTimer', $coolingTimer);
                             }
                         }
                     }
                 }
+                $this->SetValue('CoolingTimer', $coolingTimer);
             }
             //Sensor
             if (array_key_exists('sensorDataPoints', $result)) {

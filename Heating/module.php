@@ -212,7 +212,7 @@ class TadoHeating extends IPSModule
         $this->SendDebug(__FUNCTION__, json_encode($result), 0);
         if (!empty($result)) {
             // Mode
-            $mode = 1; #automatic
+            $mode = 1; //automatic
             if (array_key_exists('overlayType', $result)) {
                 if ($result['overlayType'] == 'MANUAL') {
                     $mode = 0;
@@ -221,6 +221,7 @@ class TadoHeating extends IPSModule
             $this->SetValue('Mode', $mode);
             //Setpoint temperature
             if (array_key_exists('setting', $result)) {
+                $this->SendDebug(__FUNCTION__, 'array key setting exits', 0);
                 if (array_key_exists('temperature', $result['setting'])) {
                     $temperatureSettings = $result['setting']['temperature'];
                     if (is_array($temperatureSettings)) {
@@ -233,25 +234,28 @@ class TadoHeating extends IPSModule
             }
             //Timer
             if (array_key_exists('overlay', $result)) {
+                $heatingTimer = 0;
+                $this->SendDebug(__FUNCTION__, 'array key overlay exits', 0);
                 $overlay = $result['overlay'];
                 if (is_array($overlay)) {
                     if (array_key_exists('termination', $overlay)) {
+                        $this->SendDebug(__FUNCTION__, 'array key termination exits', 0);
                         $termination = $overlay['termination'];
                         if (is_array($termination)) {
                             if (array_key_exists('typeSkillBasedApp', $termination)) {
+                                $this->SendDebug(__FUNCTION__, 'array key typeSkillBasedApp exits', 0);
                                 $type = $termination['typeSkillBasedApp'];
                                 $this->SendDebug(__FUNCTION__, 'Timer type: ' . $type, 0);
-                                $heatingTimer = 0;
                                 if ($type == 'TIMER' || $type == 'NEXT_TIME_BLOCK') {
                                     if (array_key_exists('remainingTimeInSeconds', $termination)) {
                                         $heatingTimer = $termination['remainingTimeInSeconds'];
                                     }
                                 }
-                                $this->SetValue('HeatingTimer', $heatingTimer);
                             }
                         }
                     }
                 }
+                $this->SetValue('HeatingTimer', $heatingTimer);
             }
             //Sensor
             if (array_key_exists('sensorDataPoints', $result)) {

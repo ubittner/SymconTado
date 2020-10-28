@@ -27,6 +27,11 @@
           "width": "auto"
         },
         {
+          "name": "Description",
+          "caption": "Description",
+          "width": "200px"
+        },
+        {
           "name": "Identifier",
           "caption": "Identifier",
           "width": "250px"
