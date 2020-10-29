@@ -20,7 +20,10 @@
       "Off": "Aus",
       "Till next time block": "Bis zum nächsten Schaltpunkt",
       "Room temperature": "Raum-Temperatur",
-      "Air humidity": "Luftfeuchtigkeit"
+      "Air humidity": "Luftfeuchtigkeit",
+      "Heating Power": "Heizleistung",
+      "Home": "Anwesend",
+      "Away": "Abwesend"
     }
   }
 }

@@ -270,6 +270,31 @@ class TadoHeating extends IPSModule
                     $this->SetValue('AirHumidity', (float) $humidity);
                 }
             }
+            //Heating power
+            $heatingPower = 0;
+            if (array_key_exists('activityDataPoints', $result)) {
+                $activityDataPoints = $result['activityDataPoints'];
+                if (is_array($activityDataPoints)) {
+                    if (array_key_exists('heatingPower', $activityDataPoints)) {
+                        $heatingPowerData = $activityDataPoints['heatingPower'];
+                        if (is_array($heatingPowerData)) {
+                            if (array_key_exists('percentage', $heatingPowerData)) {
+                                $heatingPower = $heatingPowerData['percentage'];
+                            }
+                        }
+                    }
+                }
+            }
+            $this->SetValue('HeatingPower', $heatingPower);
+            //Geofencing status
+            if (array_key_exists('tadoMode', $result)) {
+                $tadoMode = $result['tadoMode'];
+                $state = false;
+                if ($tadoMode == 'AWAY') {
+                    $state = true;
+                }
+                $this->SetValue('GeofencingStatus', $state);
+            }
         }
     }
 
@@ -380,11 +405,26 @@ class TadoHeating extends IPSModule
             $j = sprintf('%02d', $i);
             IPS_SetVariableProfileAssociation($profile, $seconds, $j . ':00:00', '', -1);
         }
+        //Heating power
+        $profile = 'TADO.' . $this->InstanceID . '.HeatingPower';
+        if (!IPS_VariableProfileExists($profile)) {
+            IPS_CreateVariableProfile($profile, 1);
+        }
+        IPS_SetVariableProfileIcon($profile, 'Radiator');
+        IPS_SetVariableProfileText($profile, '', ' %');
+        IPS_SetVariableProfileValues($profile, 0, 100, 1);
+        //Geofencing status
+        $profile = 'TADO.' . $this->InstanceID . '.GeofencingStatus';
+        if (!IPS_VariableProfileExists($profile)) {
+            IPS_CreateVariableProfile($profile, 0);
+        }
+        IPS_SetVariableProfileAssociation($profile, 0, $this->Translate('Home'), 'Presence', 0x00FF00);
+        IPS_SetVariableProfileAssociation($profile, 1, $this->Translate('Away'), 'Motion', 0x0000FF);
     }
 
     private function DeleteProfiles(): void
     {
-        $profiles = ['Mode', 'SetpointTemperature', 'HeatingTimer'];
+        $profiles = ['Mode', 'SetpointTemperature', 'HeatingTimer', 'HeatingPower', 'GeofencingStatus'];
         foreach ($profiles as $profile) {
             $profileName = 'TADO.' . $this->InstanceID . '.' . $profile;
             if (@IPS_VariableProfileExists($profileName)) {
@@ -411,6 +451,12 @@ class TadoHeating extends IPSModule
         $this->RegisterVariableFloat('RoomTemperature', $this->Translate('Room temperature'), '~Temperature', 40);
         //Humidity
         $this->RegisterVariableFloat('AirHumidity', $this->Translate('Air humidity'), '~Humidity.F', 50);
+        //Heating power
+        $profile = 'TADO.' . $this->InstanceID . '.HeatingPower';
+        $this->RegisterVariableInteger('HeatingPower', $this->Translate('Heating Power'), $profile, 60);
+        //Geofencing status
+        $profile = 'TADO.' . $this->InstanceID . '.GeofencingStatus';
+        $this->RegisterVariableBoolean('GeofencingStatus', 'Geofencing Status', $profile, 70);
     }
 
     private function RegisterTimers(): void
