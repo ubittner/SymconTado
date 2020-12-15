@@ -23,7 +23,10 @@
       "Air humidity": "Luftfeuchtigkeit",
       "Heating Power": "Heizleistung",
       "Home": "Anwesend",
-      "Away": "Abwesend"
+      "Away": "Abwesend",
+      "Closed": "Geschlossen",
+      "Open": "Geöffnet",
+      "Window": "Fensterstatus"
     }
   }
 }

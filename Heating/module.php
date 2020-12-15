@@ -257,6 +257,15 @@ class TadoHeating extends IPSModule
                 }
                 $this->SetValue('HeatingTimer', $heatingTimer);
             }
+            //Open window
+            $windowState = false; #closed
+            if (array_key_exists('openWindow', $result)) {
+                $openWindow = $result['openWindow'];
+                if (is_array($openWindow)) {
+                    $windowState = true; #open
+                }
+            }
+            $this->SetValue('WindowStatus', $windowState);
             //Sensor
             if (array_key_exists('sensorDataPoints', $result)) {
                 //Inside temperature
@@ -420,6 +429,14 @@ class TadoHeating extends IPSModule
         }
         IPS_SetVariableProfileAssociation($profile, 0, $this->Translate('Home'), 'Presence', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 1, $this->Translate('Away'), 'Motion', 0x0000FF);
+        //Window status
+        $profile = 'TADO.' . $this->InstanceID . '.WindowStatus';
+        if (!IPS_VariableProfileExists($profile)) {
+            IPS_CreateVariableProfile($profile, 0);
+        }
+        IPS_SetVariableProfileIcon($profile, 'Window');
+        IPS_SetVariableProfileAssociation($profile, 0, $this->Translate('Closed'), '', 0x00FF00);
+        IPS_SetVariableProfileAssociation($profile, 1, $this->Translate('Open'), '', 0x0000FF);
     }
 
     private function DeleteProfiles(): void
@@ -457,6 +474,9 @@ class TadoHeating extends IPSModule
         //Geofencing status
         $profile = 'TADO.' . $this->InstanceID . '.GeofencingStatus';
         $this->RegisterVariableBoolean('GeofencingStatus', 'Geofencing Status', $profile, 70);
+        //Window status
+        $profile = 'TADO.' . $this->InstanceID . '.WindowStatus';
+        $this->RegisterVariableBoolean('WindowStatus', $this->Translate('Window'), $profile, 80);
     }
 
     private function RegisterTimers(): void

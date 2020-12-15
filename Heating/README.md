@@ -61,6 +61,9 @@ SetpointTemperature | float     | Solltemperatur
 HeatingTimer        | integer   | Timer
 RoomTemperature     | float     | Raumtemperatur
 AirHumidity         | float     | Luftfeuchtigkeit
+HeatingPower        | integer   | Heizleistung
+GeofencingStatus    | boolean   | Geofencing Status
+WindowStatus        | boolean   | Fensterstatus  
 
 #### Profile
 
@@ -68,7 +71,10 @@ Name                                | Typ
 ----------------------------------- | -------
 TADO.InstanzID.Mode                 | boolean
 TADO.InstanzID.SetpointTemperature  | float
-TADO.InstanzID.HeatingTimer         | integer  
+TADO.InstanzID.HeatingTimer         | integer
+TADO.InstanzID.HeatingPower         | integer
+TADO.InstanzID.GeofencingStatus     | boolean
+TADO.InstanzID.WindowStatus         | boolean  
 
 Wird die Instanz gelöscht, so werden automatisch die Profile gelöscht.  
 
@@ -77,6 +83,7 @@ Wird die Instanz gelöscht, so werden automatisch die Profile gelöscht.
 Der Automatikmodus kann ein- und ausgeschaltet werden.  
 Die Solltemperatur kann angepasst werden.  
 Der Timer kann gestellt werden.  
+Verschiedene weitere Informationen werden angezeigt.  
 
 ### 7. PHP-Befehlsreferenz
 
