@@ -17,7 +17,7 @@ trait webOAuth
         //Send data to endpoint
         $ch = curl_init();
         curl_setopt_array($ch, [
-            CURLOPT_URL            => 'https://my.tado.com/webapp/env.js',
+            CURLOPT_URL            => 'https://app.tado.com/env.js', // https://my.tado.com/webapp/env.js
             CURLOPT_HEADER         => true,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FAILONERROR    => true,
@@ -30,7 +30,7 @@ trait webOAuth
                 'Accept: */*',
                 'Cache-Control: no-cache',
                 'Connection: keep-alive',
-                'Host: my.tado.com',
+                'Host: app.tado.com', //  'Host: my.tado.com',
                 'User-Agent: SymconTado/1.00-1',
                 'accept-encoding: gzip, deflate',
                 'cache-control: no-cache'
