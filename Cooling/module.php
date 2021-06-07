@@ -103,6 +103,14 @@ class TadoCooling extends IPSModule
                 $this->SetCoolingTemperature($Value);
                 break;
 
+            case 'FanSpeed':
+                $this->SetFanSpeed($Value);
+                break;
+
+            case 'Swing':
+                $this->SetSwingState($Value);
+                break;
+
             case 'CoolingTimer':
                 $this->SetCoolingTimer($Value);
                 break;
@@ -167,6 +175,44 @@ class TadoCooling extends IPSModule
         $this->UpdateCoolingZoneState();
     }
 
+    public function SetFanSpeed(int $Speed): void
+    {
+        $this->SendDebug(__FUNCTION__, 'The method was executed with parameter $Speed: ' . json_encode($Speed) . ' (' . microtime(true) . ')', 0);
+        //Check parent
+        if (!$this->CheckParent()) {
+            return;
+        }
+        //Check IDs
+        if (!$this->CheckHomeID()) {
+            return;
+        }
+        if (!$this->CheckZoneID()) {
+            return;
+        }
+        $this->SetValue('FanSpeed', $Speed);
+        $this->SetCooling();
+        $this->UpdateCoolingZoneState();
+    }
+
+    public function SetSwingState(int $State): void
+    {
+        $this->SendDebug(__FUNCTION__, 'The method was executed with parameter $Temperatur: ' . json_encode($State) . ' (' . microtime(true) . ')', 0);
+        //Check parent
+        if (!$this->CheckParent()) {
+            return;
+        }
+        //Check IDs
+        if (!$this->CheckHomeID()) {
+            return;
+        }
+        if (!$this->CheckZoneID()) {
+            return;
+        }
+        $this->SetValue('Swing', $State);
+        $this->SetCooling();
+        $this->UpdateCoolingZoneState();
+    }
+
     public function SetCoolingTimer(int $Duration): void
     {
         $this->SendDebug(__FUNCTION__, 'The method was executed with parameter $Duration: ' . json_encode($Duration) . ' (' . microtime(true) . ')', 0);
@@ -219,8 +265,9 @@ class TadoCooling extends IPSModule
                 }
             }
             $this->SetValue('Mode', $mode);
-            //Setpoint temperature
+            //Setting
             if (array_key_exists('setting', $result)) {
+                //Setpoint temperature
                 if (array_key_exists('temperature', $result['setting'])) {
                     $temperatureSettings = $result['setting']['temperature'];
                     if (is_array($temperatureSettings)) {
@@ -229,6 +276,36 @@ class TadoCooling extends IPSModule
                             $this->SetValue('SetpointTemperature', $temperature);
                         }
                     }
+                }
+                //Fan speed
+                if (array_key_exists('fanSpeed', $result['setting'])) {
+                    $fanSpeed = (string) $result['setting']['fanSpeed'];
+                    switch ($fanSpeed) {
+                        case 'LOW':
+                            $fanSpeedState = 0;
+                            break;
+
+                        case 'MIDDLE':
+                            $fanSpeedState = 1;
+                            break;
+
+                        case 'HIGH':
+                            $fanSpeedState = 2;
+                            break;
+
+                        default:
+                            $fanSpeedState = 3;
+                    }
+                    $this->SetValue('FanSpeed', $fanSpeedState);
+                }
+                //Swing
+                if (array_key_exists('swing', $result['setting'])) {
+                    $swing = (string) $result['setting']['swing'];
+                    $swingState = 0;
+                    if ($swing == 'ON') {
+                        $swingState = 1;
+                    }
+                    $this->SetValue('Swing', $swingState);
                 }
             }
             //Timer
@@ -269,6 +346,104 @@ class TadoCooling extends IPSModule
         }
     }
 
+    public function SetCooling(): void
+    {
+        $homeID = intval($this->ReadPropertyString('HomeID'));
+        $zoneID = intval($this->ReadPropertyString('ZoneID'));
+        $data = [];
+        $buffer = [];
+        $data['DataID'] = TADO_SPLITTER_DATA_GUID;
+        $power = 'ON';
+        $temperature = $this->GetValue('SetpointTemperature');
+        if ($temperature == 0) {
+            $power = 'OFF';
+        }
+
+        //Fan speed
+        $fanSpeed = $this->GetValue('FanSpeed');
+        switch ($fanSpeed) {
+            case 0:
+                $fanSpeedValue = 'LOW';
+                break;
+
+            case 2:
+                $fanSpeedValue = 'MIDDLE';
+                break;
+
+            case 3:
+                $fanSpeedValue = 'HIGH';
+                break;
+
+            default:
+                $fanSpeedValue = 'AUTO';
+        }
+
+        //Swing
+        $swingValue = 'OFF';
+        if ($this->GetValue('Swing')) {
+            $swingValue = 'ON';
+        }
+
+        $coolingTimer = $this->GetValue('CoolingTimer');
+        //No Timer
+        if ($coolingTimer == 0) {
+            $this->SendDebug(__FUNCTION__, 'Do not use timer, set temperature for unlimited time.', 0);
+            switch ($this->ReadPropertyInteger('DeviceType')) {
+                case 1:
+                case 2:
+                    $buffer['Command'] = 'SetCoolingZoneTemperatureEx';
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'temperature' => $temperature, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
+                    break;
+
+                default:
+                    $buffer['Command'] = 'SetCoolingZoneTemperature';
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'temperature' => $temperature];
+            }
+            $data['Buffer'] = $buffer;
+            $data = json_encode($data);
+            $result = json_decode($this->SendDataToParent($data), true);
+            $this->SendDebug(__FUNCTION__, json_encode($result), 0);
+        }
+        //Timer till next time block
+        if ($coolingTimer == 1) {
+            $this->SendDebug(__FUNCTION__, 'Use cooling timer, set temperature till next time block.', 0);
+            switch ($this->ReadPropertyInteger('DeviceType')) {
+                case 1:
+                case 2:
+                    $buffer['Command'] = 'SetCoolingZoneTemperatureTimerNextTimeBlockEx';
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'temperature' => $temperature, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
+                    break;
+
+                default:
+                    $buffer['Command'] = 'SetCoolingZoneTemperatureTimerNextTimeBlock';
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'temperature' => $temperature];
+            }
+            $data['Buffer'] = $buffer;
+            $data = json_encode($data);
+            $result = json_decode($this->SendDataToParent($data), true);
+            $this->SendDebug(__FUNCTION__, json_encode($result), 0);
+        }
+        //Timer
+        if ($coolingTimer >= 300) {
+            $this->SendDebug(__FUNCTION__, 'Use cooling timer, set temperature for ' . $coolingTimer . 'seconds.', 0);
+            switch ($this->ReadPropertyInteger('DeviceType')) {
+                case 1:
+                case 2:
+                    $buffer['Command'] = 'SetCoolingZoneTemperatureTimerEx';
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'temperature' => $temperature, 'durationInSeconds' => $coolingTimer, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
+                    break;
+
+                default:
+                    $buffer['Command'] = 'SetCoolingZoneTemperatureTimer';
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'temperature' => $temperature, 'durationInSeconds' => $coolingTimer];
+            }
+            $data['Buffer'] = $buffer;
+            $data = json_encode($data);
+            $result = json_decode($this->SendDataToParent($data), true);
+            $this->SendDebug(__FUNCTION__, json_encode($result), 0);
+        }
+    }
+
     #################### Private
 
     private function KernelReady(): void
@@ -278,6 +453,7 @@ class TadoCooling extends IPSModule
 
     private function RegisterProperties(): void
     {
+        $this->RegisterPropertyInteger('DeviceType', 0);
         $this->RegisterPropertyString('HomeID', '');
         $this->RegisterPropertyString('HomeName', '');
         $this->RegisterPropertyString('ZoneID', '');
@@ -308,6 +484,24 @@ class TadoCooling extends IPSModule
             $color = 0x8AC1E8;
             IPS_SetVariableProfileAssociation($profile, $i, $i . ' °', '', $color);
         }
+        //Fan speed
+        $profile = 'TADO.' . $this->InstanceID . '.FanSpeed';
+        if (!IPS_VariableProfileExists($profile)) {
+            IPS_CreateVariableProfile($profile, 1);
+        }
+        IPS_SetVariableProfileIcon($profile, 'Climate');
+        IPS_SetVariableProfileAssociation($profile, 0, $this->Translate('Low'), '', 0x0000FF);
+        IPS_SetVariableProfileAssociation($profile, 1, $this->Translate('Middle'), '', 0x0000FF);
+        IPS_SetVariableProfileAssociation($profile, 2, $this->Translate('High'), '', 0x0000FF);
+        IPS_SetVariableProfileAssociation($profile, 3, $this->Translate('Auto'), '', 0x00FF00);
+        //Swing
+        $profile = 'TADO.' . $this->InstanceID . '.Swing';
+        if (!IPS_VariableProfileExists($profile)) {
+            IPS_CreateVariableProfile($profile, 1);
+        }
+        IPS_SetVariableProfileIcon($profile, 'Shutter');
+        IPS_SetVariableProfileAssociation($profile, 0, $this->Translate('Off'), '', -1);
+        IPS_SetVariableProfileAssociation($profile, 1, $this->Translate('On'), '', 0x00FF00);
         //Cooling timer
         $profile = 'TADO.' . $this->InstanceID . '.CoolingTimer';
         if (!IPS_VariableProfileExists($profile)) {
@@ -365,6 +559,14 @@ class TadoCooling extends IPSModule
         $profile = 'TADO.' . $this->InstanceID . '.SetpointTemperature';
         $this->RegisterVariableFloat('SetpointTemperature', $this->Translate('Setpoint temperature'), $profile, 20);
         $this->EnableAction('SetpointTemperature');
+        //Fan speed
+        $profile = 'TADO.' . $this->InstanceID . '.FanSpeed';
+        $this->RegisterVariableInteger('FanSpeed', $this->Translate('Fan speed'), $profile, 23);
+        $this->EnableAction('FanSpeed');
+        //Swing
+        $profile = 'TADO.' . $this->InstanceID . '.Swing';
+        $this->RegisterVariableInteger('Swing', $this->Translate('Swing'), $profile, 26);
+        $this->EnableAction('Swing');
         //Cooling timer
         $profile = 'TADO.' . $this->InstanceID . '.CoolingTimer';
         $this->RegisterVariableInteger('CoolingTimer', 'Timer', $profile, 30);
@@ -408,50 +610,5 @@ class TadoCooling extends IPSModule
             $result = false;
         }
         return $result;
-    }
-
-    private function SetCooling(): void
-    {
-        $homeID = intval($this->ReadPropertyString('HomeID'));
-        $zoneID = intval($this->ReadPropertyString('ZoneID'));
-        $data = [];
-        $buffer = [];
-        $data['DataID'] = TADO_SPLITTER_DATA_GUID;
-        $power = 'ON';
-        $temperature = $this->GetValue('SetpointTemperature');
-        if ($temperature == 0) {
-            $power = 'OFF';
-        }
-        $coolingTimer = $this->GetValue('CoolingTimer');
-        //No Timer
-        if ($coolingTimer == 0) {
-            $this->SendDebug(__FUNCTION__, 'Do not use timer, set temperature for unlimited time.', 0);
-            $buffer['Command'] = 'SetCoolingZoneTemperature';
-            $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'type' => 'AIR_CONDITIONING', 'power' => $power, 'temperature' => $temperature];
-            $data['Buffer'] = $buffer;
-            $data = json_encode($data);
-            $result = json_decode($this->SendDataToParent($data), true);
-            $this->SendDebug(__FUNCTION__, json_encode($result), 0);
-        }
-        //Timer till next time block
-        if ($coolingTimer == 1) {
-            $this->SendDebug(__FUNCTION__, 'Use cooling timer, set temperature till next time block.', 0);
-            $buffer['Command'] = 'SetCoolingZoneTemperatureTimerNextTimeBlock';
-            $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'temperature' => $temperature];
-            $data['Buffer'] = $buffer;
-            $data = json_encode($data);
-            $result = json_decode($this->SendDataToParent($data), true);
-            $this->SendDebug(__FUNCTION__, json_encode($result), 0);
-        }
-        //Timer
-        if ($coolingTimer >= 300) {
-            $this->SendDebug(__FUNCTION__, 'Use cooling timer, set temperature for ' . $coolingTimer . 'seconds.', 0);
-            $buffer['Command'] = 'SetCoolingZoneTemperatureTimer';
-            $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'type' => 'AIR_CONDITIONING', 'power' => $power, 'temperature' => $temperature, 'durationInSeconds' => $coolingTimer];
-            $data['Buffer'] = $buffer;
-            $data = json_encode($data);
-            $result = json_decode($this->SendDataToParent($data), true);
-            $this->SendDebug(__FUNCTION__, json_encode($result), 0);
-        }
     }
 }
