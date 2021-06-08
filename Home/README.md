@@ -70,7 +70,12 @@ Ger Geofencing Modus kann geschaltet (Auto, Home, Away) werden.
 
 ```text
 void TADO_SetGeofencingMode(integer $InstanceID, integer $Mode);  
-Schaltet den Geofencing Modus (0 = Auto, 1 = Home, 2 = Away).
+Schaltet den Geofencing Modus.
+ 
+$Mode:
+0 = Auto
+1 = Home
+2 = Away
 
 Beispiel:
 $data = TADO_SetGeofencingMode(12345, 0);

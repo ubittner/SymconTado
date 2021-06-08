@@ -89,7 +89,11 @@ Verschiedene weitere Informationen werden angezeigt.
 
 ```text
 void TADO_ToggleHeatingMode(integer $InstanceID, boolean $Mode);  
-Schaltet den Automatikmodus (false = Manuell, true = Automatik).
+Schaltet den Automatikmodus.
+
+$Mode:
+false   = Manuell
+true    = Automatik
 
 Beispiel:
 $data = TADO_ToggleHeatingMode(12345, false);
@@ -105,7 +109,12 @@ $data = TADO_SetHeatingTemperature(12345, 22.5);
 
 ```text
 void TADO_SetHeatingTimer(integer $InstanceID, integer $Duration);  
-Schaltet den Timer (0 = unendlich, 1 = bis zum nächsten Schaltpunkt, >300 Dauer in Sekunden).
+Schaltet den Timer.
+ 
+$Duration:
+0       = unendlich
+1       = bis zum nächsten Schaltpunkt
+>300    = Dauer in Sekunden
 
 Beispiel:
 $data = TADO_SetHeatingTimer(12345, 3600);

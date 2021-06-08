@@ -66,7 +66,7 @@ Der Batteriezustand des Gerätes wird im WebFront angezeigt.
 
 ```text
 void TADO_UpdateDeviceState(integer $InstanceID);  
-Aktualisiert den Staus des Geofencing Modus. 
+Aktualisiert den Staus des Gerätes. 
 
 Beispiel:
 $data = TADO_UpdateDeviceState(12345);

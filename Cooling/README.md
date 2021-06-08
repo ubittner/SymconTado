@@ -23,6 +23,8 @@ Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen 
 
 * Automatikmodus schalten
 * Soll-Temperatur anpassen
+* Lüftungsintensität schalten
+* Lamellenbewegung schalten
 * Timer schalten
 * Anzeige der Raumtemperatur
 * Anzeige der Luftfeuchtigkeit
@@ -46,7 +48,11 @@ __Konfigurationsseite__:
 
 Name            | Beschreibung
 --------------- | ----------------------------------------------
+Gerätetyp       | Auswahl des Gerätetyps 
 Informationen   | Diverse Informationen über den Raum (Zone)
+
+Sofern der Gerätetyp nicht auf Standard eingestellt ist,  
+kann zusätzlich die Lüftungsintensität und Lamellenbewegung genutzt werden.
 
 ### 5. Statusvariablen und Profile
 
@@ -58,6 +64,8 @@ Name                | Typ       | Beschreibung
 ------------------- | --------- | ---------------------------
 Mode                | boolean   | Manueller / Automatik Modus
 SetpointTemperature | float     | Solltemperatur
+FanSpeed            | integer   | Lüftungsintensität
+Swing               | integer   | Lamellenbewegung
 CoolingTimer        | integer   | Timer
 RoomTemperature     | float     | Raumtemperatur
 AirHumidity         | float     | Luftfeuchtigkeit
@@ -68,6 +76,8 @@ Name                                | Typ
 ----------------------------------- | -------
 TADO.InstanzID.Mode                 | boolean
 TADO.InstanzID.SetpointTemperature  | float
+TADO.InstanzID.FanSpeed             | integer
+TADO.InstanzID.Swing                | integer
 TADO.InstanzID.CoolingTimer         | integer  
 
 Wird die Instanz gelöscht, so werden automatisch die Profile gelöscht.  
@@ -76,13 +86,19 @@ Wird die Instanz gelöscht, so werden automatisch die Profile gelöscht.
 
 Der Automatikmodus kann ein- und ausgeschaltet werden.  
 Die Solltemperatur kann angepasst werden.  
+Die Lüftungsintesität kann ausgewähöt werden.  
+Die Lammellenbewegung kann ein- und ausgeschaltet werden.  
 Der Timer kann gestellt werden.  
 
 ### 7. PHP-Befehlsreferenz
 
 ```text
 void TADO_ToggleCoolingMode(integer $InstanceID, boolean $Mode);  
-Schaltet den Automatikmodus (false = Manuell, true = Automatik).
+Schaltet den Automatikmodus.
+
+$Mode:
+false   = Manuell
+true    = Automatik
 
 Beispiel:
 $data = TADO_ToggleCoolingMode(12345, false);
@@ -97,8 +113,39 @@ $data = TADO_SetCoolingTemperature(12345, 15.5);
 ```  
 
 ```text
+void TADO_SetFanSpeed(integer $InstanceID, int $Speed);  
+Verändert die Lüftungsintensität.
+
+$Speed:
+0 = LOW (Gering)
+1 = MIDDLE (Mittel)
+2 = HIGH (Hoch)
+3 = AUTO (Auto)
+
+Beispiel:
+$data = TADO_SetFanSpeed(12345, 3);
+```  
+
+```text
+void TADO_SetSwingState(integer $InstanceID, int $State);  
+Schaltet die Lamellenbewegung aus oder ein.
+
+$State:
+0 = OFF (Aus)
+1 = ON (An)
+
+Beispiel:
+$data = TADO_SetSwingState(12345, 1);
+```  
+
+```text
 void TADO_SetCoolingTimer(integer $InstanceID, integer $Duration);  
-Schaltet den Timer (0 = unendlich, 1 = bis zum nächsten Schaltpunkt, >300 Dauer in Sekunden).
+Schaltet den Timer.
+
+$Duration:
+0       = unendlich
+1       = bis zum nächsten Schaltpunkt
+>300    = Dauer in Sekunden
 
 Beispiel:
 $data = TADO_SetCoolingTimer(12345, 3600);

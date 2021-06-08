@@ -146,7 +146,7 @@ class TadoCooling extends IPSModule
             $data = [];
             $buffer = [];
             $data['DataID'] = TADO_SPLITTER_DATA_GUID;
-            $buffer['Command'] = 'TurnZoneManualHeatingOff';
+            $buffer['Command'] = 'StopManualMode';
             $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID];
             $data['Buffer'] = $buffer;
             $data = json_encode($data);
@@ -366,11 +366,11 @@ class TadoCooling extends IPSModule
                 $fanSpeedValue = 'LOW';
                 break;
 
-            case 2:
+            case 1:
                 $fanSpeedValue = 'MIDDLE';
                 break;
 
-            case 3:
+            case 2:
                 $fanSpeedValue = 'HIGH';
                 break;
 
@@ -540,7 +540,7 @@ class TadoCooling extends IPSModule
 
     private function DeleteProfiles(): void
     {
-        $profiles = ['Mode', 'SetpointTemperature', 'CoolingTimer'];
+        $profiles = ['Mode', 'SetpointTemperature', 'FanSpeed', 'Swing', 'CoolingTimer'];
         foreach ($profiles as $profile) {
             $profileName = 'TADO.' . $this->InstanceID . '.' . $profile;
             if (@IPS_VariableProfileExists($profileName)) {

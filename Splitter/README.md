@@ -58,7 +58,9 @@ Die Splitter Instanz ist im WebFront nicht verfügbar.
 
 ```text
 Benutzerkonto:  
+```
 
+```text
 string TADO_GetAccount(integer $InstanceID);  
 Liefert Informationen über das Tado Benutzerkonto.
 
@@ -68,21 +70,25 @@ $data = TADO_GetAccount(12345);
 
 ```text
 Zuhause (Home):  
+```
 
+```text
 string TADO_GetHome(integer $InstanceID, integer $HomeID);  
 Liefert Informationen über das Zuhause (Home).
 
 Beispiel:
 $data = TADO_GetHome(12345, 1234);  
-  
+```
 
+```text
 string TADO_GetHomeState(integer $InstanceID, integer $HomeID);  
 Liefert Statusinformationen über das Zuhause (Home).
 
 Beispiel:
 $data = TADO_GetHomeState(12345, 1234);  
-  
+```
 
+```text
 string TADO_SetPresenceLock(integer $InstanceID, integer $HomeID, integer $Mode);  
 Schaltet den Geofencing Modus (0 = Auto, 1 = Home, 2 = Away).
 
@@ -92,21 +98,25 @@ $data = TADO_SetPresenceLock(12345, 1234, 0);
 
 ```text
 Raum (Zone):  
+```
 
+```text
 string TADO_GetZones(integer $InstanceID, integer $HomeID);  
 Liefert Informationen über die Räume (Zonen) des Zuhauses (Home).
 
 Beispiel:
 $data = TADO_GetZones(12345);  
-  
+```
 
+```text
 string TADO_GetZoneState(integer $InstanceID, integer $HomeID, integer $ZoneID);  
 Liefert Statusinformationen über den Raum (Zone) des Zuhauses (Home).
 
 Beispiel:
 $data = TADO_GetZoneState(12345, 1234, 1);  
-  
+```
 
+```text
 string TADO_StopManualMode(integer $InstanceID, integer $HomeID, integer $ZoneID);  
 Stoppt dem manuellen Modus und schaltet zurück auf den intelligenten Zeitplan.
 
@@ -116,49 +126,84 @@ $data = TADO_StopManualMode(12345, 1234, 1);
 
 ```text
 Heizmodus (Smartes Thermostat, Smartes Heizkörper-Thermostat):  
+```
 
+```text
 string TADO_SetHeatingZoneTemperature(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, float $Temperature)  
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) auf den die angegebene Temperatur.
 
 Beispiel:
 $data = TADO_SetHeatingZoneTemperature(12345, 1234, 1, 'ON', 23.5);
-  
+```
 
+```text
 string SetHeatingZoneTemperatureTimer(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, integer $Temperature, integer $DurationInSeconds) 
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) für eine bestimmte Zeit auf den die angegebene Temperatur.
 
 Beispiel:
 $data = SetHeatingZoneTemperatureTimer(12345, 1234, 1, 'ON', 23.5, 180);
-  
+```
 
+```text
 string SetHeatingZoneTemperatureTimerNextTimeBlock(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, integer $Temperature)
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home)  bis zum nächsten Zeitblock auf den die angegebene Temperatur.
 
 Beispiel:
 $data = SetHeatingZoneTemperatureTimerNextTimeBlock(12345, 1234, 1, 'ON', 23.5);
- ```  
+```
 
 ```text
 Kühlmodus (Smartes Klimaanlagen-Thermostat):  
+ ```  
 
+```text
 string TADO_SetCoolingZoneTemperature(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, float $Temperature)  
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) auf den die angegebene Temperatur.
 
 Beispiel:
 $data = TADO_SetCoolingZoneTemperature(12345, 1234, 1, 'ON', 15.5);
-  
+```
 
+```text
+string TADO_SetCoolingZoneTemperatureEx(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, float $Temperature, string $FanSpeed, string $Swing)  
+Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) auf den die angegebene Temperatur.
+Zusätzlich kann die Lüftungsintensität und die Lamellenbewegung angegeben werden.
+
+Beispiel:
+$data = TADO_SetCoolingZoneTemperatureEx(12345, 1234, 1, 'ON', 15.5, 'MID', 'ON');
+```
+
+```text
 string SetCoolingZoneTemperatureTimer(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, integer $Temperature, integer $DurationInSeconds) 
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) für eine bestimmte Zeit auf den die angegebene Temperatur.
 
 Beispiel:
 $data = SetCoolingZoneTemperatureTimer(12345, 1234, 1, 'ON', 15.5, 180);
-  
+```
 
+```text
+string SetCoolingZoneTemperatureTimerEx(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, integer $Temperature, integer $DurationInSeconds, string $FanSpeed, string $Swing) 
+Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) für eine bestimmte Zeit auf den die angegebene Temperatur.
+Zusätzlich kann die Lüftungsintensität und die Lamellenbewegung angegeben werden.
+
+Beispiel:
+$data = SetCoolingZoneTemperatureTimerEx(12345, 1234, 1, 'ON', 15.5, 180, 'MID', 'ON');
+```
+
+```text
 string SetCoolingZoneTemperatureTimerNextTimeBlock(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, integer $Temperature)
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home)  bis zum nächsten Zeitblock auf den die angegebene Temperatur.
 
 Beispiel:
 $data = SetCoolingZoneTemperatureTimerNextTimeBlock(12345, 1234, 1, 'ON', 15.5);
+```
+
+```text
+string SetCoolingZoneTemperatureTimerNextTimeBlockEx(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, integer $Temperature, string $FanSpeed, string $Swing)
+Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home)  bis zum nächsten Zeitblock auf den die angegebene Temperatur.
+Zusätzlich kann die Lüftungsintensität und die Lamellenbewegung angegeben werden.
+
+Beispiel:
+$data = SetCoolingZoneTemperatureTimerNextTimeBlockEx(12345, 1234, 1, 'ON', 15.5, 'MID', 'ON');
 ```
 
