@@ -142,7 +142,7 @@ class TadoSplitter extends IPSModule
 
             case 'SetCoolingZoneTemperatureEx':
                 $params = (array) $data->Buffer->Params;
-                $response = $this->SetCoolingZoneTemperatureEx($params['homeID'], $params['zoneID'], $params['power'], $params['temperature'], $params['fanSpeed'], $params['swing']);
+                $response = $this->SetCoolingZoneTemperatureEx($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['fanSpeed'], $params['swing']);
                 break;
 
             case 'SetCoolingZoneTemperatureTimer':
@@ -152,7 +152,7 @@ class TadoSplitter extends IPSModule
 
             case 'SetCoolingZoneTemperatureTimerEx':
                 $params = (array) $data->Buffer->Params;
-                $response = $this->SetCoolingZoneTemperatureTimerEx($params['homeID'], $params['zoneID'], $params['power'], $params['temperature'], $params['durationInSeconds'], $params['fanSpeed'], $params['swing']);
+                $response = $this->SetCoolingZoneTemperatureTimerEx($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['durationInSeconds'], $params['fanSpeed'], $params['swing']);
                 break;
 
             case 'SetCoolingZoneTemperatureTimerNextTimeBlock':
@@ -162,7 +162,7 @@ class TadoSplitter extends IPSModule
 
             case 'SetCoolingZoneTemperatureTimerNextTimeBlockEx':
                 $params = (array) $data->Buffer->Params;
-                $response = $this->SetCoolingZoneTemperatureTimerNextTimeBlockEx($params['homeID'], $params['zoneID'], $params['power'], $params['temperature'], $params['fanSpeed'], $params['swing']);
+                $response = $this->SetCoolingZoneTemperatureTimerNextTimeBlockEx($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['fanSpeed'], $params['swing']);
                 break;
 
             default:

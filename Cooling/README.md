@@ -21,6 +21,8 @@ Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen 
 
 ### 1. Funktionsumfang
 
+* Klimaanlage schalten
+* Gerätemodus schalten
 * Automatikmodus schalten
 * Soll-Temperatur anpassen
 * Lüftungsintensität schalten
@@ -62,6 +64,7 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 Name                | Typ       | Beschreibung
 ------------------- | --------- | ---------------------------
+DeviceMode          | integer   | Gerätemodus 
 Mode                | boolean   | Manueller / Automatik Modus
 SetpointTemperature | float     | Solltemperatur
 FanSpeed            | integer   | Lüftungsintensität
@@ -74,6 +77,7 @@ AirHumidity         | float     | Luftfeuchtigkeit
 
 Name                                | Typ
 ----------------------------------- | -------
+TADO.InstanzID.DeviceMode           | integer
 TADO.InstanzID.Mode                 | boolean
 TADO.InstanzID.SetpointTemperature  | float
 TADO.InstanzID.FanSpeed             | integer
@@ -84,6 +88,8 @@ Wird die Instanz gelöscht, so werden automatisch die Profile gelöscht.
 
 ### 6. WebFront
 
+Die Klimaanlage kann ein- und ausgeschaltet werden.
+Der Gerätemodus kann geschaltet werden.
 Der Automatikmodus kann ein- und ausgeschaltet werden.  
 Die Solltemperatur kann angepasst werden.  
 Die Lüftungsintesität kann ausgewähöt werden.  
@@ -91,6 +97,32 @@ Die Lammellenbewegung kann ein- und ausgeschaltet werden.
 Der Timer kann gestellt werden.  
 
 ### 7. PHP-Befehlsreferenz
+
+```text
+void TADO_TogglePower(integer $InstanceID, boolean $State);  
+Schaltet die Klimaanlage aus oder an.
+
+$State:
+false   = Aus
+true    = An
+
+Beispiel:
+$data = TADO_TogglePower(12345, false);
+```  
+
+```text
+void TADO_ToggleDeviceMode(integer $InstanceID, integer $Mode);  
+Schaltet den Gerätemodus der Klimanalage.
+
+$Mode:
+0 = Cool    | Kühlen
+1 = Dry     | Trocknen
+2 = Fan     | Lüften
+3 = Heat    | Heizen
+
+Beispiel:
+$data = TADO_ToggleDeviceMode(12345, 0);
+```  
 
 ```text
 void TADO_ToggleCoolingMode(integer $InstanceID, boolean $Mode);  

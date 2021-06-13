@@ -95,6 +95,14 @@ class TadoCooling extends IPSModule
     public function RequestAction($Ident, $Value)
     {
         switch ($Ident) {
+            case 'Power':
+                $this->TogglePower($Value);
+                break;
+
+            case 'DeviceMode':
+                $this->ToggleDeviceMode($Value);
+                break;
+
             case 'Mode':
                 $this->ToggleCoolingMode($Value);
                 break;
@@ -116,6 +124,44 @@ class TadoCooling extends IPSModule
                 break;
 
         }
+    }
+
+    public function TogglePower(bool $State): void
+    {
+        $this->SendDebug(__FUNCTION__, 'The method was executed with parameter $Mode: ' . json_encode($State) . ' (' . microtime(true) . ')', 0);
+        //Check parent
+        if (!$this->CheckParent()) {
+            return;
+        }
+        //Check IDs
+        if (!$this->CheckHomeID()) {
+            return;
+        }
+        if (!$this->CheckZoneID()) {
+            return;
+        }
+        $this->SetValue('Power', $State);
+        $this->SetCooling();
+        $this->UpdateCoolingZoneState();
+    }
+
+    public function ToggleDeviceMode(int $Mode): void
+    {
+        $this->SendDebug(__FUNCTION__, 'The method was executed with parameter $Mode: ' . json_encode($Mode) . ' (' . microtime(true) . ')', 0);
+        //Check parent
+        if (!$this->CheckParent()) {
+            return;
+        }
+        //Check IDs
+        if (!$this->CheckHomeID()) {
+            return;
+        }
+        if (!$this->CheckZoneID()) {
+            return;
+        }
+        $this->SetValue('DeviceMode', $Mode);
+        $this->SetCooling();
+        $this->UpdateCoolingZoneState();
     }
 
     public function ToggleCoolingMode(bool $Mode): void
@@ -267,6 +313,36 @@ class TadoCooling extends IPSModule
             $this->SetValue('Mode', $mode);
             //Setting
             if (array_key_exists('setting', $result)) {
+                //Power
+                if (array_key_exists('power', $result['setting'])) {
+                    $power = $result['setting']['power'];
+                    $powerState = false;
+                    if ($power == 'ON') {
+                        $powerState = true;
+                    }
+                    $this->SetValue('Power', $powerState);
+                }
+                //Device mode
+                if (array_key_exists('mode', $result['setting'])) {
+                    $mode = $result['setting']['mode'];
+                    switch ($mode) {
+                        case 'DRY':
+                            $modeValue = 1;
+                            break;
+
+                        case 'FAN':
+                            $modeValue = 2;
+                            break;
+
+                        case 'HEAT':
+                            $modeValue = 3;
+                            break;
+
+                        default:
+                            $modeValue = 0;
+                    }
+                    $this->SetValue('DeviceMode', $modeValue);
+                }
                 //Setpoint temperature
                 if (array_key_exists('temperature', $result['setting'])) {
                     $temperatureSettings = $result['setting']['temperature'];
@@ -353,7 +429,31 @@ class TadoCooling extends IPSModule
         $data = [];
         $buffer = [];
         $data['DataID'] = TADO_SPLITTER_DATA_GUID;
-        $power = 'ON';
+
+        //Power
+        $power = 'OFF';
+        if ($this->GetValue('Power')) {
+            $power = 'ON';
+        }
+
+        switch ($this->GetValue('DeviceMode')) {
+            case 1:
+                $deviceMode = 'DRY';
+                break;
+
+            case 2:
+                $deviceMode = 'FAN';
+                break;
+
+            case 3:
+                $deviceMode = 'HEAT';
+                break;
+
+            default:
+                $deviceMode = 'COOL';
+        }
+
+        //Setpoint temperature
         $temperature = $this->GetValue('SetpointTemperature');
         if ($temperature == 0) {
             $power = 'OFF';
@@ -392,7 +492,7 @@ class TadoCooling extends IPSModule
                 case 1:
                 case 2:
                     $buffer['Command'] = 'SetCoolingZoneTemperatureEx';
-                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'temperature' => $temperature, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'mode' => $deviceMode, 'temperature' => $temperature, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
                     break;
 
                 default:
@@ -411,7 +511,7 @@ class TadoCooling extends IPSModule
                 case 1:
                 case 2:
                     $buffer['Command'] = 'SetCoolingZoneTemperatureTimerNextTimeBlockEx';
-                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'temperature' => $temperature, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'mode' => $deviceMode, 'temperature' => $temperature, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
                     break;
 
                 default:
@@ -430,7 +530,7 @@ class TadoCooling extends IPSModule
                 case 1:
                 case 2:
                     $buffer['Command'] = 'SetCoolingZoneTemperatureTimerEx';
-                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'temperature' => $temperature, 'durationInSeconds' => $coolingTimer, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'mode' => $deviceMode, 'temperature' => $temperature, 'durationInSeconds' => $coolingTimer, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
                     break;
 
                 default:
@@ -464,6 +564,15 @@ class TadoCooling extends IPSModule
 
     private function CreateProfiles(): void
     {
+        //Device mode
+        $profile = 'TADO.' . $this->InstanceID . '.DeviceMode';
+        if (!IPS_VariableProfileExists($profile)) {
+            IPS_CreateVariableProfile($profile, 1);
+        }
+        IPS_SetVariableProfileAssociation($profile, 0, $this->Translate('Cool'), 'Snowflake', 0x0000FF);
+        IPS_SetVariableProfileAssociation($profile, 1, $this->Translate('Dry'), 'Drops', 0x00FF00);
+        IPS_SetVariableProfileAssociation($profile, 2, $this->Translate('Fan'), 'Ventilation', 0x00FF00);
+        IPS_SetVariableProfileAssociation($profile, 3, $this->Translate('Heat'), 'Flame', 0xFF0000);
         //Mode
         $profile = 'TADO.' . $this->InstanceID . '.Mode';
         if (!IPS_VariableProfileExists($profile)) {
@@ -540,7 +649,7 @@ class TadoCooling extends IPSModule
 
     private function DeleteProfiles(): void
     {
-        $profiles = ['Mode', 'SetpointTemperature', 'FanSpeed', 'Swing', 'CoolingTimer'];
+        $profiles = ['DeviceMode', 'Mode', 'SetpointTemperature', 'FanSpeed', 'Swing', 'CoolingTimer'];
         foreach ($profiles as $profile) {
             $profileName = 'TADO.' . $this->InstanceID . '.' . $profile;
             if (@IPS_VariableProfileExists($profileName)) {
@@ -551,6 +660,13 @@ class TadoCooling extends IPSModule
 
     private function RegisterVariables(): void
     {
+        //Power
+        $this->RegisterVariableBoolean('Power', 'Power', '~Switch', 1);
+        $this->EnableAction('Power');
+        //Device mode
+        $profile = 'TADO.' . $this->InstanceID . '.DeviceMode';
+        $this->RegisterVariableInteger('DeviceMode', $this->Translate('Device mode'), $profile, 5);
+        $this->EnableAction('DeviceMode');
         //Mode
         $profile = 'TADO.' . $this->InstanceID . '.Mode';
         $this->RegisterVariableBoolean('Mode', $this->Translate('Automatic'), $profile, 10);
