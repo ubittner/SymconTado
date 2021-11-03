@@ -489,10 +489,15 @@ class TadoCooling extends IPSModule
         if ($coolingTimer == 0) {
             $this->SendDebug(__FUNCTION__, 'Do not use timer, set temperature for unlimited time.', 0);
             switch ($this->ReadPropertyInteger('DeviceType')) {
-                case 1:
-                case 2:
+                case 1: # Fujitsu AUYG07LVLA
+                case 2: # Fujitsu ASYG09LMCA
                     $buffer['Command'] = 'SetCoolingZoneTemperatureEx';
                     $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'mode' => $deviceMode, 'temperature' => $temperature, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
+                    break;
+
+                case 3: # LG Standard Plus PC12SQ (without swing)
+                    $buffer['Command'] = 'SetCoolingZoneTemperatureEx2';
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'mode' => $deviceMode, 'temperature' => $temperature, 'fanSpeed' => $fanSpeedValue];
                     break;
 
                 default:
@@ -508,10 +513,15 @@ class TadoCooling extends IPSModule
         if ($coolingTimer == 1) {
             $this->SendDebug(__FUNCTION__, 'Use cooling timer, set temperature till next time block.', 0);
             switch ($this->ReadPropertyInteger('DeviceType')) {
-                case 1:
-                case 2:
+                case 1: # Fujitsu AUYG07LVLA
+                case 2: # Fujitsu ASYG09LMCA
                     $buffer['Command'] = 'SetCoolingZoneTemperatureTimerNextTimeBlockEx';
                     $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'mode' => $deviceMode, 'temperature' => $temperature, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
+                    break;
+
+                case 3: # LG Standard Plus PC12SQ (without swing)
+                    $buffer['Command'] = 'SetCoolingZoneTemperatureTimerNextTimeBlockEx2';
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'mode' => $deviceMode, 'temperature' => $temperature, 'fanSpeed' => $fanSpeedValue];
                     break;
 
                 default:
@@ -527,10 +537,15 @@ class TadoCooling extends IPSModule
         if ($coolingTimer >= 300) {
             $this->SendDebug(__FUNCTION__, 'Use cooling timer, set temperature for ' . $coolingTimer . 'seconds.', 0);
             switch ($this->ReadPropertyInteger('DeviceType')) {
-                case 1:
-                case 2:
+                case 1: # Fujitsu AUYG07LVLA
+                case 2: # Fujitsu ASYG09LMCA
                     $buffer['Command'] = 'SetCoolingZoneTemperatureTimerEx';
                     $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'mode' => $deviceMode, 'temperature' => $temperature, 'durationInSeconds' => $coolingTimer, 'fanSpeed' => $fanSpeedValue, 'swing' => $swingValue];
+                    break;
+
+                case 3: # LG Standard Plus PC12SQ (without swing)
+                    $buffer['Command'] = 'SetCoolingZoneTemperatureTimerEx2';
+                    $buffer['Params'] = ['homeID' => $homeID, 'zoneID' => $zoneID, 'power' => $power, 'mode' => $deviceMode, 'temperature' => $temperature, 'durationInSeconds' => $coolingTimer, 'fanSpeed' => $fanSpeedValue];
                     break;
 
                 default:
