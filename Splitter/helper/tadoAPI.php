@@ -332,6 +332,25 @@ trait tadoAPI
         return $this->SendDataToTado($endpoint, 'PUT', $postfields);
     }
 
+    public function SetCoolingZoneTemperatureEx2(int $HomeID, int $ZoneID, string $PowerState, string $DeviceMode, float $Temperature, string $FanSpeed): string
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
+        switch ($DeviceMode) {
+            case 'DRY': # without temperature and fan speed
+                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode], 'termination' => ['type' => 'MANUAL']]);
+                break;
+
+            case 'FAN': # without temperature
+                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed], 'termination' => ['type' => 'MANUAL']]);
+                break;
+
+            default:
+                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'temperature' =>['celsius' => $Temperature]], 'termination' => ['type' => 'MANUAL']]);
+
+        }
+        return $this->SendDataToTado($endpoint, 'PUT', $postfields);
+    }
+
     /**
      * This PUT endpoint will make it possible to set a manual temperature for the given cooling zone of your home for a selected time.
      *
@@ -370,6 +389,25 @@ trait tadoAPI
         return $this->SendDataToTado($endpoint, 'PUT', $postfields);
     }
 
+    public function SetCoolingZoneTemperatureTimerEx2(int $HomeID, int $ZoneID, string $PowerState, string $DeviceMode, int $Temperature, int $DurationInSeconds, string $FanSpeed): string
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
+        switch ($DeviceMode) {
+            case 'DRY': # without temperature and fan speed
+                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]);
+                break;
+
+            case 'FAN': # without temperature
+                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]);
+                break;
+
+            default:
+                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'temperature' =>['celsius' => $Temperature]], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]);
+
+        }
+        return $this->SendDataToTado($endpoint, 'PUT', $postfields);
+    }
+
     /**
      * This PUT endpoint will make it possible to set a manual temperature for the given cooling zone of your home till the next time block.
      *
@@ -402,6 +440,25 @@ trait tadoAPI
 
             default:
                 $postfields = json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing, 'temperature' =>['celsius' => $Temperature]], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]);
+
+        }
+        return $this->SendDataToTado($endpoint, 'PUT', $postfields);
+    }
+
+    public function SetCoolingZoneTemperatureTimerNextTimeBlockEx2(int $HomeID, int $ZoneID, string $PowerState, string $DeviceMode, int $Temperature, string $FanSpeed): string
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
+        switch ($DeviceMode) {
+            case 'DRY': # without temperature and fan speed
+                $postfields = json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]);
+                break;
+
+            case 'FAN': # without temperature
+                $postfields = json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]);
+                break;
+
+            default:
+                $postfields = json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'temperature' =>['celsius' => $Temperature]], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]);
 
         }
         return $this->SendDataToTado($endpoint, 'PUT', $postfields);
