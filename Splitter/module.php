@@ -145,6 +145,11 @@ class TadoSplitter extends IPSModule
                 $response = $this->SetCoolingZoneTemperatureEx($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['fanSpeed'], $params['swing']);
                 break;
 
+            case 'SetCoolingZoneTemperatureEx2':
+                $params = (array) $data->Buffer->Params;
+                $response = $this->SetCoolingZoneTemperatureEx2($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['fanSpeed']);
+                break;
+
             case 'SetCoolingZoneTemperatureTimer':
                 $params = (array) $data->Buffer->Params;
                 $response = $this->SetCoolingZoneTemperatureTimer($params['homeID'], $params['zoneID'], $params['power'], $params['temperature'], $params['durationInSeconds']);
@@ -155,6 +160,11 @@ class TadoSplitter extends IPSModule
                 $response = $this->SetCoolingZoneTemperatureTimerEx($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['durationInSeconds'], $params['fanSpeed'], $params['swing']);
                 break;
 
+            case 'SetCoolingZoneTemperatureTimerEx2':
+                $params = (array) $data->Buffer->Params;
+                $response = $this->SetCoolingZoneTemperatureTimerEx2($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['durationInSeconds'], $params['fanSpeed']);
+                break;
+
             case 'SetCoolingZoneTemperatureTimerNextTimeBlock':
                 $params = (array) $data->Buffer->Params;
                 $response = $this->SetCoolingZoneTemperatureTimerNextTimeBlock($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
@@ -163,6 +173,16 @@ class TadoSplitter extends IPSModule
             case 'SetCoolingZoneTemperatureTimerNextTimeBlockEx':
                 $params = (array) $data->Buffer->Params;
                 $response = $this->SetCoolingZoneTemperatureTimerNextTimeBlockEx($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['fanSpeed'], $params['swing']);
+                break;
+
+            case 'SetCoolingZoneTemperatureTimerNextTimeBlockEx2':
+                $params = (array) $data->Buffer->Params;
+                $response = $this->SetCoolingZoneTemperatureTimerNextTimeBlockEx2($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['fanSpeed']);
+                break;
+
+            case 'SendDataToTado':
+                $params = (array) $data->Buffer->Params;
+                $response = $this->SendDataToTado($params['endpoint'], $params['customRequest'], $params['postfields']);
                 break;
 
             default:

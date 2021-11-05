@@ -492,7 +492,7 @@ trait tadoAPI
 
     #################### Private
 
-    private function SendDataToTado(string $Endpoint, string $CustomRequest, string $Postfields)
+    public function SendDataToTado(string $Endpoint, string $CustomRequest, string $Postfields)
     {
         $this->SendDebug(__FUNCTION__, 'Endpoint: ' . $Endpoint, 0);
         $this->SendDebug(__FUNCTION__, 'CustomRequest: ' . $CustomRequest, 0);
