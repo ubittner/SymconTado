@@ -584,7 +584,6 @@ trait tadoAPI
     {
         $this->SendDebug(__FUNCTION__, 'Endpoint: ' . $Endpoint, 0);
         $this->SendDebug(__FUNCTION__, 'CustomRequest: ' . $CustomRequest, 0);
-        return '';
         $body = '';
         $accessToken = $this->GetBearerToken();
         if (is_array(json_decode($accessToken, true))) {
