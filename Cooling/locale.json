@@ -1,6 +1,7 @@
 {
   "translations": {
     "de": {
+      "Swing": "Lamellenbewegung",
       "Home ID": "Zuhause ID",
       "Home Name": "Zuhause Name",
       "Zone ID": "Raum ID",
@@ -26,7 +27,6 @@
       "Device mode": "Gerätemodus",
       "Setpoint temperature": "Soll-Temperatur",
       "Fan speed": "Lüftungsintensität",
-      "Swing": "Lamellenbewegung",
       "Off": "Aus",
       "On": "An",
       "Till next time block": "Bis zum nächsten Schaltpunkt",

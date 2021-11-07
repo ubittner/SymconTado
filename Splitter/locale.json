@@ -15,7 +15,8 @@
       "Please enter your E-Mail address!": "Bitte geben Sie Ihre E-Mail Adresse an!",
       "Please enter your password!": "Bitte geben Sie Ihre Kennwort an!",
       "Check credentials. Token is missing or invalid!": "Bitte Anmeldedaten prüfen. Fehlender oder ungültiger Token!",
-      "Instance is inactive!": "Instanz ist inaktiv!"
+      "Instance is inactive!": "Instanz ist inaktiv!",
+      "This method is deprecated and will no longer be available after the next update!": "Diese Methode ist veraltet und steht ab der nächsten Aktualisierung nicht mehr zur Verfügung!"
     }
   }
 }

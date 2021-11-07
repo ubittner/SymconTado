@@ -1,5 +1,6 @@
 <?php
 
+/** @noinspection PhpRedundantMethodOverrideInspection */
 /** @noinspection PhpUnused */
 
 /*
@@ -135,49 +136,39 @@ class TadoSplitter extends IPSModule
                 $response = $this->SetHeatingZoneTemperatureTimerNextTimeBlock($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
                 break;
 
-            case 'SetCoolingZoneTemperature':
+            case 'SetCoolingZoneTemperature': # Deprecated !
                 $params = (array) $data->Buffer->Params;
                 $response = $this->SetCoolingZoneTemperature($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
                 break;
 
-            case 'SetCoolingZoneTemperatureEx':
+            case 'SetCoolingZoneTemperatureEx': # Deprecated !
                 $params = (array) $data->Buffer->Params;
                 $response = $this->SetCoolingZoneTemperatureEx($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['fanSpeed'], $params['swing']);
                 break;
 
-            case 'SetCoolingZoneTemperatureEx2':
-                $params = (array) $data->Buffer->Params;
-                $response = $this->SetCoolingZoneTemperatureEx2($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['fanSpeed']);
-                break;
-
-            case 'SetCoolingZoneTemperatureTimer':
+            case 'SetCoolingZoneTemperatureTimer': # Deprecated !
                 $params = (array) $data->Buffer->Params;
                 $response = $this->SetCoolingZoneTemperatureTimer($params['homeID'], $params['zoneID'], $params['power'], $params['temperature'], $params['durationInSeconds']);
                 break;
 
-            case 'SetCoolingZoneTemperatureTimerEx':
+            case 'SetCoolingZoneTemperatureTimerEx': # Deprecated !
                 $params = (array) $data->Buffer->Params;
                 $response = $this->SetCoolingZoneTemperatureTimerEx($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['durationInSeconds'], $params['fanSpeed'], $params['swing']);
                 break;
 
-            case 'SetCoolingZoneTemperatureTimerEx2':
-                $params = (array) $data->Buffer->Params;
-                $response = $this->SetCoolingZoneTemperatureTimerEx2($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['durationInSeconds'], $params['fanSpeed']);
-                break;
-
-            case 'SetCoolingZoneTemperatureTimerNextTimeBlock':
+            case 'SetCoolingZoneTemperatureTimerNextTimeBlock': # Deprecated !
                 $params = (array) $data->Buffer->Params;
                 $response = $this->SetCoolingZoneTemperatureTimerNextTimeBlock($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
                 break;
 
-            case 'SetCoolingZoneTemperatureTimerNextTimeBlockEx':
+            case 'SetCoolingZoneTemperatureTimerNextTimeBlockEx': # Deprecated !
                 $params = (array) $data->Buffer->Params;
                 $response = $this->SetCoolingZoneTemperatureTimerNextTimeBlockEx($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['fanSpeed'], $params['swing']);
                 break;
 
-            case 'SetCoolingZoneTemperatureTimerNextTimeBlockEx2':
+            case 'SetCoolingZone':
                 $params = (array) $data->Buffer->Params;
-                $response = $this->SetCoolingZoneTemperatureTimerNextTimeBlockEx2($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['fanSpeed']);
+                $response = $this->SetCoolingZone($params['homeID'], $params['zoneID'], $params['power'], $params['deviceMode'], $params['mode'], $params['temperatureCelsius'], $params['fanSpeed'], $params['swing'], $params['timer'], $params['durationInSeconds']);
                 break;
 
             case 'SendDataToTado':

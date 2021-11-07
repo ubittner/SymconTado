@@ -50,7 +50,7 @@ __Konfigurationsseite__:
 
 Name            | Beschreibung
 --------------- | ----------------------------------------------
-Gerätetyp       | Auswahl des Gerätetyps 
+Lamellenbwegung | Lammelenbewegung verwenden, sofern vom Gerät unterstützt 
 Informationen   | Diverse Informationen über den Raum (Zone)
 
 Sofern der Gerätetyp nicht auf Standard eingestellt ist,  
@@ -64,6 +64,7 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 Name                | Typ       | Beschreibung
 ------------------- | --------- | ---------------------------
+Power               | bool      | Aus / An
 DeviceMode          | integer   | Gerätemodus 
 Mode                | boolean   | Manueller / Automatik Modus
 SetpointTemperature | float     | Solltemperatur

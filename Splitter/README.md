@@ -169,6 +169,27 @@ OFF | ON
 ```  
 
 ```text
+string TADO_SetCoolingZone(interger $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, string $DeviceMode, string $Mode, float $TemperatureCelsius, string $FanSpeed, string $Swing, string $Timer, int $DurationInSeconds);
+Setzt einen Raums (Zone) des Zuhauses (Home) auf die angegebene Werte.
+
+     * @param int $HomeID
+     * @param int $ZoneID
+     * @param string $PowerState        OFF, ON
+     * @param string $DeviceMode        COOL, HEAT, DRY, FAN
+     * @param string $Mode              MANUAL, AUTO
+     * @param float $TemperatureCelsius
+     * @param string $FanSpeed          LOW, MIDDLE, HIGH, AUTO
+     * @param string $Swing             OFF, ON
+     * @param string $Timer             NO TIMER, TIMER, NEXT_TIME_BLOCK
+     * @param int $DurationInSeconds
+     
+Beispiel:
+$data = TADO_SetCoolingZone(12345, 1234, 1, 'ON', 'COOL', 'MANUAL', 15.5, 'LOW', ON, 'NO TIMER', 0);
+```
+
+```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string TADO_SetCoolingZoneTemperature(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, float $Temperature)  
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) auf den die angegebene Temperatur.
 
@@ -177,6 +198,8 @@ $data = TADO_SetCoolingZoneTemperature(12345, 1234, 1, 'ON', 15.5);
 ```
 
 ```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string TADO_SetCoolingZoneTemperatureEx(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, string $DeviceMode, float $Temperature, string $FanSpeed, string $Swing)  
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) auf den die angegebene Temperatur.
 Zusätzlich kann der Gerätemodus, die Lüftungsintensität und die Lamellenbewegung angegeben werden.
@@ -186,6 +209,8 @@ $data = TADO_SetCoolingZoneTemperatureEx(12345, 1234, 1, 'ON', 'COOL', 15.5, 'MI
 ```
 
 ```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string SetCoolingZoneTemperatureTimer(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, integer $Temperature, integer $DurationInSeconds) 
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) für eine bestimmte Zeit auf den die angegebene Temperatur.
 
@@ -194,6 +219,8 @@ $data = SetCoolingZoneTemperatureTimer(12345, 1234, 1, 'ON', 15.5, 180);
 ```
 
 ```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string SetCoolingZoneTemperatureTimerEx(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, string $DeviceMode, integer $Temperature, integer $DurationInSeconds, string $FanSpeed, string $Swing) 
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) für eine bestimmte Zeit auf den die angegebene Temperatur.
 Zusätzlich kann der Gerätemodus, die Lüftungsintensität und die Lamellenbewegung angegeben werden.
@@ -203,6 +230,8 @@ $data = SetCoolingZoneTemperatureTimerEx(12345, 1234, 1, 'ON', 'COOL', 15.5, 180
 ```
 
 ```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string SetCoolingZoneTemperatureTimerNextTimeBlock(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, integer $Temperature)
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home)  bis zum nächsten Zeitblock auf den die angegebene Temperatur.
 
@@ -211,6 +240,8 @@ $data = SetCoolingZoneTemperatureTimerNextTimeBlock(12345, 1234, 1, 'ON', 15.5);
 ```
 
 ```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string SetCoolingZoneTemperatureTimerNextTimeBlockEx(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, string $DeviceMode, integer $Temperature, string $FanSpeed, string $Swing)
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home)  bis zum nächsten Zeitblock auf den die angegebene Temperatur.
 Zusätzlich kann der Gerätemodus, die Lüftungsintensität und die Lamellenbewegung angegeben werden.
