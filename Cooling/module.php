@@ -49,6 +49,15 @@ class TadoCooling extends IPSModule
         // Power
         $this->RegisterVariableBoolean('Power', 'Power', '~Switch', 10);
         $this->EnableAction('Power');
+        // Mode
+        $profile = 'TADO.' . $this->InstanceID . '.Mode';
+        if (!IPS_VariableProfileExists($profile)) {
+            IPS_CreateVariableProfile($profile, 0);
+        }
+        IPS_SetVariableProfileAssociation($profile, 0, $this->Translate('Manual'), 'Execute', -1);
+        IPS_SetVariableProfileAssociation($profile, 1, $this->Translate('Smart Schedule'), 'Calendar', 0x00FF00);
+        $this->RegisterVariableBoolean('Mode', $this->Translate('Mode'), $profile, 20);
+        $this->EnableAction('Mode');
         // Device mode
         $profile = 'TADO.' . $this->InstanceID . '.DeviceMode';
         if (!IPS_VariableProfileExists($profile)) {
@@ -57,18 +66,10 @@ class TadoCooling extends IPSModule
         IPS_SetVariableProfileAssociation($profile, 0, $this->Translate('Cool'), 'Snowflake', 0x0000FF);
         IPS_SetVariableProfileAssociation($profile, 1, $this->Translate('Dry'), 'Drops', 0x00FF00);
         IPS_SetVariableProfileAssociation($profile, 2, $this->Translate('Fan'), 'Ventilation', 0x00FF00);
-        IPS_SetVariableProfileAssociation($profile, 3, $this->Translate('Heat'), 'Flame', 0xFF0000);
-        $this->RegisterVariableInteger('DeviceMode', $this->Translate('Device mode'), $profile, 20);
+        IPS_SetVariableProfileAssociation($profile, 3, $this->Translate('Heat'), 'Sun', 0xFF0000);
+        IPS_SetVariableProfileAssociation($profile, 4, $this->Translate('Auto'), 'Climate', -1);
+        $this->RegisterVariableInteger('DeviceMode', $this->Translate('Device mode'), $profile, 30);
         $this->EnableAction('DeviceMode');
-        // Mode
-        $profile = 'TADO.' . $this->InstanceID . '.Mode';
-        if (!IPS_VariableProfileExists($profile)) {
-            IPS_CreateVariableProfile($profile, 0);
-        }
-        IPS_SetVariableProfileAssociation($profile, 0, $this->Translate('Manual'), 'Execute', -1);
-        IPS_SetVariableProfileAssociation($profile, 1, $this->Translate('Automatic'), 'Calendar', 0x00FF00);
-        $this->RegisterVariableBoolean('Mode', $this->Translate('Automatic'), $profile, 30);
-        $this->EnableAction('Mode');
         // Set point temperature
         $profile = 'TADO.' . $this->InstanceID . '.SetpointTemperature';
         if (!IPS_VariableProfileExists($profile)) {
@@ -246,12 +247,12 @@ class TadoCooling extends IPSModule
                 $this->TogglePower($Value);
                 break;
 
-            case 'DeviceMode':
-                $this->ToggleDeviceMode($Value);
-                break;
-
             case 'Mode':
                 $this->ToggleCoolingMode($Value);
+                break;
+
+            case 'DeviceMode':
+                $this->ToggleDeviceMode($Value);
                 break;
 
             case 'SetpointTemperature':
@@ -291,25 +292,6 @@ class TadoCooling extends IPSModule
         $this->SetCooling();
     }
 
-    public function ToggleDeviceMode(int $Mode): void
-    {
-        $this->SendDebug(__FUNCTION__, 'The method was executed with parameter $Mode: ' . json_encode($Mode) . ' (' . microtime(true) . ')', 0);
-        // Check parent
-        if (!$this->CheckParent()) {
-            return;
-        }
-        // Check IDs
-        if (!$this->CheckHomeID()) {
-            return;
-        }
-        if (!$this->CheckZoneID()) {
-            return;
-        }
-        $this->SetValue('Power', true);
-        $this->SetValue('DeviceMode', $Mode);
-        $this->SetCooling();
-    }
-
     public function ToggleCoolingMode(bool $Mode): void
     {
         $this->SendDebug(__FUNCTION__, 'The method was executed with parameter $Mode: ' . json_encode($Mode) . ' (' . microtime(true) . ')', 0);
@@ -331,7 +313,7 @@ class TadoCooling extends IPSModule
             $this->SetValue('Power', true);
             $this->SetCooling();
         }
-        // Automatic mode
+        // Smart schedule (automatic)
         if ($Mode) {
             $this->SendDebug(__FUNCTION__, 'Mode: Automatic', 0);
             $homeID = intval($this->ReadPropertyString('HomeID'));
@@ -346,6 +328,26 @@ class TadoCooling extends IPSModule
             json_decode($this->SendDataToParent($data), true);
             $this->UpdateCoolingZoneState();
         }
+    }
+
+    public function ToggleDeviceMode(int $Mode): void
+    {
+        $this->SendDebug(__FUNCTION__, 'The method was executed with parameter $Mode: ' . json_encode($Mode) . ' (' . microtime(true) . ')', 0);
+        // Check parent
+        if (!$this->CheckParent()) {
+            return;
+        }
+        // Check IDs
+        if (!$this->CheckHomeID()) {
+            return;
+        }
+        if (!$this->CheckZoneID()) {
+            return;
+        }
+        $this->SetValue('Power', true);
+        $this->SetValue('Mode', false);
+        $this->SetValue('DeviceMode', $Mode);
+        $this->SetCooling();
     }
 
     public function SetCoolingTemperature(float $Temperature): void
@@ -365,7 +367,6 @@ class TadoCooling extends IPSModule
         $this->SetValue('Power', true);
         $this->SetValue('Mode', false);
         $this->SetValue('SetpointTemperature', $Temperature);
-        $this->TogglePower(true);
         $this->SetCooling();
     }
 
@@ -384,6 +385,7 @@ class TadoCooling extends IPSModule
             return;
         }
         $this->SetValue('Power', true);
+        $this->SetValue('Mode', false);
         $this->SetValue('FanSpeed', $Speed);
         $this->SetCooling();
     }
@@ -403,6 +405,7 @@ class TadoCooling extends IPSModule
             return;
         }
         $this->SetValue('Power', true);
+        $this->SetValue('Mode', false);
         $this->SetValue('Swing', $State);
         $this->SetCooling();
     }
@@ -429,6 +432,7 @@ class TadoCooling extends IPSModule
 
     public function UpdateCoolingZoneState(): void
     {
+        $this->SendDebug(__FUNCTION__, 'The method was executed. (' . microtime(true) . ')', 0);
         if (!$this->CheckParent()) {
             return;
         }
@@ -452,7 +456,7 @@ class TadoCooling extends IPSModule
         $this->SendDebug(__FUNCTION__, json_encode($result), 0);
         if (!empty($result)) {
             // Mode
-            $mode = 1; # automatic
+            $mode = 1; # smart schedule
             if (array_key_exists('overlayType', $result)) {
                 if ($result['overlayType'] == 'MANUAL') {
                     $mode = 0;
@@ -484,6 +488,10 @@ class TadoCooling extends IPSModule
 
                         case 'HEAT':
                             $modeValue = 3;
+                            break;
+
+                        case 'AUTO':
+                            $modeValue = 4;
                             break;
 
                         default:
@@ -543,7 +551,10 @@ class TadoCooling extends IPSModule
                             if (array_key_exists('typeSkillBasedApp', $termination)) {
                                 $type = $termination['typeSkillBasedApp'];
                                 $this->SendDebug(__FUNCTION__, 'Timer type: ' . $type, 0);
-                                if ($type == 'TIMER' || $type == 'NEXT_TIME_BLOCK') {
+                                if ($type == 'NEXT_TIME_BLOCK') {
+                                    $coolingTimer = 1;
+                                }
+                                if ($type == 'TIMER') {
                                     if (array_key_exists('remainingTimeInSeconds', $termination)) {
                                         $coolingTimer = $termination['remainingTimeInSeconds'];
                                     }
@@ -568,94 +579,132 @@ class TadoCooling extends IPSModule
                 }
             }
         }
+        // Set next timer interval
+        $milliseconds = $this->ReadPropertyInteger('UpdateInterval') * 1000;
+        $this->SetTimerInterval('UpdateCoolingState', $milliseconds);
     }
 
     public function SetCooling(): void
     {
-        // Power
-        $power = 'OFF';
-        if ($this->GetValue('Power')) {
-            $power = 'ON';
-        }
-
-        // Device Mode
-        switch ($this->GetValue('DeviceMode')) {
-            case 1:
-                $deviceMode = 'DRY';
-                break;
-
-            case 2:
-                $deviceMode = 'FAN';
-                break;
-
-            case 3:
-                $deviceMode = 'HEAT';
-                break;
-
-            default:
-                $deviceMode = 'COOL';
-        }
-
-        // Mode
-        $mode = 'MANUAL';
-        if ($this->GetValue('Mode')) {
-            $mode = 'AUTO';
-        }
-
-        // Temperature
-        $temperatureCelsius = $this->GetValue('SetpointTemperature');
-
-        // Fan speed
-        switch ($this->GetValue('FanSpeed')) {
-            case 0:
-                $fanSpeed = 'LOW';
-                break;
-
-            case 1:
-                $fanSpeed = 'MIDDLE';
-                break;
-
-            case 2:
-                $fanSpeed = 'HIGH';
-                break;
-
-            default:
-                $fanSpeed = 'AUTO';
-        }
-
-        // Swing
-        $swing = '';
-        if ($this->ReadPropertyBoolean('UseSwing')) {
-            $swing = 'OFF';
-            if ($this->GetValue('Swing')) {
-                $swing = 'ON';
-            }
-        }
-
-        // Timer
-        $coolingTimer = $this->GetValue('CoolingTimer');
-        $timer = 'NO TIMER';
-        $durationInSeconds = 0;
-        if ($coolingTimer == 1) {
-            $timer = 'NEXT_TIME_BLOCK';
-        }
-        if ($coolingTimer >= 300) {
-            $timer = 'TIMER';
-            $durationInSeconds = $coolingTimer;
-        }
+        $this->SendDebug(__FUNCTION__, 'The method was executed. (' . microtime(true) . ')', 0);
+        // Disable update during cooling setting
+        $this->SetTimerInterval('UpdateCoolingState', 0);
+        // Prepare data
         $data = [];
         $buffer = [];
         $data['DataID'] = TADO_SPLITTER_DATA_GUID;
         $homeID = $this->ReadPropertyString('HomeID');
         $zoneID = $this->ReadPropertyString('ZoneID');
-        $buffer['Command'] = 'SetCoolingZone';
-        $buffer['Params'] = ['homeID' => (int) $homeID, 'zoneID' => (int) $zoneID, 'power' => $power, 'deviceMode' => $deviceMode, 'mode' => $mode, 'temperatureCelsius' => $temperatureCelsius, 'fanSpeed' => $fanSpeed, 'swing' => $swing, 'timer' => $timer, 'durationInSeconds' => $durationInSeconds];
+        // Power off
+        if (!$this->GetValue('Power')) {
+            $buffer['Command'] = 'SetCoolingZone';
+            $postfields['termination'] = ['typeSkillBasedApp' => 'MANUAL'];
+            $postfields['setting'] = ['power' => 'OFF', 'type' => 'AIR_CONDITIONING'];
+            $buffer['Params'] = ['homeID' => (int) $homeID, 'zoneID' => (int) $zoneID, 'overlay' => json_encode($postfields)];
+        } else {
+            // Power on
+            // Smart schedule
+            if ($this->GetValue('Mode')) {
+                $buffer['Command'] = 'StopManualMode';
+            } else {
+                // Manual mode
+                $buffer['Command'] = 'SetCoolingZone';
+                // Timer
+                $coolingTimer = $this->GetValue('CoolingTimer');
+                if ($coolingTimer == 0) { # No timer
+                    $postfields['termination'] = ['typeSkillBasedApp' => 'MANUAL'];
+                }
+                if ($coolingTimer == 1) { # Timer till next time block
+                    $postfields['termination'] = ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK'];
+                }
+                if ($coolingTimer >= 300) { # Timer
+                    $postfields['termination'] = ['type' => 'TIMER', 'durationInSeconds' => $coolingTimer];
+                }
+                // Temperature
+                $postfields['setting']['temperature'] = ['celsius' => $this->GetValue('SetpointTemperature'), 'fahrenheit' => (float) (($this->GetValue('SetpointTemperature') * 9 / 5) + 32)];
+                // Device mode
+                switch ($this->GetValue('DeviceMode')) {
+                    case 1:
+                        $deviceMode = 'DRY';
+                        break;
+
+                    case 2:
+                        $deviceMode = 'FAN';
+                        break;
+
+                    case 3:
+                        $deviceMode = 'HEAT';
+                        break;
+
+                    case 4:
+                        $deviceMode = 'AUTO';
+                        break;
+
+                    default:
+                        $deviceMode = 'COOL';
+                }
+                $postfields['setting']['mode'] = $deviceMode;
+                // Type
+                $postfields['setting']['type'] = 'AIR_CONDITIONING';
+                // Power
+                $postfields['setting']['power'] = 'ON';
+                // Fan speed
+                switch ($this->GetValue('FanSpeed')) {
+                    case 0:
+                        $fanSpeed = 'LOW';
+                        break;
+
+                    case 1:
+                        $fanSpeed = 'MIDDLE';
+                        break;
+
+                    case 2:
+                        $fanSpeed = 'HIGH';
+                        break;
+
+                    default:
+                        $fanSpeed = 'AUTO';
+                }
+                $postfields['setting']['fanSpeed'] = $fanSpeed;
+                // Swing
+                if ($this->ReadPropertyBoolean('UseSwing')) {
+                    $swing = 'OFF';
+                    if ($this->GetValue('Swing')) {
+                        $swing = 'ON';
+                    }
+                    $postfields['setting']['swing'] = $swing;
+                }
+
+                ########## Check device mode
+
+                // COOL: we need teperature and fanspeed, if device has swing mode we also need swing mode
+                // DRY: without temperature and fan speed, if device has swing mode we also need swing mode
+                if ($deviceMode == 'DRY') {
+                    unset($postfields['setting']['temperature']);
+                    unset($postfields['setting']['fanSpeed']);
+                }
+                // FAN: without temperature and fanspeed, if device has swing mode we also need swing mode
+                if ($deviceMode == 'FAN') {
+                    unset($postfields['setting']['temperature']);
+                    unset($postfields['setting']['fanSpeed']);
+                }
+                // HEAT: we need temperature and fanspeed, if device has swing mode we also need swing mode
+                // AUTO: without temperature and fanspeed
+                if ($deviceMode == 'AUTO') {
+                    unset($postfields['setting']['temperature']);
+                    unset($postfields['setting']['fanSpeed']);
+                }
+                // Add data
+                $buffer['Params'] = ['homeID' => (int) $homeID, 'zoneID' => (int) $zoneID, 'overlay' => json_encode($postfields)];
+            }
+        }
+        // Send data
         $data['Buffer'] = $buffer;
         $data = json_encode($data);
         $this->SendDebug(__FUNCTION__, 'Data: ' . $data, 0);
         $result = json_decode($this->SendDataToParent($data), true);
         $this->SendDebug(__FUNCTION__, 'Result: ' . json_encode($result), 0);
-
+        // Update
         $this->UpdateCoolingZoneState();
     }
 

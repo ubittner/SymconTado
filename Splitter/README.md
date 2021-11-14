@@ -154,37 +154,23 @@ $data = SetHeatingZoneTemperatureTimerNextTimeBlock(12345, 1234, 1, 'ON', 23.5);
 
 ```text
 Kühlmodus (Smartes Klimaanlagen-Thermostat):  
-  
-$PowerState
-OFF | ON
-
-$DeviceMode
-COOL | DRY | FAN | HEAT
-
-$FanSpeed (Lüftungsintesität)
-LOW | MIDDLE | HIGH | AUTO
-
-$Swing (Lamellenbewegung)
-OFF | ON
 ```  
 
 ```text
-string TADO_SetCoolingZone(interger $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, string $DeviceMode, string $Mode, float $TemperatureCelsius, string $FanSpeed, string $Swing, string $Timer, int $DurationInSeconds);
-Setzt einen Raums (Zone) des Zuhauses (Home) auf die angegebene Werte.
+string TADO_SetCoolingZone(interger $InstanceID, integer $HomeID, integer $ZoneID, string $Overlay);
+Setzt einen Raum (Zone) des Zuhauses (Home) auf die angegebene Werte.
+$Overlay muss für die entsprehcneden Parameter angegeben werden:
 
-     * @param int $HomeID
-     * @param int $ZoneID
-     * @param string $PowerState        OFF, ON
-     * @param string $DeviceMode        COOL, HEAT, DRY, FAN
-     * @param string $Mode              MANUAL, AUTO
-     * @param float $TemperatureCelsius
-     * @param string $FanSpeed          LOW, MIDDLE, HIGH, AUTO
-     * @param string $Swing             OFF, ON
-     * @param string $Timer             NO TIMER, TIMER, NEXT_TIME_BLOCK
-     * @param int $DurationInSeconds
+['setting']['power']        OFF | ON
+['setting']['mode']         COOL | HEAT | DRY | FAN
+['setting']['type']         AIR_CONDITIONING
+['setting']['fanSpeed']     LOW | MIDDLE | HIGH | AUTO
+['setting']['temperature']  CELSIUS | FAHRENHEIT
+['setting']['swing']        OFF | ON
      
 Beispiel:
-$data = TADO_SetCoolingZone(12345, 1234, 1, 'ON', 'COOL', 'MANUAL', 15.5, 'LOW', ON, 'NO TIMER', 0);
+$overlay = '{"termination":{"typeSkillBasedApp":"MANUAL"},"setting":{"mode":"DRY","type":"AIR_CONDITIONING","power":"ON"}}';
+$data = TADO_SetCoolingZone(12345, 1234, 1, $overlay);
 ```
 
 ```text

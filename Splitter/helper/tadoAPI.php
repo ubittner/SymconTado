@@ -296,87 +296,19 @@ trait tadoAPI
     ########## Cooling
 
     /**
-     * This PUT endpoint will make it possible to set parameters for the given cooling zone of your home.
+     *
+     * This PUT endpoint will make it possible to set parameters for the overlay of the given cooling zone of your home.
      *
      * @param int $HomeID
      * @param int $ZoneID
-     * @param string $PowerState        OFF, ON
-     * @param string $DeviceMode        COOL, HEAT, DRY, FAN
-     * @param string $Mode              MANUAL, AUTO
-     * @param float $TemperatureCelsius
-     * @param string $FanSpeed          LOW, MIDDLE, HIGH, AUTO
-     * @param string $Swing             OFF, ON
-     * @param string $Timer             NO TIMER, TIMER, NEXT_TIME_BLOCK
-     * @param int $DurationInSeconds
+     * @param string $Overlay
      * @return string
      */
-    public function SetCoolingZone(int $HomeID, int $ZoneID, string $PowerState, string $DeviceMode, string $Mode, float $TemperatureCelsius, string $FanSpeed, string $Swing, string $Timer, int $DurationInSeconds): string
+    public function SetCoolingZone(int $HomeID, int $ZoneID, string $Overlay): string
     {
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
-        $postfields = [];
-
-        // Power off
-        if ($PowerState == 'OFF') {
-            $postfields['termination'] = ['typeSkillBasedApp' => 'MANUAL'];
-            $postfields['setting'] = ['power' => 'OFF', 'type' => 'AIR_CONDITIONING'];
-        }
-
-        // Power on
-        if ($PowerState == 'ON') {
-
-            // Manual mode
-            if ($Mode == 'MANUAL') {
-                switch ($Timer) {
-                    case 'TIMER': # Timer
-                        $postfields['termination'] = ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds];
-                        break;
-
-                    case 'NEXT_TIME_BLOCK': # Timer till next time block
-                        $postfields['termination'] = ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK'];
-                        break;
-
-                    default: # No Timer
-                        $postfields['termination'] = ['typeSkillBasedApp' => 'MANUAL'];
-
-                }
-
-                $postfields['setting']['temperature'] = ['celsius' => $TemperatureCelsius, 'fahrenheit' => (float) (($TemperatureCelsius * 9 / 5) + 32)];
-                $postfields['setting']['mode'] = $DeviceMode;
-                $postfields['setting']['type'] = 'AIR_CONDITIONING';
-                $postfields['setting']['power'] = 'ON';
-                $postfields['setting']['fanspeed'] = $FanSpeed;
-                if (!empty($Swing)) {
-                    $postfields['setting']['swing'] = $Swing;
-                }
-
-                ########## Check device mode
-
-                // COOL: we need teperature and fanspeed, if device has swing mode we also need swing mode
-
-                // DRY: without temperature and fan speed, if device has swing mode we also need swing mode
-                if ($DeviceMode == 'DRY') {
-                    unset($postfields['setting']['temperature']);
-                    unset($postfields['setting']['fanspeed']);
-                }
-
-                // FAN: without temperature and fanspeed, if device has swing mode we also need swing mode
-                if ($DeviceMode == 'FAN') {
-                    unset($postfields['setting']['temperature']);
-                }
-
-                // HEAT: we need temperature and fanspeed, if device has swing mode we also need swing mode
-            }
-
-            // Automatic mode
-            if ($Mode == 'AUTO') {
-                $postfields['termination'] = ['typeSkillBasedApp' => 'MANUAL'];
-                $postfields['setting'] = ['mode' => 'AUTO', 'type' => 'AIR_CONDITIONING', 'power' => 'ON'];
-            }
-        }
-
-        $postfields = json_encode($postfields);
-        $this->SendDebug(__FUNCTION__, 'Postfields: ' . $postfields, 0);
-        return $this->SendDataToTado($endpoint, 'PUT', $postfields);
+        $this->SendDebug(__FUNCTION__, 'Postfields: ' . $Overlay, 0);
+        return $this->SendDataToTado($endpoint, 'PUT', $Overlay);
     }
 
     /**

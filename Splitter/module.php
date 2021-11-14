@@ -136,6 +136,12 @@ class TadoSplitter extends IPSModule
                 $response = $this->SetHeatingZoneTemperatureTimerNextTimeBlock($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
                 break;
 
+            case 'SetCoolingZone':
+                $params = (array) $data->Buffer->Params;
+                $response = $this->SetCoolingZone($params['homeID'], $params['zoneID'], $params['overlay']);
+                $this->SendDebug(__FUNCTION__, 'Overlay: ' . $params['overlay'], 0);
+                break;
+
             case 'SetCoolingZoneTemperature': # Deprecated !
                 $params = (array) $data->Buffer->Params;
                 $response = $this->SetCoolingZoneTemperature($params['homeID'], $params['zoneID'], $params['power'], $params['temperature']);
@@ -164,11 +170,6 @@ class TadoSplitter extends IPSModule
             case 'SetCoolingZoneTemperatureTimerNextTimeBlockEx': # Deprecated !
                 $params = (array) $data->Buffer->Params;
                 $response = $this->SetCoolingZoneTemperatureTimerNextTimeBlockEx($params['homeID'], $params['zoneID'], $params['power'], $params['mode'], $params['temperature'], $params['fanSpeed'], $params['swing']);
-                break;
-
-            case 'SetCoolingZone':
-                $params = (array) $data->Buffer->Params;
-                $response = $this->SetCoolingZone($params['homeID'], $params['zoneID'], $params['power'], $params['deviceMode'], $params['mode'], $params['temperatureCelsius'], $params['fanSpeed'], $params['swing'], $params['timer'], $params['durationInSeconds']);
                 break;
 
             case 'SendDataToTado':
