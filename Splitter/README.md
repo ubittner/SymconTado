@@ -154,21 +154,28 @@ $data = SetHeatingZoneTemperatureTimerNextTimeBlock(12345, 1234, 1, 'ON', 23.5);
 
 ```text
 Kühlmodus (Smartes Klimaanlagen-Thermostat):  
-  
-$PowerState
-OFF | ON
-
-$DeviceMode
-COOL | DRY | FAN | HEAT
-
-$FanSpeed (Lüftungsintesität)
-LOW | MIDDLE | HIGH | AUTO
-
-$Swing (Lamellenbewegung)
-OFF | ON
 ```  
 
 ```text
+string TADO_SetCoolingZone(interger $InstanceID, integer $HomeID, integer $ZoneID, string $Overlay);
+Setzt einen Raum (Zone) des Zuhauses (Home) auf die angegebene Werte.
+$Overlay muss für die entsprehcneden Parameter angegeben werden:
+
+['setting']['power']        OFF | ON
+['setting']['mode']         COOL | HEAT | DRY | FAN
+['setting']['type']         AIR_CONDITIONING
+['setting']['fanSpeed']     LOW | MIDDLE | HIGH | AUTO
+['setting']['temperature']  CELSIUS | FAHRENHEIT
+['setting']['swing']        OFF | ON
+     
+Beispiel:
+$overlay = '{"termination":{"typeSkillBasedApp":"MANUAL"},"setting":{"mode":"DRY","type":"AIR_CONDITIONING","power":"ON"}}';
+$data = TADO_SetCoolingZone(12345, 1234, 1, $overlay);
+```
+
+```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string TADO_SetCoolingZoneTemperature(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, float $Temperature)  
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) auf den die angegebene Temperatur.
 
@@ -177,6 +184,8 @@ $data = TADO_SetCoolingZoneTemperature(12345, 1234, 1, 'ON', 15.5);
 ```
 
 ```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string TADO_SetCoolingZoneTemperatureEx(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, string $DeviceMode, float $Temperature, string $FanSpeed, string $Swing)  
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) auf den die angegebene Temperatur.
 Zusätzlich kann der Gerätemodus, die Lüftungsintensität und die Lamellenbewegung angegeben werden.
@@ -186,6 +195,8 @@ $data = TADO_SetCoolingZoneTemperatureEx(12345, 1234, 1, 'ON', 'COOL', 15.5, 'MI
 ```
 
 ```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string SetCoolingZoneTemperatureTimer(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, integer $Temperature, integer $DurationInSeconds) 
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) für eine bestimmte Zeit auf den die angegebene Temperatur.
 
@@ -194,6 +205,8 @@ $data = SetCoolingZoneTemperatureTimer(12345, 1234, 1, 'ON', 15.5, 180);
 ```
 
 ```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string SetCoolingZoneTemperatureTimerEx(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, string $DeviceMode, integer $Temperature, integer $DurationInSeconds, string $FanSpeed, string $Swing) 
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home) für eine bestimmte Zeit auf den die angegebene Temperatur.
 Zusätzlich kann der Gerätemodus, die Lüftungsintensität und die Lamellenbewegung angegeben werden.
@@ -203,6 +216,8 @@ $data = SetCoolingZoneTemperatureTimerEx(12345, 1234, 1, 'ON', 'COOL', 15.5, 180
 ```
 
 ```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string SetCoolingZoneTemperatureTimerNextTimeBlock(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, integer $Temperature)
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home)  bis zum nächsten Zeitblock auf den die angegebene Temperatur.
 
@@ -211,6 +226,8 @@ $data = SetCoolingZoneTemperatureTimerNextTimeBlock(12345, 1234, 1, 'ON', 15.5);
 ```
 
 ```text
+Funktion veraltet ! Wird bei der nächsten Aktualisierung gelöscht!
+
 string SetCoolingZoneTemperatureTimerNextTimeBlockEx(integer $InstanceID, integer $HomeID, integer $ZoneID, string $PowerState, string $DeviceMode, integer $Temperature, string $FanSpeed, string $Swing)
 Setzt manuell die Temperatur eines Raums (Zone) des Zuhauses (Home)  bis zum nächsten Zeitblock auf den die angegebene Temperatur.
 Zusätzlich kann der Gerätemodus, die Lüftungsintensität und die Lamellenbewegung angegeben werden.

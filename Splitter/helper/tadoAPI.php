@@ -296,6 +296,24 @@ trait tadoAPI
     ########## Cooling
 
     /**
+     *
+     * This PUT endpoint will make it possible to set parameters for the overlay of the given cooling zone of your home.
+     *
+     * @param int $HomeID
+     * @param int $ZoneID
+     * @param string $Overlay
+     * @return string
+     */
+    public function SetCoolingZone(int $HomeID, int $ZoneID, string $Overlay): string
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
+        $this->SendDebug(__FUNCTION__, 'Postfields: ' . $Overlay, 0);
+        return $this->SendDataToTado($endpoint, 'PUT', $Overlay);
+    }
+
+    /**
+     * Deprecated !
+     *
      * This PUT endpoint will make it possible to set a manual temperature for the given cooling zone of your home.
      *
      * @param int $HomeID
@@ -308,13 +326,31 @@ trait tadoAPI
      */
     public function SetCoolingZoneTemperature(int $HomeID, int $ZoneID, string $PowerState, float $Temperature): string
     {
+        $text = 'This method is deprecated and will no longer be available after the next update!';
+        $this->SendDebug(__FUNCTION__, $this->Translate($text), 0);
+        $this->LogMessage($this->Translate($text), KL_WARNING);
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
         $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => 'COOL', 'temperature' =>['celsius' => $Temperature]], 'termination' => ['type' => 'MANUAL']]);
         return $this->SendDataToTado($endpoint, 'PUT', $postfields);
     }
 
+    /**
+     * Deprecated !
+     *
+     * @param int $HomeID
+     * @param int $ZoneID
+     * @param string $PowerState
+     * @param string $DeviceMode
+     * @param float $Temperature
+     * @param string $FanSpeed
+     * @param string $Swing
+     * @return string
+     */
     public function SetCoolingZoneTemperatureEx(int $HomeID, int $ZoneID, string $PowerState, string $DeviceMode, float $Temperature, string $FanSpeed, string $Swing): string
     {
+        $text = 'This method is deprecated and will no longer be available after the next update!';
+        $this->SendDebug(__FUNCTION__, $this->Translate($text), 0);
+        $this->LogMessage($this->Translate($text), KL_WARNING);
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
         switch ($DeviceMode) {
             case 'DRY': # without temperature and fan speed
@@ -333,6 +369,8 @@ trait tadoAPI
     }
 
     /**
+     * Deprecated !
+     *
      * This PUT endpoint will make it possible to set a manual temperature for the given cooling zone of your home for a selected time.
      *
      * @param int $HomeID
@@ -346,13 +384,32 @@ trait tadoAPI
      */
     public function SetCoolingZoneTemperatureTimer(int $HomeID, int $ZoneID, string $PowerState, int $Temperature, int $DurationInSeconds): string
     {
+        $text = 'This method is deprecated and will no longer be available after the next update!';
+        $this->SendDebug(__FUNCTION__, $this->Translate($text), 0);
+        $this->LogMessage($this->Translate($text), KL_WARNING);
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
         $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => 'COOL', 'temperature' =>['celsius' => $Temperature]], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]);
         return $this->SendDataToTado($endpoint, 'PUT', $postfields);
     }
 
+    /**
+     * Deprecated !
+     *
+     * @param int $HomeID
+     * @param int $ZoneID
+     * @param string $PowerState
+     * @param string $DeviceMode
+     * @param int $Temperature
+     * @param int $DurationInSeconds
+     * @param string $FanSpeed
+     * @param string $Swing
+     * @return string
+     */
     public function SetCoolingZoneTemperatureTimerEx(int $HomeID, int $ZoneID, string $PowerState, string $DeviceMode, int $Temperature, int $DurationInSeconds, string $FanSpeed, string $Swing): string
     {
+        $text = 'This method is deprecated and will no longer be available after the next update!';
+        $this->SendDebug(__FUNCTION__, $this->Translate($text), 0);
+        $this->LogMessage($this->Translate($text), KL_WARNING);
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
         switch ($DeviceMode) {
             case 'DRY': # without temperature and fan speed
@@ -371,6 +428,8 @@ trait tadoAPI
     }
 
     /**
+     * Deprecated !
+     *
      * This PUT endpoint will make it possible to set a manual temperature for the given cooling zone of your home till the next time block.
      *
      * @param int $HomeID
@@ -383,13 +442,31 @@ trait tadoAPI
      */
     public function SetCoolingZoneTemperatureTimerNextTimeBlock(int $HomeID, int $ZoneID, string $PowerState, int $Temperature): string
     {
+        $text = 'This method is deprecated and will no longer be available after the next update!';
+        $this->SendDebug(__FUNCTION__, $this->Translate($text), 0);
+        $this->LogMessage($this->Translate($text), KL_WARNING);
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
         $postfields = json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => 'COOL', 'temperature' =>['celsius' => $Temperature]], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]);
         return $this->SendDataToTado($endpoint, 'PUT', $postfields);
     }
 
+    /**
+     * Deprecated !
+     *
+     * @param int $HomeID
+     * @param int $ZoneID
+     * @param string $PowerState
+     * @param string $DeviceMode
+     * @param int $Temperature
+     * @param string $FanSpeed
+     * @param string $Swing
+     * @return string
+     */
     public function SetCoolingZoneTemperatureTimerNextTimeBlockEx(int $HomeID, int $ZoneID, string $PowerState, string $DeviceMode, int $Temperature, string $FanSpeed, string $Swing): string
     {
+        $text = 'This method is deprecated and will no longer be available after the next update!';
+        $this->SendDebug(__FUNCTION__, $this->Translate($text), 0);
+        $this->LogMessage($this->Translate($text), KL_WARNING);
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
         switch ($DeviceMode) {
             case 'DRY': # without temperature and fan speed
@@ -435,7 +512,7 @@ trait tadoAPI
 
     #################### Private
 
-    private function SendDataToTado(string $Endpoint, string $CustomRequest, string $Postfields)
+    public function SendDataToTado(string $Endpoint, string $CustomRequest, string $Postfields)
     {
         $this->SendDebug(__FUNCTION__, 'Endpoint: ' . $Endpoint, 0);
         $this->SendDebug(__FUNCTION__, 'CustomRequest: ' . $CustomRequest, 0);
