@@ -1,18 +1,18 @@
 {
-  "id": "{55862B9A-A9E9-2A1D-2EA9-C195C18A42EA}",
-  "name": "Tado Configurator",
-  "type": 4,
-  "vendor": "Tado",
-  "aliases": [
-    "Tado Configurator"
-  ],
-  "url": "https://github.com/ubittner/SymconTado/Configurator",
-  "parentRequirements": [
-    "{9B0CC551-1523-14B7-8C56-39869942CF02}"
-  ],
-  "childRequirements": [],
-  "implemented": [
-    "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
-  ],
-  "prefix": "TADO"
+    "id": "{55862B9A-A9E9-2A1D-2EA9-C195C18A42EA}",
+    "name": "Tado Configurator",
+    "type": 4,
+    "vendor": "Tado",
+    "aliases": [
+        "Tado Configurator"
+    ],
+    "url": "https://github.com/ubittner/SymconTado/Configurator",
+    "parentRequirements": [
+        "{9B0CC551-1523-14B7-8C56-39869942CF02}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
+    ],
+    "prefix": "TADO"
 }

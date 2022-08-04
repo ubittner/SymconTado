@@ -1,20 +1,20 @@
 {
-  "translations": {
-    "de": {
-      "Please select a category": "Bitte wählen Sie eine Kategorie aus",
-      "Category": "Kategorie",
-      "Home": "Zuhause",
-      "Identifier": "ID / Seriennummer",
-      "Description": "Beschreibung",
-      "Type": "Typ",
-      "Heating": "Heizen",
-      "Room": "Raum",
-      "Device": "Gerät",
-      "Cooling": "Kühlen",
-      "Devices": "Geräte",
-      "Smart Thermostat": "Smartes Thermostat",
-      "Smart Radiator-Thermostat": "Smartes Heizkörper-Thermostat",
-      "Smart Air Conditioning Control": "Smarte Klimaanlagen-Steuerung"
+    "translations": {
+        "de": {
+            "Please select a category": "Bitte wählen Sie eine Kategorie aus",
+            "Category": "Kategorie",
+            "Home": "Zuhause",
+            "Identifier": "ID / Seriennummer",
+            "Description": "Beschreibung",
+            "Type": "Typ",
+            "Heating": "Heizen",
+            "Room": "Raum",
+            "Device": "Gerät",
+            "Cooling": "Kühlen",
+            "Devices": "Geräte",
+            "Smart Thermostat": "Smartes Thermostat",
+            "Smart Radiator-Thermostat": "Smartes Heizkörper-Thermostat",
+            "Smart Air Conditioning Control": "Smarte Klimaanlagen-Steuerung"
+        }
     }
-  }
 }
