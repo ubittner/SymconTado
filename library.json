@@ -4,9 +4,9 @@
     "name": "Tado",
     "url": "https://github.com/ubittner/SymconTado",
     "compatibility": {
-        "version": "5.5"
+        "version": "6.1"
     },
     "version": "1.05",
-    "build": 36,
-    "date": 1636875139
+    "build": 37,
+    "date": 1660040521
 }

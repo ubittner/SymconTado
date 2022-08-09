@@ -1,0 +1,18 @@
+{
+    "id": "{2EA2896C-8FB0-C565-EB69-F6FADECDC736}",
+    "name": "TadoAC",
+    "type": 3,
+    "vendor": "tado°",
+    "aliases": [
+        "tado° AC"
+    ],
+    "url": "https://github.com/ubittner/SymconTado/AC",
+    "parentRequirements": [
+        "{9B0CC551-1523-14B7-8C56-39869942CF02}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
+    ],
+    "prefix": "TADOAC"
+}
