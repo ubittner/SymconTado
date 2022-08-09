@@ -1,10 +1,10 @@
 {
     "id": "{31C59151-0182-07DB-4D0D-7EDA0668186F}",
-    "name": "Tado Splitter",
+    "name": "TadoSplitter",
     "type": 2,
-    "vendor": "Tado",
+    "vendor": "tado°",
     "aliases": [
-        "Tado Splitter"
+        "tado° Splitter"
     ],
     "url": "https://github.com/ubittner/SymconTado/Splitter",
     "parentRequirements": [],
