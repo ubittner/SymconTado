@@ -1,10 +1,10 @@
 {
     "id": "{55862B9A-A9E9-2A1D-2EA9-C195C18A42EA}",
-    "name": "Tado Configurator",
+    "name": "TadoConfigurator",
     "type": 4,
-    "vendor": "Tado",
+    "vendor": "tado°",
     "aliases": [
-        "Tado Configurator"
+        "tado° Configurator"
     ],
     "url": "https://github.com/ubittner/SymconTado/Configurator",
     "parentRequirements": [
