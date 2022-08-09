@@ -1,11 +1,10 @@
 {
     "id": "{07B0E642-8AF4-0E49-5A5E-DA70531CCF7F}",
-    "name": "Tado Device",
+    "name": "TadoDevice",
     "type": 3,
-    "vendor": "Tado",
+    "vendor": "tado°",
     "aliases": [
-        "Tado Device",
-        "Tado Gerät"
+        "tado° Device"
     ],
     "url": "https://github.com/ubittner/SymconTado/Device",
     "parentRequirements": [

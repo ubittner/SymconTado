@@ -1,10 +1,10 @@
 {
     "id": "{69F3B4F8-3A8E-BB23-FEFD-66BB7846CAEF}",
-    "name": "Tado Home",
+    "name": "TadoHome",
     "type": 3,
-    "vendor": "Tado",
+    "vendor": "tado°",
     "aliases": [
-        "Tado Home"
+        "tado° Home"
     ],
     "url": "https://github.com/ubittner/SymconTado/Home",
     "parentRequirements": [

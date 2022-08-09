@@ -1,10 +1,10 @@
 {
     "id": "{374753E5-0048-7EF7-43C5-D8AAB5CB317B}",
-    "name": "Tado Cooling",
+    "name": "TadoCooling",
     "type": 3,
-    "vendor": "Tado",
+    "vendor": "tado°",
     "aliases": [
-        "Tado Cooling"
+        "tado° Cooling (legacy)"
     ],
     "url": "https://github.com/ubittner/SymconTado/Cooling",
     "parentRequirements": [
