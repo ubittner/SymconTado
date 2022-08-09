@@ -1,8 +1,8 @@
-# Tado Device
+![Image](../imgs/tado_logo.png)
 
-![Image](../imgs/tado_logo.png)  
+# Device (Gerät)
 
-Mit dem Tado Device kann der Batteriestatus eines Gerätes (Smartes Thermostat, Smartes Heizkörper-Thermostat) angezeigt werden. 
+Mit diesem Modul kann der Batteriestatus eines Gerätes (Smartes Thermostat, Smartes-Heizkörper-Thermostat) angezeigt werden. 
 
 Für dieses Modul besteht kein Anspruch auf Fehlerfreiheit, Weiterentwicklung, sonstige Unterstützung oder Support.  
 Bevor das Modul installiert wird, sollte unbedingt ein Backup von IP-Symcon durchgeführt werden.  
@@ -25,24 +25,24 @@ Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen 
 
 ### 2. Voraussetzungen
 
-- IP-Symcon ab Version 5.5
+- IP-Symcon ab Version 6.1
 
 ### 3. Software-Installation
 
 * Bei kommerzieller Nutzung (z.B. als Einrichter oder Integrator) wenden Sie sich bitte zunächst an den Autor.
-* Bei privater Nutzung wird das 'Tado'-Modul über den Module Store installiert.
+* Bei privater Nutzung wird das `tado° Modul` über den Module-Store installiert.
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-Unter 'Instanz hinzufügen' kann das 'Tado Device'-Modul mithilfe des Schnellfilters gefunden werden.  
-Alternativ kann die 'Tado Configurator'-Instanz zur automatischen Einrichtung verwendet werden.  
+Unter `Instanz hinzufügen` kann die `tado° Device` Instanz mithilfe des Schnellfilters gefunden werden.  
+Alternativ kann der `tado° Configurator` zur automatischen Einrichtung verwendet werden.  
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)  
 
 __Konfigurationsseite__:
 
-Name            | Beschreibung
---------------- | ----------------------------------------------
-Informationen   | Diverse Informationen über das Gerät (Device)
+| Name          | Beschreibung                                  |
+|---------------|-----------------------------------------------|
+| Informationen | Diverse Informationen über das Gerät (Device) |
 
 ### 5. Statusvariablen und Profile
 
@@ -50,9 +50,9 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 #### Statusvariablen
 
-Name            | Typ       | Beschreibung
---------------- | --------- | ----------------
-BatteryState    | integer   | Batteriestatus
+| Name         | Typ     | Beschreibung   |
+|--------------|---------|----------------|
+| BatteryState | integer | Batteriestatus |
 
 #### Profile
 

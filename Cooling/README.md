@@ -1,8 +1,13 @@
-# Tado Cooling
+![Image](../imgs/tado_logo.png)
 
-![Image](../imgs/tado_logo.png)  
+# Cooling (Klimaanlage)
 
-Mit Tado Cooling kann eine Klimaanlage smart gesteuert werden. 
+Mit diesem Modul kann eine Klimaanlage smart gesteuert werden.
+
+### Hinweis
+
+Dieses Modul wird nicht mehr weiterentwickelt.  
+Nutzen Sie das [tado° AC Modul](../AC/README.md) als Nachfolgemodul.
 
 Für dieses Modul besteht kein Anspruch auf Fehlerfreiheit, Weiterentwicklung, sonstige Unterstützung oder Support.  
 Bevor das Modul installiert wird, sollte unbedingt ein Backup von IP-Symcon durchgeführt werden.  
@@ -21,37 +26,37 @@ Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen 
 
 ### 1. Funktionsumfang
 
-* Klimaanlage schalten
+* Klimaanlage aus- und einschalten
 * Gerätemodus schalten
-* Automatikmodus schalten
+* Automatikmodus aus- und einschalten
 * Soll-Temperatur anpassen
-* Lüftungsintensität schalten
-* Lamellenbewegung schalten
+* Lüftungsintesität schalten
+* Lamellenbewegung aus- und einschalten
 * Timer schalten
-* Anzeige der Raumtemperatur
-* Anzeige der Luftfeuchtigkeit
+* Raumtemperatur anzeigen
+* Luftfeuchtigkeit anzeigen
 
 ### 2. Voraussetzungen
 
-- IP-Symcon ab Version 5.5
+- IP-Symcon ab Version 6.1
 
 ### 3. Software-Installation
 
 * Bei kommerzieller Nutzung (z.B. als Einrichter oder Integrator) wenden Sie sich bitte zunächst an den Autor.
-* Bei privater Nutzung wird das 'Tado'-Modul über den Module Store installiert.
+* Bei privater Nutzung wird das `tado° Modul` über den Module-Store installiert.
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-Unter 'Instanz hinzufügen' kann das 'Tado Cooling'-Modul mithilfe des Schnellfilters gefunden werden.  
-Alternativ kann die 'Tado Configurator'-Instanz zur automatischen Einrichtung verwendet werden.  
+Unter `Instanz hinzufügen` kann die `tado° Cooling` Instanz mithilfe des Schnellfilters gefunden werden.  
+Alternativ kann der `tado° Configurator` zur automatischen Einrichtung verwendet werden.  
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)  
 
 __Konfigurationsseite__:
 
-Name            | Beschreibung
---------------- | ----------------------------------------------
-Lamellenbwegung | Lammelenbewegung verwenden, sofern vom Gerät unterstützt 
-Informationen   | Diverse Informationen über den Raum (Zone)
+| Name            | Beschreibung                                             |
+|-----------------|----------------------------------------------------------|
+| Lamellenbwegung | Lammelenbewegung verwenden, sofern vom Gerät unterstützt |
+| Informationen   | Diverse Informationen über den Raum (Zone)               |
 
 Sofern der Gerätetyp nicht auf Standard eingestellt ist,  
 kann zusätzlich die Lüftungsintensität und Lamellenbewegung genutzt werden.
@@ -62,40 +67,42 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 #### Statusvariablen
 
-Name                | Typ       | Beschreibung
-------------------- | --------- | ---------------------------
-Power               | bool      | Aus / An
-DeviceMode          | integer   | Gerätemodus 
-Mode                | boolean   | Manueller / Automatik Modus
-SetpointTemperature | float     | Solltemperatur
-FanSpeed            | integer   | Lüftungsintensität
-Swing               | integer   | Lamellenbewegung
-CoolingTimer        | integer   | Timer
-RoomTemperature     | float     | Raumtemperatur
-AirHumidity         | float     | Luftfeuchtigkeit
+| Name                | Typ     | Beschreibung                |
+|---------------------|---------|-----------------------------|
+| Power               | bool    | Aus / An                    |
+| DeviceMode          | integer | Gerätemodus                 |
+| Mode                | boolean | Manueller / Automatik Modus |
+| SetpointTemperature | float   | Solltemperatur              |
+| FanSpeed            | integer | Lüftungsintensität          |
+| Swing               | integer | Lamellenbewegung            |
+| CoolingTimer        | integer | Timer                       |
+| RoomTemperature     | float   | Raumtemperatur              |
+| AirHumidity         | float   | Luftfeuchtigkeit            |
 
 #### Profile
 
-Name                                | Typ
------------------------------------ | -------
-TADO.InstanzID.DeviceMode           | integer
-TADO.InstanzID.Mode                 | boolean
-TADO.InstanzID.SetpointTemperature  | float
-TADO.InstanzID.FanSpeed             | integer
-TADO.InstanzID.Swing                | integer
-TADO.InstanzID.CoolingTimer         | integer  
+| Name                               | Typ     |
+|------------------------------------|---------|
+| TADO.InstanzID.DeviceMode          | integer |
+| TADO.InstanzID.Mode                | boolean |
+| TADO.InstanzID.SetpointTemperature | float   |
+| TADO.InstanzID.FanSpeed            | integer |
+| TADO.InstanzID.Swing               | integer |
+| TADO.InstanzID.CoolingTimer        | integer |
 
-Wird die Instanz gelöscht, so werden automatisch die Profile gelöscht.  
+Wird die Instanz gelöscht, so werden die Profile automatisch gelöscht.
 
 ### 6. WebFront
 
-Die Klimaanlage kann ein- und ausgeschaltet werden.
-Der Gerätemodus kann geschaltet werden.
-Der Automatikmodus kann ein- und ausgeschaltet werden.  
-Die Solltemperatur kann angepasst werden.  
-Die Lüftungsintesität kann ausgewähöt werden.  
-Die Lammellenbewegung kann ein- und ausgeschaltet werden.  
-Der Timer kann gestellt werden.  
+* Klimaanlage aus- und einschalten
+* Gerätemodus schalten
+* Automatikmodus aus- und einschalten
+* Soll-Temperatur anpassen
+* Lüftungsintesität schalten
+* Lamellenbewegung aus- und einschalten
+* Timer schalten
+* Raumtemperatur anzeigen
+* Luftfeuchtigkeit anzeigen
 
 ### 7. PHP-Befehlsreferenz
 
