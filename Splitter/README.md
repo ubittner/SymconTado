@@ -1,8 +1,8 @@
-# Tado Splitter
+![Image](../imgs/tado_logo.png)
 
-![Image](../imgs/tado_logo.png)  
+# Splitter
 
-Mit dem Tado Splitter wird die Kommunikation zu my.tado.com hergestellt. 
+Mit diesem Modul wird die Kommunikation zu my.tado.com hergestellt. 
 
 Für dieses Modul besteht kein Anspruch auf Fehlerfreiheit, Weiterentwicklung, sonstige Unterstützung oder Support.  
 Bevor das Modul installiert wird, sollte unbedingt ein Backup von IP-Symcon durchgeführt werden.  
@@ -25,26 +25,26 @@ Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen 
 
 ### 2. Voraussetzungen
 
-- IP-Symcon ab Version 5.5
+- IP-Symcon ab Version 6.1
 
 ### 3. Software-Installation
 
 * Bei kommerzieller Nutzung (z.B. als Einrichter oder Integrator) wenden Sie sich bitte zunächst an den Autor.
-* Bei privater Nutzung wird das 'Tado'-Modul über den Module Store installiert.
+* Bei privater Nutzung wird das `tado° Modul` über den Module-Store installiert.
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-Unter 'Instanz hinzufügen' kann das 'Tado Splitter'-Modul mithilfe des Schnellfilters gefunden werden.  
+Unter `Instanz hinzufügen` kann die `tado° Splitter` Instanz mithilfe des Schnellfilters gefunden werden.
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)  
 
 __Konfigurationsseite__:
 
-Name            | Beschreibung
---------------- | --------------------------------
-Aktiv           | De- bzw. aktiviert den Splitter  
-E-Mail Adresse  | E-Mail Adresse für my.tado.com  
-Kennwort        | Kennwort für my.tado.com  
-Timeout         | Netzwerk-Timout  
+| Name           | Beschreibung                    |
+|----------------|---------------------------------|
+| Aktiv          | De- bzw. aktiviert den Splitter |
+| E-Mail Adresse | E-Mail Adresse für my.tado.com  |
+| Kennwort       | Kennwort für my.tado.com        |
+| Timeout        | Netzwerk-Timout                 |
 
 ### 5. Statusvariablen und Profile
 
@@ -52,7 +52,7 @@ Es werden keine Statusvariablen und Profile verwendet.
 
 ### 6. WebFront
 
-Die Splitter Instanz ist im WebFront nicht verfügbar. 
+Der `tado° Splitter` ist im WebFront nicht verfügbar.
 
 ### 7. PHP-Befehlsreferenz
 
