@@ -11,6 +11,10 @@ class SymconTadoValidationTest extends TestCaseSymconValidation
         $this->validateLibrary(__DIR__ . '/..');
     }
 
+    public function testValidateModule_AC(): void
+    {
+        $this->validateModule(__DIR__ . '/../AC');
+    }
     public function testValidateConfiguratorModule(): void
     {
         $this->validateModule(__DIR__ . '/../Configurator');

@@ -5,6 +5,7 @@
     </php>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../AC</directory>
             <directory suffix=".php">../Configurator</directory>
             <directory suffix=".php">../Cooling</directory>
             <directory suffix=".php">../Device</directory>
