@@ -341,7 +341,7 @@ class TadoConfigurator extends IPSModule
     private function GetDeviceInstanceID(string $SerialNumber): int
     {
         $id = 0;
-        $instances = IPS_GetInstanceListByModuleID(TADO_DEVICE_GUID);
+        $instances = IPS_GetInstanceListByModuleID(self::TADO_DEVICE_GUID);
         foreach ($instances as $instance) {
             if (IPS_GetProperty($instance, 'SerialNumber') == $SerialNumber) {
                 $id = $instance;
