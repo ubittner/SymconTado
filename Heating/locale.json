@@ -1,32 +1,32 @@
 {
-  "translations": {
-    "de": {
-      "Home ID": "Zuhause ID",
-      "Home Name": "Zuhause Name",
-      "Zone ID": "Raum ID",
-      "Zone Name": "Raum Name",
-      "Zone Type": "Raum Typ",
-      "Update Interval": "Aktualisierungsintervall",
-      "seconds": "Sekunden",
-      "Update State": "Status aktualisieren",
-      "Tado Heating will be created": "Tado Heating wird erstellt",
-      "Tado Heating is active": "Tado Heating ist aktiv",
-      "Tado Heating will be deleted": "Tado Heating wird gelöscht",
-      "Tado Heating is inactive": "Tado Heating ist inaktiv",
-      "An error has occurred, for further information see messages, log file or debug": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug",
-      "Automatic": "Automatik",
-      "Manual": "Manuell",
-      "Setpoint temperature": "Soll-Temperatur",
-      "Off": "Aus",
-      "Till next time block": "Bis zum nächsten Schaltpunkt",
-      "Room temperature": "Raum-Temperatur",
-      "Air humidity": "Luftfeuchtigkeit",
-      "Heating Power": "Heizleistung",
-      "Home": "Anwesend",
-      "Away": "Abwesend",
-      "Closed": "Geschlossen",
-      "Open": "Geöffnet",
-      "Window": "Fensterstatus"
+    "translations": {
+        "de": {
+            "Home ID": "Zuhause ID",
+            "Home Name": "Zuhause Name",
+            "Zone ID": "Raum ID",
+            "Zone Name": "Raum Name",
+            "Zone Type": "Raum Typ",
+            "Update Interval": "Aktualisierungsintervall",
+            "seconds": "Sekunden",
+            "Update State": "Status aktualisieren",
+            "Tado Heating will be created": "Tado Heating wird erstellt",
+            "Tado Heating is active": "Tado Heating ist aktiv",
+            "Tado Heating will be deleted": "Tado Heating wird gelöscht",
+            "Tado Heating is inactive": "Tado Heating ist inaktiv",
+            "An error has occurred, for further information see messages, log file or debug": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug",
+            "Automatic": "Automatik",
+            "Manual": "Manuell",
+            "Setpoint temperature": "Soll-Temperatur",
+            "Off": "Aus",
+            "Till next time block": "Bis zum nächsten Schaltpunkt",
+            "Room temperature": "Raum-Temperatur",
+            "Air humidity": "Luftfeuchtigkeit",
+            "Heating Power": "Heizleistung",
+            "Home": "Anwesend",
+            "Away": "Abwesend",
+            "Closed": "Geschlossen",
+            "Open": "Geöffnet",
+            "Window": "Fensterstatus"
+        }
     }
-  }
 }

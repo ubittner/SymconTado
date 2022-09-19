@@ -66,11 +66,8 @@ class TadoDevice extends IPSModule
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
         $this->SendDebug('MessageSink', 'SenderID: ' . $SenderID . ', Message: ' . $Message, 0);
-        switch ($Message) {
-            case IPS_KERNELSTARTED:
-                $this->KernelReady();
-                break;
-
+        if ($Message == IPS_KERNELSTARTED) {
+            $this->KernelReady();
         }
     }
 
@@ -113,7 +110,7 @@ class TadoDevice extends IPSModule
         $devices = json_decode($this->SendDataToParent($data), true);
         $this->SendDebug(__FUNCTION__, json_encode($devices), 0);
         if (!empty($devices)) {
-            foreach ($devices as $key => $device) {
+            foreach ($devices as $device) {
                 if (array_key_exists('serialNo', $device)) {
                     $deviceSerialNumber = $device['serialNo'];
                     if ($deviceSerialNumber == $serialNumber) {

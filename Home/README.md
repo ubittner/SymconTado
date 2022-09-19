@@ -1,8 +1,8 @@
-# Tado Home
+![Image](../imgs/tado_logo.png)
 
-![Image](../imgs/tado_logo.png)  
+# Home (Zuhause)
 
-Mit dem Tado Home kann der Geofencing Modus gesteuert werden. 
+Mit diesem Modul kann der Geofencing Modus gesteuert werden. 
 
 Für dieses Modul besteht kein Anspruch auf Fehlerfreiheit, Weiterentwicklung, sonstige Unterstützung oder Support.  
 Bevor das Modul installiert wird, sollte unbedingt ein Backup von IP-Symcon durchgeführt werden.  
@@ -25,24 +25,24 @@ Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen 
 
 ### 2. Voraussetzungen
 
-- IP-Symcon ab Version 5.5
+- IP-Symcon ab Version 6.1
 
 ### 3. Software-Installation
 
 * Bei kommerzieller Nutzung (z.B. als Einrichter oder Integrator) wenden Sie sich bitte zunächst an den Autor.
-* Bei privater Nutzung wird das 'Tado'-Modul über den Module Store installiert.
+* Bei privater Nutzung wird das `tado° Modul` über den Module-Store installiert.
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-Unter 'Instanz hinzufügen' kann das 'Tado Home'-Modul mithilfe des Schnellfilters gefunden werden.  
-Alternativ kann die 'Tado Configurator'-Instanz zur automatischen Einrichtung verwendet werden.  
+Unter `Instanz hinzufügen` kann die `tado° Home` Instanz mithilfe des Schnellfilters gefunden werden.  
+Alternativ kann der `tado° Configurator` zur automatischen Einrichtung verwendet werden.  
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)  
 
 __Konfigurationsseite__:
 
-Name            | Beschreibung
---------------- | ----------------------------------------------
-Informationen   | Diverse Informationen über das Zuhause (Home)
+| Name          | Beschreibung                                  |
+|---------------|-----------------------------------------------|
+| Informationen | Diverse Informationen über das Zuhause (Home) |
 
 ### 5. Statusvariablen und Profile
 
@@ -50,21 +50,21 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 #### Statusvariablen
 
-Name            | Typ       | Beschreibung
---------------- | --------- | ----------------
-GeofencingMode  | integer   | Geofencing Modus
+| Name           | Typ     | Beschreibung     |
+|----------------|---------|------------------|
+| GeofencingMode | integer | Geofencing Modus |
 
 #### Profile
 
-Name                            | Typ
-------------------------------- | -------
-TADO.InstanzID.GeofencingMode   | integer
-  
-Wird die Instanz gelöscht, so werden automatisch die Profile gelöscht.  
+| Name                          | Typ     |
+|-------------------------------|---------|
+| TADO.InstanzID.GeofencingMode | integer |
+
+Wird die Instanz gelöscht, so werden die Profile automatisch gelöscht.  
 
 ### 6. WebFront
 
-Ger Geofencing Modus kann geschaltet (Auto, Home, Away) werden.
+* Geofencing Modus (0 = Auto, 1 = Home, 2 = Away)
 
 ### 7. PHP-Befehlsreferenz
 

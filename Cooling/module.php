@@ -217,11 +217,8 @@ class TadoCooling extends IPSModule
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
         $this->SendDebug('MessageSink', 'SenderID: ' . $SenderID . ', Message: ' . $Message, 0);
-        switch ($Message) {
-            case IPS_KERNELSTARTED:
-                $this->KernelReady();
-                break;
-
+        if ($Message == IPS_KERNELSTARTED) {
+            $this->KernelReady();
         }
     }
 
@@ -606,6 +603,7 @@ class TadoCooling extends IPSModule
             // Smart schedule
             if ($this->GetValue('Mode')) {
                 $buffer['Command'] = 'StopManualMode';
+                $buffer['Params'] = ['homeID' => (int) $homeID, 'zoneID' => (int) $zoneID]; //bug fix
             } else {
                 // Manual mode
                 $buffer['Command'] = 'SetCoolingZone';

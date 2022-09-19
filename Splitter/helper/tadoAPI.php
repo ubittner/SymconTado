@@ -306,6 +306,7 @@ trait tadoAPI
      */
     public function SetCoolingZone(int $HomeID, int $ZoneID, string $Overlay): string
     {
+        $this->SendDebug(__FUNCTION__, 'Overlay: ' . $Overlay, 0);
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
         $this->SendDebug(__FUNCTION__, 'Postfields: ' . $Overlay, 0);
         return $this->SendDataToTado($endpoint, 'PUT', $Overlay);
@@ -516,6 +517,7 @@ trait tadoAPI
     {
         $this->SendDebug(__FUNCTION__, 'Endpoint: ' . $Endpoint, 0);
         $this->SendDebug(__FUNCTION__, 'CustomRequest: ' . $CustomRequest, 0);
+        $this->SendDebug(__FUNCTION__, 'Postfields: ' . $Postfields, 0);
         $body = '';
         $accessToken = $this->GetBearerToken();
         if (is_array(json_decode($accessToken, true))) {

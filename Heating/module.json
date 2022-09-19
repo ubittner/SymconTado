@@ -1,18 +1,18 @@
 {
-  "id": "{F6D924F8-0CAB-2EB7-725D-2640B8F5556B}",
-  "name": "Tado Heating",
-  "type": 3,
-  "vendor": "Tado",
-  "aliases": [
-    "Tado Heating"
-  ],
-  "url": "https://github.com/ubittner/SymconTado/Heating",
-  "parentRequirements": [
-    "{9B0CC551-1523-14B7-8C56-39869942CF02}"
-  ],
-  "childRequirements": [],
-  "implemented": [
-    "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
-  ],
-  "prefix": "TADO"
+    "id": "{F6D924F8-0CAB-2EB7-725D-2640B8F5556B}",
+    "name": "TadoHeating",
+    "type": 3,
+    "vendor": "tado°",
+    "aliases": [
+        "tado° Heating"
+    ],
+    "url": "https://github.com/ubittner/SymconTado/Heating",
+    "parentRequirements": [
+        "{9B0CC551-1523-14B7-8C56-39869942CF02}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
+    ],
+    "prefix": "TADO"
 }

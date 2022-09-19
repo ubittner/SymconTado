@@ -25,10 +25,17 @@
 
 declare(strict_types=1);
 
-include_once __DIR__ . '/../libs/constants.php';
-
 class TadoConfigurator extends IPSModule
 {
+    //Constants
+    private const TADO_SPLITTER_GUID = '{31C59151-0182-07DB-4D0D-7EDA0668186F}';
+    private const TADO_SPLITTER_DATA_GUID = '{9B0CC551-1523-14B7-8C56-39869942CF02}';
+    private const TADO_HOME_GUID = '{69F3B4F8-3A8E-BB23-FEFD-66BB7846CAEF}';
+    private const TADO_HEATING_GUID = '{F6D924F8-0CAB-2EB7-725D-2640B8F5556B}';
+    private const TADO_COOLING_GUID = '{374753E5-0048-7EF7-43C5-D8AAB5CB317B}';
+    private const TADO_AC_GUID = '{2EA2896C-8FB0-C565-EB69-F6FADECDC736}';
+    private const TADO_DEVICE_GUID = '{07B0E642-8AF4-0E49-5A5E-DA70531CCF7F}';
+
     public function Create()
     {
         //Never delete this line!
@@ -36,7 +43,7 @@ class TadoConfigurator extends IPSModule
         //Register properties
         $this->RegisterPropertyInteger('CategoryID', 0);
         //Connect to splitter
-        $this->ConnectParent(TADO_SPLITTER_GUID);
+        $this->ConnectParent(self::TADO_SPLITTER_GUID);
     }
 
     public function Destroy()
@@ -49,22 +56,16 @@ class TadoConfigurator extends IPSModule
     {
         //Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
+
         //Never delete this line!
         parent::ApplyChanges();
-        //Check runlevel
-        if (IPS_GetKernelRunlevel() != KR_READY) {
-            return;
-        }
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
     {
         $this->SendDebug('MessageSink', 'SenderID: ' . $SenderID . ', Message: ' . $Message, 0);
-        switch ($Message) {
-            case IPS_KERNELSTARTED:
-                $this->KernelReady();
-                break;
-
+        if ($Message == IPS_KERNELSTARTED) {
+            $this->KernelReady();
         }
     }
 
@@ -89,12 +90,11 @@ class TadoConfigurator extends IPSModule
         if (!$this->HasActiveParent()) {
             return $values;
         }
-        $values = [];
         $location = $this->GetCategoryPath($this->ReadPropertyInteger(('CategoryID')));
         //Homes
         $data = [];
         $buffer = [];
-        $data['DataID'] = TADO_SPLITTER_DATA_GUID;
+        $data['DataID'] = self::TADO_SPLITTER_DATA_GUID;
         $buffer['Command'] = 'GetAccount';
         $buffer['Params'] = '';
         $data['Buffer'] = $buffer;
@@ -110,7 +110,7 @@ class TadoConfigurator extends IPSModule
                     $homeName = $home['name'];
                     $data = [];
                     $buffer = [];
-                    $data['DataID'] = TADO_SPLITTER_DATA_GUID;
+                    $data['DataID'] = self::TADO_SPLITTER_DATA_GUID;
                     $buffer['Command'] = 'GetHome';
                     $buffer['Params'] = $homeID;
                     $data['Buffer'] = $buffer;
@@ -140,7 +140,7 @@ class TadoConfigurator extends IPSModule
                             'Type'        => '',
                             'instanceID'  => $homeInstanceID,
                             'create'      => [
-                                'moduleID'      => TADO_HOME_GUID,
+                                'moduleID'      => self::TADO_HOME_GUID,
                                 'name'          => 'Tado ' . $home['name'] . ' (' . $this->Translate('Home') . ')',
                                 'configuration' => [
                                     'HomeID'       => (string) $homeDataID,
@@ -163,7 +163,7 @@ class TadoConfigurator extends IPSModule
                     //Zones
                     $data = [];
                     $buffer = [];
-                    $data['DataID'] = TADO_SPLITTER_DATA_GUID;
+                    $data['DataID'] = self::TADO_SPLITTER_DATA_GUID;
                     $buffer['Command'] = 'GetZones';
                     $buffer['Params'] = $homeID;
                     $data['Buffer'] = $buffer;
@@ -172,7 +172,7 @@ class TadoConfigurator extends IPSModule
                     $this->SendDebug(__FUNCTION__, $zones, 0);
                     $zones = json_decode($zones, true);
                     if (!empty($zones)) {
-                        foreach ($zones as $key => $zone) {
+                        foreach ($zones as $zone) {
                             $zoneID = (int) $zone['id'];
                             $id = $homeID . $zoneID;
                             if ($zone['type'] == 'HEATING') {
@@ -187,7 +187,7 @@ class TadoConfigurator extends IPSModule
                                     'Type'                  => $zone['type'],
                                     'instanceID'            => $instanceID,
                                     'create'                => [
-                                        'moduleID'      => TADO_HEATING_GUID,
+                                        'moduleID'      => self::TADO_HEATING_GUID,
                                         'name'          => 'Tado ' . $zone['name'] . ' (' . $this->Translate('Room') . ')',
                                         'configuration' => [
                                             'HomeID'                => (string) $homeID,
@@ -212,8 +212,8 @@ class TadoConfigurator extends IPSModule
                                     'Type'                  => $zone['type'],
                                     'instanceID'            => $instanceID,
                                     'create'                => [
-                                        'moduleID'      => TADO_COOLING_GUID,
-                                        'name'          => 'Tado ' . $zone['name'] . ' (' . $this->Translate('Room' . ')'),
+                                        'moduleID'      => self::TADO_AC_GUID,
+                                        'name'          => 'tado° AC ' . $zone['name'] . ' (' . $this->Translate('Room' . ')'),
                                         'configuration' => [
                                             'HomeID'                => (string) $homeID,
                                             'HomeName'              => (string) $homeName,
@@ -228,7 +228,7 @@ class TadoConfigurator extends IPSModule
                             //Devices
                             if (array_key_exists('devices', $zone)) {
                                 $devices = $zone['devices'];
-                                foreach ($devices as $index => $device) {
+                                foreach ($devices as $device) {
                                     $this->SendDebug(__FUNCTION__, 'DeviceType : ' . $device['deviceType'], 0);
                                     switch ($device['deviceType']) {
                                         case 'RU01':
@@ -263,7 +263,7 @@ class TadoConfigurator extends IPSModule
                                         'Type'                  => $deviceType,
                                         'instanceID'            => $deviceInstanceID,
                                         'create'                => [
-                                            'moduleID'      => TADO_DEVICE_GUID,
+                                            'moduleID'      => self::TADO_DEVICE_GUID,
                                             'name'          => 'Tado ' . $this->Translate($deviceName) . ' (' . $device['serialNo'] . ')',
                                             'configuration' => [
                                                 'DeviceType'                  => (string) $device['deviceType'],
@@ -302,7 +302,7 @@ class TadoConfigurator extends IPSModule
     private function GetHomeInstanceID(int $HomeID): int
     {
         $id = 0;
-        $moduleID = TADO_HOME_GUID;
+        $moduleID = self::TADO_HOME_GUID;
         $instances = IPS_GetInstanceListByModuleID($moduleID);
         foreach ($instances as $instance) {
             if (IPS_GetProperty($instance, 'HomeID') == $HomeID) {
@@ -315,14 +315,24 @@ class TadoConfigurator extends IPSModule
     private function GetZoneInstanceID(int $ZoneID, int $Type): int
     {
         $id = 0;
-        $moduleID = TADO_HEATING_GUID;
-        if ($Type == 1) {
-            $moduleID = TADO_COOLING_GUID;
+        if ($Type == 0) {
+            $moduleID = self::TADO_HEATING_GUID;
+            $instances = IPS_GetInstanceListByModuleID($moduleID);
+            foreach ($instances as $instance) {
+                if (IPS_GetProperty($instance, 'ZoneID') == $ZoneID) {
+                    $id = $instance;
+                }
+            }
         }
-        $instances = IPS_GetInstanceListByModuleID($moduleID);
-        foreach ($instances as $instance) {
-            if (IPS_GetProperty($instance, 'ZoneID') == $ZoneID) {
-                $id = $instance;
+        if ($Type == 1) {
+            $moduleID = self::TADO_AC_GUID;
+            $legacy = self::TADO_COOLING_GUID; #deprecated, legacy
+            $this->SendDebug(__FUNCTION__, $legacy . 'not supported anymore', 0);
+            $instances = IPS_GetInstanceListByModuleID($moduleID);
+            foreach ($instances as $instance) {
+                if (IPS_GetProperty($instance, 'ZoneID') == $ZoneID) {
+                    $id = $instance;
+                }
             }
         }
         return $id;
@@ -331,7 +341,7 @@ class TadoConfigurator extends IPSModule
     private function GetDeviceInstanceID(string $SerialNumber): int
     {
         $id = 0;
-        $instances = IPS_GetInstanceListByModuleID(TADO_DEVICE_GUID);
+        $instances = IPS_GetInstanceListByModuleID(self::TADO_DEVICE_GUID);
         foreach ($instances as $instance) {
             if (IPS_GetProperty($instance, 'SerialNumber') == $SerialNumber) {
                 $id = $instance;

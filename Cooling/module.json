@@ -1,18 +1,18 @@
 {
-  "id": "{374753E5-0048-7EF7-43C5-D8AAB5CB317B}",
-  "name": "Tado Cooling",
-  "type": 3,
-  "vendor": "Tado",
-  "aliases": [
-    "Tado Cooling"
-  ],
-  "url": "https://github.com/ubittner/SymconTado/Cooling",
-  "parentRequirements": [
-    "{9B0CC551-1523-14B7-8C56-39869942CF02}"
-  ],
-  "childRequirements": [],
-  "implemented": [
-    "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
-  ],
-  "prefix": "TADO"
+    "id": "{374753E5-0048-7EF7-43C5-D8AAB5CB317B}",
+    "name": "TadoCooling",
+    "type": 3,
+    "vendor": "tado°",
+    "aliases": [
+        "tado° Cooling (legacy)"
+    ],
+    "url": "https://github.com/ubittner/SymconTado/Cooling",
+    "parentRequirements": [
+        "{9B0CC551-1523-14B7-8C56-39869942CF02}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
+    ],
+    "prefix": "TADO"
 }

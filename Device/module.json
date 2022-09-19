@@ -1,19 +1,18 @@
 {
-  "id": "{07B0E642-8AF4-0E49-5A5E-DA70531CCF7F}",
-  "name": "Tado Device",
-  "type": 3,
-  "vendor": "Tado",
-  "aliases": [
-    "Tado Device",
-    "Tado Gerät"
-  ],
-  "url": "https://github.com/ubittner/SymconTado/Device",
-  "parentRequirements": [
-    "{9B0CC551-1523-14B7-8C56-39869942CF02}"
-  ],
-  "childRequirements": [],
-  "implemented": [
-    "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
-  ],
-  "prefix": "TADO"
+    "id": "{07B0E642-8AF4-0E49-5A5E-DA70531CCF7F}",
+    "name": "TadoDevice",
+    "type": 3,
+    "vendor": "tado°",
+    "aliases": [
+        "tado° Device"
+    ],
+    "url": "https://github.com/ubittner/SymconTado/Device",
+    "parentRequirements": [
+        "{9B0CC551-1523-14B7-8C56-39869942CF02}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
+    ],
+    "prefix": "TADO"
 }

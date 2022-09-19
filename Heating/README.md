@@ -1,8 +1,8 @@
-# Tado Heating
+![Image](../imgs/tado_logo.png)
 
-![Image](../imgs/tado_logo.png)  
+# Heating (Heizung)
 
-Mit Tado Heating kann eine Heizung smart gesteuert werden. 
+Mit diesem Modul kann eine Heizung smart gesteuert werden. 
 
 Für dieses Modul besteht kein Anspruch auf Fehlerfreiheit, Weiterentwicklung, sonstige Unterstützung oder Support.  
 Bevor das Modul installiert wird, sollte unbedingt ein Backup von IP-Symcon durchgeführt werden.  
@@ -21,32 +21,33 @@ Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen 
 
 ### 1. Funktionsumfang
 
-* Automatikmodus schalten
-* Soll-Temperatur anpassen
+* Automatikmodus aus- und einschalten
+* Solltemperatur anpassen
 * Timer schalten
+* Weitere Informationen anzeigen
 * Anzeige der Raumtemperatur
 * Anzeige der Luftfeuchtigkeit
 
 ### 2. Voraussetzungen
 
-- IP-Symcon ab Version 5.5
+- IP-Symcon ab Version 6.1
 
 ### 3. Software-Installation
 
 * Bei kommerzieller Nutzung (z.B. als Einrichter oder Integrator) wenden Sie sich bitte zunächst an den Autor.
-* Bei privater Nutzung wird das 'Tado'-Modul über den Module Store installiert.
+* Bei privater Nutzung wird das `tado° Modul` über den Module-Store installiert.
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-Unter 'Instanz hinzufügen' kann das 'Tado Heating'-Modul mithilfe des Schnellfilters gefunden werden.  
-Alternativ kann die 'Tado Configurator'-Instanz zur automatischen Einrichtung verwendet werden.  
+Unter `Instanz hinzufügen` kann die `tado° Heating` Instanz mithilfe des Schnellfilters gefunden werden.  
+Alternativ kann der `tado° Configurator` zur automatischen Einrichtung verwendet werden.  
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)  
 
 __Konfigurationsseite__:
 
-Name            | Beschreibung
---------------- | ----------------------------------------------
-Informationen   | Diverse Informationen über den Raum (Zone)
+| Name          | Beschreibung                               |
+|---------------|--------------------------------------------|
+| Informationen | Diverse Informationen über den Raum (Zone) |
 
 ### 5. Statusvariablen und Profile
 
@@ -54,36 +55,38 @@ Die Statusvariablen/Kategorien werden automatisch angelegt. Das Löschen einzeln
 
 #### Statusvariablen
 
-Name                | Typ       | Beschreibung
-------------------- | --------- | ---------------------------
-Mode                | boolean   | Manueller / Automatik Modus
-SetpointTemperature | float     | Solltemperatur
-HeatingTimer        | integer   | Timer
-RoomTemperature     | float     | Raumtemperatur
-AirHumidity         | float     | Luftfeuchtigkeit
-HeatingPower        | integer   | Heizleistung
-GeofencingStatus    | boolean   | Geofencing Status
-WindowStatus        | boolean   | Fensterstatus  
+| Name                | Typ     | Beschreibung                |
+|---------------------|---------|-----------------------------|
+| Mode                | boolean | Manueller / Automatik Modus |
+| SetpointTemperature | float   | Solltemperatur              |
+| HeatingTimer        | integer | Timer                       |
+| RoomTemperature     | float   | Raumtemperatur              |
+| AirHumidity         | float   | Luftfeuchtigkeit            |
+| HeatingPower        | integer | Heizleistung                |
+| GeofencingStatus    | boolean | Geofencing Status           |
+| WindowStatus        | boolean | Fensterstatus               |
 
 #### Profile
 
-Name                                | Typ
------------------------------------ | -------
-TADO.InstanzID.Mode                 | boolean
-TADO.InstanzID.SetpointTemperature  | float
-TADO.InstanzID.HeatingTimer         | integer
-TADO.InstanzID.HeatingPower         | integer
-TADO.InstanzID.GeofencingStatus     | boolean
-TADO.InstanzID.WindowStatus         | boolean  
+| Name                               | Typ     |
+|------------------------------------|---------|
+| TADO.InstanzID.Mode                | boolean |
+| TADO.InstanzID.SetpointTemperature | float   |
+| TADO.InstanzID.HeatingTimer        | integer |
+| TADO.InstanzID.HeatingPower        | integer |
+| TADO.InstanzID.GeofencingStatus    | boolean |
+| TADO.InstanzID.WindowStatus        | boolean |
 
-Wird die Instanz gelöscht, so werden automatisch die Profile gelöscht.  
+Wird die Instanz gelöscht, so werden die Profile automatisch gelöscht. 
 
 ### 6. WebFront
 
-Der Automatikmodus kann ein- und ausgeschaltet werden.  
-Die Solltemperatur kann angepasst werden.  
-Der Timer kann gestellt werden.  
-Verschiedene weitere Informationen werden angezeigt.  
+* Automatikmodus aus- und einschalten  
+* Solltemperatur anpassen  
+* Timer schalten  
+* Weitere Informationen anzeigen  
+* Anzeige der Raumtemperatur
+* Anzeige der Luftfeuchtigkeit
 
 ### 7. PHP-Befehlsreferenz
 

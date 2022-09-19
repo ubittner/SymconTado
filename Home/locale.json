@@ -1,26 +1,26 @@
 {
-  "translations": {
-    "de": {
-      "Home ID": "Zuhause ID",
-      "Home Name": "Zuhause Name",
-      "Contact Name": "Kontakt",
-      "E-Mail Address": "E-Mail Adresse",
-      "Phone": "Telefon",
-      "Address 1": "Adresse 1",
-      "Address 2": "Adresse 2",
-      "Zip Code": "Postleitzahl",
-      "City": "Ort",
-      "State": "Bundesland",
-      "Country": "Land",
-      "Update Interval": "Aktualisierungsintervall",
-      "seconds": "Sekunden",
-      "Update State": "Status aktualisieren",
-      "Tado Home will be created": "Tado Home wird erstellt",
-      "Tado Home is active": "Tado Home ist aktiv",
-      "Tado Home will be deleted": "Tado Home wird gelöscht",
-      "Tado Home is inactive": "Tado Home ist inaktiv",
-      "An error has occurred, for further information see messages, log file or debug": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug",
-      "Geofencing Mode": "Geofencing Modus"
+    "translations": {
+        "de": {
+            "Home ID": "Zuhause ID",
+            "Home Name": "Zuhause Name",
+            "Contact Name": "Kontakt",
+            "E-Mail Address": "E-Mail Adresse",
+            "Phone": "Telefon",
+            "Address 1": "Adresse 1",
+            "Address 2": "Adresse 2",
+            "Zip Code": "Postleitzahl",
+            "City": "Ort",
+            "State": "Bundesland",
+            "Country": "Land",
+            "Update Interval": "Aktualisierungsintervall",
+            "seconds": "Sekunden",
+            "Update State": "Status aktualisieren",
+            "Tado Home will be created": "Tado Home wird erstellt",
+            "Tado Home is active": "Tado Home ist aktiv",
+            "Tado Home will be deleted": "Tado Home wird gelöscht",
+            "Tado Home is inactive": "Tado Home ist inaktiv",
+            "An error has occurred, for further information see messages, log file or debug": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug",
+            "Geofencing Mode": "Geofencing Modus"
+        }
     }
-  }
 }

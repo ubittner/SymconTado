@@ -1,18 +1,18 @@
 {
-  "id": "{69F3B4F8-3A8E-BB23-FEFD-66BB7846CAEF}",
-  "name": "Tado Home",
-  "type": 3,
-  "vendor": "Tado",
-  "aliases": [
-    "Tado Home"
-  ],
-  "url": "https://github.com/ubittner/SymconTado/Home",
-  "parentRequirements": [
-    "{9B0CC551-1523-14B7-8C56-39869942CF02}"
-  ],
-  "childRequirements": [],
-  "implemented": [
-    "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
-  ],
-  "prefix": "TADO"
+    "id": "{69F3B4F8-3A8E-BB23-FEFD-66BB7846CAEF}",
+    "name": "TadoHome",
+    "type": 3,
+    "vendor": "tado°",
+    "aliases": [
+        "tado° Home"
+    ],
+    "url": "https://github.com/ubittner/SymconTado/Home",
+    "parentRequirements": [
+        "{9B0CC551-1523-14B7-8C56-39869942CF02}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
+    ],
+    "prefix": "TADO"
 }

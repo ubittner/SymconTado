@@ -1,22 +1,22 @@
 {
-  "translations": {
-    "de": {
-      "Active": "Aktiv",
-      "Please enter your e-mail address and password for my.tado.com": "Bitte geben Sie Ihre E-Mail Adresse und Kennwort für my.tado.com an",
-      "E-Mail Address": "E-Mail Adresse",
-      "Password": "Kennwort",
-      "milliseconds": "Millisekunden",
-      "Tado Splitter will be created": "Tado Splitter wird erstellt",
-      "Tado Splitter is active": "Tado Splitter ist aktiv",
-      "Tado Splitter will be deleted": "Tado Splitter wird gelöscht",
-      "Tado Splitter is inactive": "Tado Splitter ist inaktiv",
-      "An error has occurred, for further information see messages, log file or debug": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug",
-      "Please enter your credentials!": "Bitte geben Sie Ihre Zugangsdaten an!",
-      "Please enter your E-Mail address!": "Bitte geben Sie Ihre E-Mail Adresse an!",
-      "Please enter your password!": "Bitte geben Sie Ihre Kennwort an!",
-      "Check credentials. Token is missing or invalid!": "Bitte Anmeldedaten prüfen. Fehlender oder ungültiger Token!",
-      "Instance is inactive!": "Instanz ist inaktiv!",
-      "This method is deprecated and will no longer be available after the next update!": "Diese Methode ist veraltet und steht ab der nächsten Aktualisierung nicht mehr zur Verfügung!"
+    "translations": {
+        "de": {
+            "Active": "Aktiv",
+            "Please enter your e-mail address and password for my.tado.com": "Bitte geben Sie Ihre E-Mail Adresse und Kennwort für my.tado.com an",
+            "E-Mail Address": "E-Mail Adresse",
+            "Password": "Kennwort",
+            "milliseconds": "Millisekunden",
+            "Tado Splitter will be created": "Tado Splitter wird erstellt",
+            "Tado Splitter is active": "Tado Splitter ist aktiv",
+            "Tado Splitter will be deleted": "Tado Splitter wird gelöscht",
+            "Tado Splitter is inactive": "Tado Splitter ist inaktiv",
+            "An error has occurred, for further information see messages, log file or debug": "Es ist Fehler aufgetreten, weitere Informationen unter Meldungen, im Log oder Debug",
+            "Please enter your credentials!": "Bitte geben Sie Ihre Zugangsdaten an!",
+            "Please enter your E-Mail address!": "Bitte geben Sie Ihre E-Mail Adresse an!",
+            "Please enter your password!": "Bitte geben Sie Ihre Kennwort an!",
+            "Check credentials. Token is missing or invalid!": "Bitte Anmeldedaten prüfen. Fehlender oder ungültiger Token!",
+            "Instance is inactive!": "Instanz ist inaktiv!",
+            "This method is deprecated and will no longer be available after the next update!": "Diese Methode ist veraltet und steht ab der nächsten Aktualisierung nicht mehr zur Verfügung!"
+        }
     }
-  }
 }

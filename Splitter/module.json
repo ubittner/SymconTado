@@ -1,18 +1,18 @@
 {
-  "id": "{31C59151-0182-07DB-4D0D-7EDA0668186F}",
-  "name": "Tado Splitter",
-  "type": 2,
-  "vendor": "Tado",
-  "aliases": [
-    "Tado Splitter"
-  ],
-  "url": "https://github.com/ubittner/SymconTado/Splitter",
-  "parentRequirements": [],
-  "childRequirements": [
-    "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
-  ],
-  "implemented": [
-    "{9B0CC551-1523-14B7-8C56-39869942CF02}"
-  ],
-  "prefix": "TADO"
+    "id": "{31C59151-0182-07DB-4D0D-7EDA0668186F}",
+    "name": "TadoSplitter",
+    "type": 2,
+    "vendor": "tado°",
+    "aliases": [
+        "tado° Splitter"
+    ],
+    "url": "https://github.com/ubittner/SymconTado/Splitter",
+    "parentRequirements": [],
+    "childRequirements": [
+        "{890EB679-2461-0CB6-C7AD-5F7F8728C98C}"
+    ],
+    "implemented": [
+        "{9B0CC551-1523-14B7-8C56-39869942CF02}"
+    ],
+    "prefix": "TADO"
 }
