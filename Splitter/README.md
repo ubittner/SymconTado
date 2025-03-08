@@ -37,13 +37,21 @@ Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen 
 Unter `Instanz hinzufügen` kann die `tado° Splitter` Instanz mithilfe des Schnellfilters gefunden werden.
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)  
 
+##### Registrierung
+
+❗️Ab dem 21.03.2025 kann die Anmeldung **NICHT** mehr mit Benutzernamen und Kennwort erfolgen..️  
+⚠️Bitte das tado° Modul aktualisieren und die neue Registrierung durchführen:  
+
+* Schritt 1: Initialisierung starten
+* Schritt 2: Die Seite zur Anmeldung öffnet automatisch im Browser
+![Image](../imgs/tado_login.png)
+* Schritt 3: Initiale Token abrufen
+
 __Konfigurationsseite__:
 
 | Name           | Beschreibung                    |
 |----------------|---------------------------------|
 | Aktiv          | De- bzw. aktiviert den Splitter |
-| E-Mail Adresse | E-Mail Adresse für my.tado.com  |
-| Kennwort       | Kennwort für my.tado.com        |
 | Timeout        | Netzwerk-Timout                 |
 
 ### 5. Statusvariablen und Profile

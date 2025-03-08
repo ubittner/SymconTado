@@ -1,6 +1,8 @@
 <?php
 
 /** @noinspection PhpRedundantMethodOverrideInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpMissingReturnTypeInspection */
 /** @noinspection PhpUnused */
 
 /*
@@ -11,7 +13,7 @@
  * @file        module.php
  *
  * @author      Ulrich Bittner
- * @copyright   (c) 2020
+ * @copyright   (c) 2020 - 2025
  * @license     CC BY-NC-SA 4.0
  *              https://creativecommons.org/licenses/by-nc-sa/4.0/
  *
@@ -35,13 +37,39 @@ class TadoSplitter extends IPSModule
     use tadoAPI;
     use webOAuth;
 
+    //Constants
+    private const LIBRARY_GUID = '{2C88856B-7D25-7502-1594-11F588E2C685}';
+
     public function Create()
     {
         //Never delete this line!
         parent::Create();
-        $this->RegisterProperties();
-        $this->RegisterAttributes();
-        $this->CreateBuffers();
+
+        //Properties
+        $this->RegisterPropertyBoolean('Active', true);
+        $this->RegisterPropertyInteger('Timeout', 5000);
+        //Legacy properties, not used anymore.
+        $this->RegisterPropertyString('UserName', '');
+        $this->RegisterPropertyString('Password', '');
+
+        //Legacy buffer, not used anymore. Transferred to attributes for new device code grand flow!
+        $this->SetBuffer('ClientSecret', json_encode(['ClientSecret' => '']));
+        $this->SetBuffer('AccessToken', json_encode(['AccessToken' => '', 'Expires' => '']));
+        $this->SetBuffer('RefreshToken', json_encode(['RefreshToken' => '']));
+        $this->SetBuffer('Scope', json_encode(['Scope' => '']));
+
+        //Attributes
+        //Device code grant flow
+        $this->RegisterAttributeString('DeviceCode', '');
+        $this->RegisterAttributeInteger('DeviceCodeExpires', 0);
+        $this->RegisterAttributeString('DeviceCodeValidUntil', '');
+        $this->RegisterAttributeString('VerificationUri', '');
+        $this->RegisterAttributeString('AccessToken', '');
+        $this->RegisterAttributeInteger('AccessTokenExpires', 0);
+        $this->RegisterAttributeString('AccessTokenValidUntil', 0);
+        $this->RegisterAttributeString('RefreshToken', '');
+        //Legacy attributes, not used anywhere.
+        $this->RegisterAttributeString('Setup', '');
     }
 
     public function Destroy()
@@ -54,12 +82,15 @@ class TadoSplitter extends IPSModule
     {
         //Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
+
         //Never delete this line!
         parent::ApplyChanges();
+
         //Check kernel runlevel
         if (IPS_GetKernelRunlevel() != KR_READY) {
             return;
         }
+
         $this->ValidateConfiguration();
     }
 
@@ -74,6 +105,10 @@ class TadoSplitter extends IPSModule
     public function GetConfigurationForm()
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
+        $library = IPS_GetLibrary(self::LIBRARY_GUID);
+        $formData['elements'][1]['caption'] = 'ID: ' . $this->InstanceID . ', Version: ' . $library['Version'] . '-' . $library['Build'] . ', ' . date('d.m.Y', $library['Date']);
+        $formData['actions'][0]['items'][0]['caption'] = $this->ReadAttributeString('AccessToken') ? 'Access Token: ' . substr($this->ReadAttributeString('AccessToken'), 0, 16) . ' ...' : 'Access Token: ' . $this->Translate('not available') . '!';
+        $formData['actions'][0]['items'][1]['caption'] = $this->Translate('Valid until') . ': ' . $this->ReadAttributeString('AccessTokenValidUntil');
         return json_encode($formData);
     }
 
@@ -182,6 +217,18 @@ class TadoSplitter extends IPSModule
         return $response;
     }
 
+    public function ShowAttributes(): void
+    {
+        echo 'DeviceCode: ' . substr($this->ReadAttributeString('DeviceCode'), 0, 16) . ' ...' . "\n";
+        echo 'DeviceCodeExpires: ' . $this->ReadAttributeInteger('DeviceCodeExpires') . "\n";
+        echo 'DeviceCodeValidUntil: ' . $this->ReadAttributeString('DeviceCodeValidUntil') . "\n";
+        echo 'VerificationUri: ' . $this->ReadAttributeString('VerificationUri') . "\n";
+        echo 'AccessToken: ' . substr($this->ReadAttributeString('AccessToken'), 0, 16) . ' ...' . "\n";
+        echo 'AccessTokenExpires: ' . $this->ReadAttributeInteger('AccessTokenExpires') . "\n";
+        echo 'AccessTokenValidUntil: ' . $this->ReadAttributeString('AccessTokenValidUntil') . "\n";
+        echo 'RefreshToken: ' . substr($this->ReadAttributeString('RefreshToken'), 0, 16) . ' ...' . "\n";
+    }
+
     #################### Private
 
     private function KernelReady(): void
@@ -189,66 +236,26 @@ class TadoSplitter extends IPSModule
         $this->ApplyChanges();
     }
 
-    private function RegisterProperties(): void
-    {
-        $this->RegisterPropertyBoolean('Active', false);
-        $this->RegisterPropertyString('UserName', '');
-        $this->RegisterPropertyString('Password', '');
-        $this->RegisterPropertyInteger('Timeout', 5000);
-    }
-
-    private function RegisterAttributes(): void
-    {
-        $this->RegisterAttributeString('Setup', '');
-    }
-
-    private function CreateBuffers(): void
-    {
-        $this->SetBuffer('ClientSecret', json_encode(['ClientSecret' => '']));
-        $this->SetBuffer('AccessToken', json_encode(['AccessToken' => '', 'Expires' => '']));
-        $this->SetBuffer('RefreshToken', json_encode(['RefreshToken' => '']));
-        $this->SetBuffer('Scope', json_encode(['Scope' => '']));
-    }
-
     private function ValidateConfiguration(): void
     {
-        $this->SendDebug(__FUNCTION__, 'Validate configuration', 0);
         $status = 102;
-        $userName = $this->ReadPropertyString('UserName');
-        $password = $this->ReadPropertyString('Password');
-        //Check password
-        if (empty($password)) {
-            $status = 203;
-        }
-        //Check user name
-        if (empty($userName)) {
-            $status = 202;
-        }
-        //Check user name and password
-        if (empty($userName) && empty($password)) {
+
+        //Check existing access token
+        $accessToken = $this->ReadAttributeString('AccessToken');
+        if ($accessToken == '') {
             $status = 201;
         }
-        if (!empty($userName) && !empty($password)) {
-            $token = $this->GetBearerToken();
-            if (is_array(json_decode($token, true))) {
-                if (array_key_exists('error', json_decode($token, true))) {
-                    $status = 204;
-                }
+
+        if (!$this->ReadPropertyBoolean('Active')) {
+            $status = 104;
+            $this->SendDebug($this->Translate('Instance Configuration'), $this->Translate('Instance is inactive!'), 0);
+        } else {
+            if ($accessToken == '') {
+                $this->SendDebug($this->Translate('Instance Configuration'), $this->Translate('Please start the initialization process!'), 0);
+                $this->LogMessage('ID ' . $this->InstanceID . ', ' . $this->Translate('Please start the initialization process!'), KL_WARNING);
             }
         }
-        $active = $this->CheckInstance();
-        if (!$active) {
-            $status = 104;
-        }
-        $this->SetStatus($status);
-    }
 
-    private function CheckInstance(): bool
-    {
-        $result = $this->ReadPropertyBoolean('Active');
-        if (!$result) {
-            $this->SendDebug(__FUNCTION__, 'Instance is inactive!', 0);
-        }
-        return $result;
+        $this->SetStatus($status);
     }
 }
