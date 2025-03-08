@@ -1,5 +1,5 @@
 .DS_Store
 .idea/
 .phpunit.*
-.php_cs.cache
-docs/developer.txt
+.php-cs-fixer.cache
+dev/
