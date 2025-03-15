@@ -90,6 +90,19 @@ trait tadoAPI
         return $this->SendDataToTado($endpoint, 'GET', '');
     }
 
+    /**
+     * This endpoint provides information about a specific mobile device controlling the selected home.
+     *
+     * @param int $HomeID
+     * @param int $DeviceID
+     * @return string
+     */
+    public function GetMobileDeviceInfo(int $HomeID, int $DeviceID): string
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/mobileDevices/' . $DeviceID;
+        return $this->SendDataToTado($endpoint, 'GET', '');
+    }
+
     public function SetPresenceLock(int $HomeID, int $Mode): string
     {
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/presenceLock';
