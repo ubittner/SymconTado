@@ -39,11 +39,12 @@ Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der In
 
 ##### Registrierung
 
-❗️Ab dem 21.03.2025 kann die Anmeldung **NICHT** mehr mit Benutzernamen und Kennwort erfolgen..️  
+❗️Ab dem 21.03.2025 kann die Anmeldung **NICHT** mehr mit Benutzernamen und Kennwort erfolgen.  
+ℹ️ Es wird die neue [device code grant flow](https://support.tado.com/en/articles/8565472-how-do-i-authenticate-to-access-the-rest-api) verwendet.  
 ⚠️Bitte das tado° Modul aktualisieren und die neue Registrierung durchführen:  
 
-* Schritt 1: Initialisierung starten
-* Schritt 2: Die Seite zur Anmeldung öffnet automatisch im Browser
+* Schritt 1: Registrierung starten
+* Schritt 2: Die Seite zur Anmeldung öffnet automatisch im Browser (Pop-ups müssen im Browser erlaubt sein)
 ![Image](../imgs/tado_login.png)
 * Schritt 3: Initiale Token abrufen
 
@@ -242,4 +243,24 @@ Zusätzlich kann der Gerätemodus, die Lüftungsintensität und die Lamellenbewe
 
 Beispiel:
 $data = SetCoolingZoneTemperatureTimerNextTimeBlockEx(12345, 1234, 1, 'ON', 'COOL', 15.5, 'MID', 'ON');
+```
+
+```text
+Mobile Geräte:  
+```  
+
+```text
+string TADO_GetMobileDevices(integer $InstanceID, integer $HomeID)  
+Liefert Informationen über die mobilen Geräte, die das ausgewählte Haus steuern.
+
+Beispiel:
+$data = TADO_GetMobileDevices(12345, 987654);
+```
+
+```text
+string TADO_GetMobileDeviceInfo(integer $InstanceID, integer $HomeID, integer $DeviceID)  
+Liefert Informationen über ein mobiles Geräte.
+
+Beispiel:
+$data = TADO_GetMobileDeviceInfo(12345, 987654, 123456);
 ```
