@@ -2,13 +2,15 @@
     "translations": {
         "de": {
             "Active": "Aktiv",
-            "Start Initialization": "Initialisierung starten",
+            "Start Registration": "Registrierung starten",
             "Retrieve Initial Tokens": "Initiale Token abrufen",
             "not available": "nicht vorhanden",
             "Developer area": "Entwicklerbereich",
             "milliseconds": "Millisekunden",
             "Show Attributes": "Attribute anzeigen",
             "Show Account Info": "Kontoinformationen anzeigen",
+            "Delete Tokens": "Token löschen",
+            "Do you really want to delete the tokens?": "Wollen Sie die Token wirklich löschen?",
             "tado° Splitter will be created": "tado° Splitter wird erstellt",
             "tado° Splitter is active": "tado° Splitter ist aktiv",
             "tado° Splitter will be deleted": "tado° Splitter wird gelöscht",
@@ -22,7 +24,16 @@
             "Valid until": "Gültig bis",
             "Step 1": "Schritt 1",
             "Step 2": "Schritt 2",
-            "Step 3": "Schritt 3"
+            "Step 3": "Schritt 3",
+            "Access token valid until": "Access token gültig bis",
+            "Response": "Antwort",
+            "Abort, tokens already exist!": "Abbruch, Token existieren bereits!",
+            "Abort, no valid device code found. Please restart the registration!": "Abbruch, kein gültiger Gerätecode gefunden. Bitte starten Sie die Registrierung erneut!",
+            "No valid device code found. Please restart the registration!": "Kein gültiger Gerätecode gefunden. Bitte starten Sie die Registrierung erneut!",
+            "OK! Access token is valid until": "OK! Access Token ist gültig bis",
+            "Expired! Get new access token!": "Abgelaufen! Neuen Access Token abrufen!",
+            "Abort, no refresh token found. Please start the registration!": "Abbruch, kein Refresh Token gefunden. Bitte starten Sie die Registrierung!",
+            "Registration successful!": "Registrierung erfolgreich!"
         }
     }
 }
