@@ -42,8 +42,8 @@
                 },
                 {
                     "type": "Button",
-                    "caption": "Start Initialization",
-                    "onClick": "TADO_InitiateDeviceCodeGrantFlow($id);"
+                    "caption": "Start Registration",
+                    "onClick": "TADO_StartRegistration($id);"
                 }
             ]
         },
@@ -102,6 +102,20 @@
                     "type": "Button",
                     "caption": "Show Account Info",
                     "onClick": "$account = TADO_GetAccount($id); print_r($account);"
+                },
+                {
+                    "type": "PopupButton",
+                    "caption": "Delete Tokens",
+                    "popup": {
+                        "caption": "Do you really want to delete the tokens?",
+                        "items": [
+                            {
+                                "type": "Button",
+                                "caption": "Delete Tokens",
+                                "onClick": "TADO_DeleteTokens($id);"
+                            }
+                        ]
+                    }
                 }
             ]
         }
