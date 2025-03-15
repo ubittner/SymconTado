@@ -66,7 +66,7 @@ class TadoSplitter extends IPSModule
         $this->RegisterAttributeString('VerificationUri', '');
         $this->RegisterAttributeString('AccessToken', '');
         $this->RegisterAttributeInteger('AccessTokenExpires', 0);
-        $this->RegisterAttributeString('AccessTokenValidUntil', 0);
+        $this->RegisterAttributeString('AccessTokenValidUntil', '');
         $this->RegisterAttributeString('RefreshToken', '');
         //Legacy attributes, not used anywhere.
         $this->RegisterAttributeString('Setup', '');
@@ -229,6 +229,17 @@ class TadoSplitter extends IPSModule
         echo 'RefreshToken: ' . substr($this->ReadAttributeString('RefreshToken'), 0, 16) . ' ...' . "\n";
     }
 
+    public function DeleteTokens(): void
+    {
+        $this->WriteAttributeString('AccessToken', '');
+        $this->WriteAttributeInteger('AccessTokenExpires', 0);
+        $this->WriteAttributeString('AccessTokenValidUntil', '');
+        $this->WriteAttributeString('RefreshToken', '');
+        $this->UpdateFormField('AccessToken', 'caption', 'Access Token: ' . $this->Translate('not available') . '!');
+        $this->UpdateFormField('TokenValidUntil', 'caption', $this->Translate('Valid until') . ': ');
+        $this->SetStatus(201);
+    }
+
     #################### Private
 
     private function KernelReady(): void
@@ -251,8 +262,8 @@ class TadoSplitter extends IPSModule
             $this->SendDebug($this->Translate('Instance Configuration'), $this->Translate('Instance is inactive!'), 0);
         } else {
             if ($accessToken == '') {
-                $this->SendDebug($this->Translate('Instance Configuration'), $this->Translate('Please start the initialization process!'), 0);
-                $this->LogMessage('ID ' . $this->InstanceID . ', ' . $this->Translate('Please start the initialization process!'), KL_WARNING);
+                $this->SendDebug($this->Translate('Instance Configuration'), $this->Translate('Please start the registration!'), 0);
+                $this->LogMessage('ID ' . $this->InstanceID . ', ' . $this->Translate('Please start the registration!'), KL_WARNING);
             }
         }
 
