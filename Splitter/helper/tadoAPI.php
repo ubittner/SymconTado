@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpSwitchCanBeReplacedWithMatchExpressionInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection PhpUnused */
 
 declare(strict_types=1);
@@ -7,7 +9,7 @@ declare(strict_types=1);
 trait tadoAPI
 {
     /**
-     * This GET endpoint provides general information about the authenticated users, the homes and the devices.
+     * This endpoint provides general information about the authenticated users, the homes and the devices.
      *
      * @return string
      */
@@ -18,7 +20,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the selected home.
+     * This endpoint provides information about the selected home.
      *
      * @param int $HomeID
      * @return string
@@ -36,7 +38,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about weather details for the selected home.
+     * This endpoint provides information about weather details for the selected home.
      *
      * @param int $HomeID
      * @return string
@@ -48,7 +50,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the TADO hardware installed in the selected home.
+     * This endpoint provides information about the hardware installed in the selected home.
      * You will be able to see for example the battery state, software version, capabilities, etc.
      *
      * IB01 = Internet bridge
@@ -65,7 +67,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the users and their mobile devices for the selected home.
+     * This endpoint provides information about the users and their mobile devices for the selected home.
      *
      * @param int $HomeID
      * @return string
@@ -77,7 +79,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the mobile devices controlling the selected home.
+     * This endpoint provides information about the mobile devices controlling the selected home.
      *
      * @param int $HomeID
      * @return string
@@ -85,6 +87,19 @@ trait tadoAPI
     public function GetMobileDevices(int $HomeID): string
     {
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/mobileDevices';
+        return $this->SendDataToTado($endpoint, 'GET', '');
+    }
+
+    /**
+     * This endpoint provides information about a specific mobile device controlling the selected home.
+     *
+     * @param int $HomeID
+     * @param int $DeviceID
+     * @return string
+     */
+    public function GetMobileDeviceInfo(int $HomeID, int $DeviceID): string
+    {
+        $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/mobileDevices/' . $DeviceID;
         return $this->SendDataToTado($endpoint, 'GET', '');
     }
 
@@ -101,7 +116,7 @@ trait tadoAPI
                 $postfields = json_encode(['homePresence' => 'HOME']);
                 break;
 
-            //Away
+                //Away
             case 2:
                 $request = 'PUT';
                 $postfields = json_encode(['homePresence' => 'AWAY']);
@@ -112,7 +127,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information for all zones of your selected home.
+     * This endpoint provides information for all zones of your selected home.
      *
      * @param int $HomeID
      * @return string
@@ -124,7 +139,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the state for the selected zone of your home.
+     * This endpoint provides information about the state for the selected zone of your home.
      * Here you will be able to see the status of the different components.
      *
      * @param int $HomeID
@@ -138,7 +153,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the capabilities for the selected zone of your home.
+     * This endpoint provides information about the capabilities for the selected zone of your home.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -151,7 +166,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the early start for the selected zone of your home.
+     * This endpoint provides information about the early start for the selected zone of your home.
      * Only supported for heating zones.
      *
      * @param int $HomeID
@@ -165,7 +180,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information of the defined timetables for the selected zone of your home.
+     * This endpoint provides information of the defined timetables for the selected zone of your home.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -178,7 +193,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the scheduled timetable type of the selected zone of your home.
+     * This endpoint provides information about the scheduled timetable type of the selected zone of your home.
      * With a PUT to this endpoint it is also possible to modify this.
      *
      * @param int $HomeID
@@ -192,7 +207,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the scheduled timetable type of the selected zone of your home.
+     * This endpoint provides information about the scheduled timetable type of the selected zone of your home.
      * With a PUT to this endpoint it is also possible to modify this.
      * This can be used for heating and hot water zones.
      *
@@ -208,7 +223,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the selected schedule of the selected zone of your home.
+     * This endpoint provides information about the selected schedule of the selected zone of your home.
      * Get the schedule id from the "GetTimeTables" methode.
      *
      * @param int $HomeID
@@ -223,7 +238,7 @@ trait tadoAPI
     }
 
     /**
-     * This GET endpoint provides information about the the history of the selected zone of your home.
+     * This endpoint provides information about the history of the selected zone of your home.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -239,7 +254,7 @@ trait tadoAPI
     ########## Heating
 
     /**
-     * This PUT endpoint will make it possible to set a manual temperature for the given heating zone of your home.
+     * This endpoint will make it possible to set a manual temperature for the given heating zone of your home.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -257,7 +272,7 @@ trait tadoAPI
     }
 
     /**
-     * This PUT endpoint will make it possible to set a manual temperature for the given heating zone of your home for a selected time.
+     * This endpoint will make it possible to set a manual temperature for the given heating zone of your home for a selected time.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -276,7 +291,7 @@ trait tadoAPI
     }
 
     /**
-     * This PUT endpoint will make it possible to set a manual temperature for the given heating zone of your home till the next time block.
+     * This endpoint will make it possible to set a manual temperature for the given heating zone of your home till the next time block.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -297,7 +312,7 @@ trait tadoAPI
 
     /**
      *
-     * This PUT endpoint will make it possible to set parameters for the overlay of the given cooling zone of your home.
+     * This endpoint will make it possible to set parameters for the overlay of the given cooling zone of your home.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -315,7 +330,7 @@ trait tadoAPI
     /**
      * Deprecated !
      *
-     * This PUT endpoint will make it possible to set a manual temperature for the given cooling zone of your home.
+     * This endpoint will make it possible to set a manual temperature for the given cooling zone of your home.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -372,7 +387,7 @@ trait tadoAPI
     /**
      * Deprecated !
      *
-     * This PUT endpoint will make it possible to set a manual temperature for the given cooling zone of your home for a selected time.
+     * This endpoint will make it possible to set a manual temperature for the given cooling zone of your home for a selected time.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -431,7 +446,7 @@ trait tadoAPI
     /**
      * Deprecated !
      *
-     * This PUT endpoint will make it possible to set a manual temperature for the given cooling zone of your home till the next time block.
+     * This endpoint will make it possible to set a manual temperature for the given cooling zone of your home till the next time block.
      *
      * @param int $HomeID
      * @param int $ZoneID
@@ -486,25 +501,25 @@ trait tadoAPI
     }
 
     /**
-     * This DELETE endpoint will stop the manual heating settings.
+     * This endpoint will stop the manual heating settings.
      * It will return to the scheduled settings for the selected zone of your home.
      *
      * @param int $HomeID
      * @param int $ZoneID
      */
-    public function StopManualMode(int $HomeID, int $ZoneID)
+    public function StopManualMode(int $HomeID, int $ZoneID): void
     {
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
         $this->SendDataToTado($endpoint, 'DELETE', '');
     }
 
     /**
-     * This POST endpoint is displaying HI! on the selected device.
+     * This endpoint is displaying HI! on the selected device.
      * Get the short serial number of your device from the "GetDevices" methode.
      *
      * @param string $DeviceShortSerialNumber
      */
-    public function IdentifiyDevice(string $DeviceShortSerialNumber)
+    public function IdentifiyDevice(string $DeviceShortSerialNumber): void
     {
         $this->SendDebug(__FUNCTION__, 'Short serial number: ' . $DeviceShortSerialNumber, 0);
         $endpoint = 'https://my.tado.com/api/v2/devices/' . $DeviceShortSerialNumber . '/identify';
@@ -513,7 +528,7 @@ trait tadoAPI
 
     #################### Private
 
-    public function SendDataToTado(string $Endpoint, string $CustomRequest, string $Postfields)
+    public function SendDataToTado(string $Endpoint, string $CustomRequest, string $Postfields): string
     {
         $this->SendDebug(__FUNCTION__, 'Endpoint: ' . $Endpoint, 0);
         $this->SendDebug(__FUNCTION__, 'CustomRequest: ' . $CustomRequest, 0);

@@ -37,13 +37,22 @@ Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen 
 Unter `Instanz hinzufügen` kann die `tado° Splitter` Instanz mithilfe des Schnellfilters gefunden werden.
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)  
 
+##### Registrierung
+
+❗️Ab dem 21.03.2025 kann die Anmeldung **NICHT** mehr mit Benutzernamen und Kennwort erfolgen.  
+ℹ️ Es wird die neue [device code grant flow](https://support.tado.com/en/articles/8565472-how-do-i-authenticate-to-access-the-rest-api) verwendet.  
+⚠️Bitte das tado° Modul aktualisieren und die neue Registrierung durchführen:  
+
+* Schritt 1: Registrierung starten
+* Schritt 2: Die Seite zur Anmeldung öffnet automatisch im Browser (Pop-ups müssen im Browser erlaubt sein)
+![Image](../imgs/tado_login.png)
+* Schritt 3: Initiale Token abrufen
+
 __Konfigurationsseite__:
 
 | Name           | Beschreibung                    |
 |----------------|---------------------------------|
 | Aktiv          | De- bzw. aktiviert den Splitter |
-| E-Mail Adresse | E-Mail Adresse für my.tado.com  |
-| Kennwort       | Kennwort für my.tado.com        |
 | Timeout        | Netzwerk-Timout                 |
 
 ### 5. Statusvariablen und Profile
@@ -234,4 +243,24 @@ Zusätzlich kann der Gerätemodus, die Lüftungsintensität und die Lamellenbewe
 
 Beispiel:
 $data = SetCoolingZoneTemperatureTimerNextTimeBlockEx(12345, 1234, 1, 'ON', 'COOL', 15.5, 'MID', 'ON');
+```
+
+```text
+Mobile Geräte:  
+```  
+
+```text
+string TADO_GetMobileDevices(integer $InstanceID, integer $HomeID)  
+Liefert Informationen über die mobilen Geräte, die das ausgewählte Haus steuern.
+
+Beispiel:
+$data = TADO_GetMobileDevices(12345, 987654);
+```
+
+```text
+string TADO_GetMobileDeviceInfo(integer $InstanceID, integer $HomeID, integer $DeviceID)  
+Liefert Informationen über ein mobiles Geräte.
+
+Beispiel:
+$data = TADO_GetMobileDeviceInfo(12345, 987654, 123456);
 ```
