@@ -176,38 +176,33 @@ trait AC_Properties
         }
 
         //Device properties
-        IPS_SetProperty($this->InstanceID, 'UseFanSpeed', $fanSpeed);
-        IPS_SetProperty($this->InstanceID, 'UseFanLevel', $fanLevel);
-        IPS_SetProperty($this->InstanceID, 'UseSwing', $swing);
-        IPS_SetProperty($this->InstanceID, 'UseVerticalSwing', $verticalSwing);
-        IPS_SetProperty($this->InstanceID, 'UseHorizontalSwing', $horizontalSwing);
-        IPS_SetProperty($this->InstanceID, 'UseDisplayLight', $light);
+        $this->UpdateFormField('UseFanSpeed', 'value', $fanSpeed);
+        $this->UpdateFormField('UseFanLevel', 'value', $fanLevel);
+        $this->UpdateFormField('UseSwing', 'value', $swing);
+        $this->UpdateFormField('UseVerticalSwing', 'value', $verticalSwing);
+        $this->UpdateFormField('UseHorizontalSwing', 'value', $horizontalSwing);
+        $this->UpdateFormField('UseDisplayLight', 'value', $light);
 
         //Device mode
-        IPS_SetProperty($this->InstanceID, 'UseCoolTemperature', $useCoolTemperature);
-        IPS_SetProperty($this->InstanceID, 'UseCoolFan', $useCoolFan);
-        IPS_SetProperty($this->InstanceID, 'UseCoolSwing', $useCoolSwing);
-        IPS_SetProperty($this->InstanceID, 'UseCoolLight', $useCoolLight);
-        IPS_SetProperty($this->InstanceID, 'UseHeatTemperature', $useHeatTemperature);
-        IPS_SetProperty($this->InstanceID, 'UseHeatFan', $useHeatFan);
-        IPS_SetProperty($this->InstanceID, 'UseHeatSwing', $useHeatSwing);
-        IPS_SetProperty($this->InstanceID, 'UseHeatLight', $useHeatLight);
-        IPS_SetProperty($this->InstanceID, 'UseDryTemperature', $useDryTemperature);
-        IPS_SetProperty($this->InstanceID, 'UseDryFan', $useDryFan);
-        IPS_SetProperty($this->InstanceID, 'UseDrySwing', $useDrySwing);
-        IPS_SetProperty($this->InstanceID, 'UseDryLight', $useDryLight);
-        IPS_SetProperty($this->InstanceID, 'UseFanTemperature', $useFanTemperature);
-        IPS_SetProperty($this->InstanceID, 'UseFan', $useFan);
-        IPS_SetProperty($this->InstanceID, 'UseFanSwing', $useFanSwing);
-        IPS_SetProperty($this->InstanceID, 'UseFanLight', $useFanLight);
-        IPS_SetProperty($this->InstanceID, 'UseAutoTemperature', $useAutoTemperature);
-        IPS_SetProperty($this->InstanceID, 'UseAutoFan', $useAutoFan);
-        IPS_SetProperty($this->InstanceID, 'UseAutoSwing', $useAutoSwing);
-        IPS_SetProperty($this->InstanceID, 'UseAutoLight', $useAutoLight);
-
-        //Apply changes
-        if (IPS_HasChanges($this->InstanceID)) {
-            IPS_ApplyChanges($this->InstanceID);
-        }
+        $this->UpdateFormField('UseCoolTemperature', 'value', $useCoolTemperature);
+        $this->UpdateFormField('UseCoolFan', 'value', $useCoolFan);
+        $this->UpdateFormField('UseCoolSwing', 'value', $useCoolSwing);
+        $this->UpdateFormField('UseCoolLight', 'value', $useCoolLight);
+        $this->UpdateFormField('UseHeatTemperature', 'value', $useHeatTemperature);
+        $this->UpdateFormField('UseHeatFan', 'value', $useHeatFan);
+        $this->UpdateFormField('UseHeatSwing', 'value', $useHeatSwing);
+        $this->UpdateFormField('UseHeatLight', 'value', $useHeatLight);
+        $this->UpdateFormField('UseDryTemperature', 'value', $useDryTemperature);
+        $this->UpdateFormField('UseDryFan', 'value', $useDryFan);
+        $this->UpdateFormField('UseDrySwing', 'value', $useDrySwing);
+        $this->UpdateFormField('UseDryLight', 'value', $useDryLight);
+        $this->UpdateFormField('UseFanTemperature', 'value', $useFanTemperature);
+        $this->UpdateFormField('UseFan', 'value', $useFan);
+        $this->UpdateFormField('UseFanSwing', 'value', $useFanSwing);
+        $this->UpdateFormField('UseFanLight', 'value', $useFanLight);
+        $this->UpdateFormField('UseAutoTemperature', 'value', $useAutoTemperature);
+        $this->UpdateFormField('UseAutoFan', 'value', $useAutoFan);
+        $this->UpdateFormField('UseAutoSwing', 'value', $useAutoSwing);
+        $this->UpdateFormField('UseAutoLight', 'value', $useAutoLight);
     }
 }
