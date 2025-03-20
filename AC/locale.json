@@ -69,7 +69,8 @@
             "Right": "Rechts",
             "Horizontal swing": "Horizontale Lamellenbewegung",
             "Room temperature": "Raum-Temperatur",
-            "Air humidity": "Luftfeuchtigkeit"
+            "Air humidity": "Luftfeuchtigkeit",
+            "Network status": "Netzwerkstatus"
         }
     }
 }
