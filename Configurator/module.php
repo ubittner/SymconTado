@@ -1,7 +1,5 @@
 <?php
 
-/** @noinspection PhpUnused */
-
 /*
  * @module      Tado Configurator
  *
@@ -10,7 +8,7 @@
  * @file        module.php
  *
  * @author      Ulrich Bittner
- * @copyright   (c) 2020
+ * @copyright   (c) 2020-2025
  * @license     CC BY-NC-SA 4.0
  *              https://creativecommons.org/licenses/by-nc-sa/4.0/
  *
@@ -28,6 +26,7 @@ declare(strict_types=1);
 class TadoConfigurator extends IPSModule
 {
     //Constants
+    private const LIBRARY_GUID = '{2C88856B-7D25-7502-1594-11F588E2C685}';
     private const TADO_SPLITTER_GUID = '{31C59151-0182-07DB-4D0D-7EDA0668186F}';
     private const TADO_SPLITTER_DATA_GUID = '{9B0CC551-1523-14B7-8C56-39869942CF02}';
     private const TADO_HOME_GUID = '{69F3B4F8-3A8E-BB23-FEFD-66BB7846CAEF}';
@@ -40,8 +39,7 @@ class TadoConfigurator extends IPSModule
     {
         //Never delete this line!
         parent::Create();
-        //Register properties
-        $this->RegisterPropertyInteger('CategoryID', 0);
+
         //Connect to splitter
         $this->ConnectParent(self::TADO_SPLITTER_GUID);
     }
@@ -72,6 +70,8 @@ class TadoConfigurator extends IPSModule
     public function GetConfigurationForm(): string
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
+        $library = IPS_GetLibrary(self::LIBRARY_GUID);
+        $formData['elements'][1]['caption'] = 'ID: ' . $this->InstanceID . ', Version: ' . $library['Version'] . '-' . $library['Build'] . ', ' . date('d.m.Y', $library['Date']);
         $values = $this->GetTadoSetup();
         $formData['actions'][0]['values'] = $values;
         return json_encode($formData);
@@ -84,13 +84,29 @@ class TadoConfigurator extends IPSModule
         $this->ApplyChanges();
     }
 
+    /**
+     * Gets the tado° setup of the user.
+     *
+     * @return array
+     */
     private function GetTadoSetup(): array
     {
         $values = [];
         if (!$this->HasActiveParent()) {
             return $values;
         }
-        $location = $this->GetCategoryPath($this->ReadPropertyInteger(('CategoryID')));
+
+        //Init found devices
+        $foundDevices['home'] = [];
+        $foundDevices['heating'] = [];
+        $foundDevices['ac'] = [];
+        $foundDevices['device'] = [];
+
+        //Get connected instances
+        $connectedInstanceIDs = json_decode($this->GetConnectedInstances(), true);
+
+        $serverConnection = true;
+
         //Homes
         $data = [];
         $buffer = [];
@@ -107,6 +123,7 @@ class TadoConfigurator extends IPSModule
                 $homes = $homes['homes'];
                 foreach ($homes as $home) {
                     $homeID = $home['id'];
+                    $foundDevices['home'][] = ['homeID' => $homeID];
                     $homeName = $home['name'];
                     $data = [];
                     $buffer = [];
@@ -131,7 +148,7 @@ class TadoConfigurator extends IPSModule
                         $state = $homeData['address']['state'];
                         $country = $homeData['address']['country'];
                         $homeInstanceID = $this->GetHomeInstanceID($homeDataID);
-                        $values[] = [
+                        $value = [
                             'id'          => $homeDataID,
                             'expanded'    => true,
                             'name'        => $homeDataName,
@@ -155,10 +172,19 @@ class TadoConfigurator extends IPSModule
                                     'State'        => (string) $state,
                                     'Country'      => (string) $country,
 
-                                ],
-                                'location' => $location
+                                ]
                             ]
                         ];
+                        if (array_key_exists('home', $connectedInstanceIDs)) {
+                            $connectedHomes = $connectedInstanceIDs['home'];
+                            foreach ($connectedHomes as $connectedHome) {
+                                if ($connectedHome['homeID'] == $homeDataID) {
+                                    $value['name'] = IPS_GetName($connectedHome['objectID']);
+                                }
+
+                            }
+                        }
+                        $values[] = $value;
                     }
                     //Zones
                     $data = [];
@@ -176,54 +202,72 @@ class TadoConfigurator extends IPSModule
                             $zoneID = (int) $zone['id'];
                             $id = $homeID . $zoneID;
                             if ($zone['type'] == 'HEATING') {
+                                $foundDevices['heating'][] = ['homeID' => $homeID, 'zoneID' => $zoneID];
                                 $instanceID = $this->GetZoneInstanceID($zoneID, 0);
-                                $values[] = [
-                                    'id'                    => $id,
-                                    'parent'                => $homeID,
-                                    'expanded'              => true,
-                                    'name'                  => $zone['name'],
-                                    'Description'           => $this->Translate('Room'),
-                                    'Identifier'            => $zone['id'],
-                                    'Type'                  => $zone['type'],
-                                    'instanceID'            => $instanceID,
-                                    'create'                => [
+                                $value = [
+                                    'id'          => $id,
+                                    'parent'      => $homeID,
+                                    'expanded'    => true,
+                                    'name'        => $zone['name'],
+                                    'Description' => $this->Translate('Room'),
+                                    'Identifier'  => $zone['id'],
+                                    'Type'        => $zone['type'],
+                                    'instanceID'  => $instanceID,
+                                    'create'      => [
                                         'moduleID'      => self::TADO_HEATING_GUID,
                                         'name'          => 'Tado ' . $zone['name'] . ' (' . $this->Translate('Room') . ')',
                                         'configuration' => [
-                                            'HomeID'                => (string) $homeID,
-                                            'HomeName'              => (string) $homeName,
-                                            'ZoneID'                => (string) $zone['id'],
-                                            'ZoneName'              => (string) $zone['name'],
-                                            'ZoneType'              => (string) $zone['type'],
-                                        ],
-                                        'location' => $location
+                                            'HomeID'   => (string) $homeID,
+                                            'HomeName' => (string) $homeName,
+                                            'ZoneID'   => (string) $zone['id'],
+                                            'ZoneName' => (string) $zone['name'],
+                                            'ZoneType' => (string) $zone['type'],
+                                        ]
                                     ]
                                 ];
+                                if (array_key_exists('heating', $connectedInstanceIDs)) {
+                                    $connectedHeatingZones = $connectedInstanceIDs['heating'];
+                                    foreach ($connectedHeatingZones as $connectedHeatingZone) {
+                                        if ($connectedHeatingZone['homeID'] == $homeID && $connectedHeatingZone['zoneID'] == $zone['id'] && $connectedHeatingZone['objectID'] == $instanceID) {
+                                            $value['name'] = IPS_GetName($connectedHeatingZone['objectID']);
+                                        }
+                                    }
+                                }
+                                $values[] = $value;
                             }
                             if ($zone['type'] == 'AIR_CONDITIONING') {
+                                $foundDevices['ac'][] = ['homeID' => $homeID, 'zoneID' => $zoneID];
                                 $instanceID = $this->GetZoneInstanceID($zoneID, 1);
-                                $values[] = [
-                                    'id'                    => $id,
-                                    'parent'                => $homeID,
-                                    'expanded'              => true,
-                                    'name'                  => $zone['name'],
-                                    'Description'           => $this->Translate('Room'),
-                                    'Identifier'            => $zone['id'],
-                                    'Type'                  => $zone['type'],
-                                    'instanceID'            => $instanceID,
-                                    'create'                => [
+                                $value = [
+                                    'id'          => $id,
+                                    'parent'      => $homeID,
+                                    'expanded'    => true,
+                                    'name'        => $zone['name'],
+                                    'Description' => $this->Translate('Room'),
+                                    'Identifier'  => $zone['id'],
+                                    'Type'        => $zone['type'],
+                                    'instanceID'  => $instanceID,
+                                    'create'      => [
                                         'moduleID'      => self::TADO_AC_GUID,
                                         'name'          => 'tado° AC ' . $zone['name'] . ' (' . $this->Translate('Room' . ')'),
                                         'configuration' => [
-                                            'HomeID'                => (string) $homeID,
-                                            'HomeName'              => (string) $homeName,
-                                            'ZoneID'                => (string) $zone['id'],
-                                            'ZoneName'              => (string) $zone['name'],
-                                            'ZoneType'              => (string) $zone['type'],
-                                        ],
-                                        'location' => $location
+                                            'HomeID'   => (string) $homeID,
+                                            'HomeName' => (string) $homeName,
+                                            'ZoneID'   => (string) $zone['id'],
+                                            'ZoneName' => (string) $zone['name'],
+                                            'ZoneType' => (string) $zone['type'],
+                                        ]
                                     ]
                                 ];
+                                if (array_key_exists('ac', $connectedInstanceIDs)) {
+                                    $connectedAirConditioningZones = $connectedInstanceIDs['ac'];
+                                    foreach ($connectedAirConditioningZones as $connectedAirConditioningZone) {
+                                        if ($connectedAirConditioningZone['homeID'] == $homeID && $connectedAirConditioningZone['zoneID'] == $zone['id'] && $connectedAirConditioningZone['objectID'] == $instanceID) {
+                                            $value['name'] = IPS_GetName($connectedAirConditioningZone['objectID']);
+                                        }
+                                    }
+                                }
+                                $values[] = $value;
                             }
                             //Devices
                             if (array_key_exists('devices', $zone)) {
@@ -255,29 +299,94 @@ class TadoConfigurator extends IPSModule
                                     $this->SendDebug(__FUNCTION__, 'DeviceSerialNumber: ' . $deviceSerialNumber, 0);
                                     $deviceInstanceID = $this->GetDeviceInstanceID($deviceSerialNumber);
                                     $this->SendDebug(__FUNCTION__, 'DeviceInstanceID: ' . $deviceInstanceID, 0);
-                                    $values[] = [
-                                        'parent'                => $id,
-                                        'name'                  => $deviceName,
-                                        'Description'           => $this->Translate('Device'),
-                                        'Identifier'            => $device['serialNo'],
-                                        'Type'                  => $deviceType,
-                                        'instanceID'            => $deviceInstanceID,
-                                        'create'                => [
+                                    $foundDevices['device'][] = ['homeID' => $homeID, 'serialNumber' => $deviceSerialNumber];
+                                    $value = [
+                                        'parent'      => $id,
+                                        'name'        => $deviceName,
+                                        'Description' => $this->Translate('Device'),
+                                        'Identifier'  => $device['serialNo'],
+                                        'Type'        => $deviceType,
+                                        'instanceID'  => $deviceInstanceID,
+                                        'create'      => [
                                             'moduleID'      => self::TADO_DEVICE_GUID,
                                             'name'          => 'Tado ' . $this->Translate($deviceName) . ' (' . $device['serialNo'] . ')',
                                             'configuration' => [
-                                                'DeviceType'                  => (string) $device['deviceType'],
-                                                'DeviceName'                  => (string) $device['deviceType'],
-                                                'SerialNumber'                => (string) $device['serialNo'],
-                                                'ShortSerialNumber'           => (string) $device['shortSerialNo'],
-                                                'HomeID'                      => (string) $homeID
-                                            ],
-                                            'location' => $location
+                                                'DeviceType'        => (string) $device['deviceType'],
+                                                'DeviceName'        => (string) $device['deviceType'],
+                                                'SerialNumber'      => (string) $device['serialNo'],
+                                                'ShortSerialNumber' => (string) $device['shortSerialNo'],
+                                                'HomeID'            => (string) $homeID
+                                            ]
                                         ]
                                     ];
+                                    $values[] = $value;
                                 }
                             }
                         }
+                    }
+                }
+            }
+        } else {
+            $serverConnection = false;
+        }
+
+        //Check if connected "devices" still exist in the tado° account of the user
+        $deviceTypes[] = ['type' => 'home', 'firstCondition' => 'homeID', 'secondCondition' => ''];
+        $deviceTypes[] = ['type' => 'heating', 'firstCondition' => 'homeID', 'secondCondition' => 'zoneID'];
+        $deviceTypes[] = ['type' => 'ac', 'firstCondition' => 'homeID', 'secondCondition' => 'zoneID'];
+        $deviceTypes[] = ['type' => 'device', 'firstCondition' => 'homeID', 'secondCondition' => 'serialNumber'];
+        $unknownDevices = 0;
+        foreach ($deviceTypes as $device) {
+            if (array_key_exists($device['type'], $connectedInstanceIDs)) {
+                $connectedDevices = $connectedInstanceIDs[$device['type']];
+                foreach ($connectedDevices as $connectedDevice) {
+                    if (array_key_exists('objectID', $connectedDevice)) {
+                        $objectID = $connectedDevice['objectID'];
+                        $connectedFirstCondition = '';
+                        if (array_key_exists($device['firstCondition'], $connectedDevice)) {
+                            $connectedFirstCondition = $connectedDevice[$device['firstCondition']];
+                        }
+                        $connectedSecondCondition = '';
+                        if ($device['secondCondition'] != '') {
+                            if (array_key_exists($device['secondCondition'], $connectedDevice)) {
+                                $connectedSecondCondition = $connectedDevice[$device['secondCondition']];
+                            }
+                        }
+                        $match = false;
+                        foreach ($foundDevices[$device['type']] as $foundDevice) {
+                            $foundFirstCondition = $foundDevice[$device['firstCondition']];
+                            if ($device['secondCondition'] == '') {
+                                if ($connectedFirstCondition == $foundFirstCondition) {
+                                    $match = true;
+                                }
+                            } else {
+                                $foundSecondCondition = $foundDevice[$device['secondCondition']];
+                                if ($connectedFirstCondition == $foundFirstCondition && $connectedSecondCondition == $foundSecondCondition) {
+                                    $match = true;
+                                }
+                            }
+                        }
+                        if ($match) {
+                            continue;
+                        }
+                        if ($unknownDevices == 0) {
+                            $values[] = [
+                                'id'       => 9999999,
+                                'expanded' => true,
+                                'name'     => $this->Translate('Unknown devices')
+                            ];
+                        }
+                        $description = $this->Translate('Does not exist anymore!');
+                        if (!$serverConnection) {
+                            $description = $this->Translate('Server not available!');
+                        }
+                        $unknownDevices++;
+                        $values[] = [
+                            'parent'      => 9999999,
+                            'name'        => IPS_GetName($objectID),
+                            'Description' => $description,
+                            'instanceID'  => $objectID
+                        ];
                     }
                 }
             }
@@ -285,20 +394,12 @@ class TadoConfigurator extends IPSModule
         return $values;
     }
 
-    private function GetCategoryPath(int $CategoryID): array
-    {
-        if ($CategoryID === 0) {
-            return [];
-        }
-        $path[] = IPS_GetName($CategoryID);
-        $parentID = IPS_GetObject($CategoryID)['ParentID'];
-        while ($parentID > 0) {
-            $path[] = IPS_GetName($parentID);
-            $parentID = IPS_GetObject($parentID)['ParentID'];
-        }
-        return array_reverse($path);
-    }
-
+    /**
+     * Gets the instance id of a home.
+     *
+     * @param int $HomeID
+     * @return int
+     */
     private function GetHomeInstanceID(int $HomeID): int
     {
         $id = 0;
@@ -312,6 +413,13 @@ class TadoConfigurator extends IPSModule
         return $id;
     }
 
+    /**
+     * Gets the instance id of a zone.
+     *
+     * @param int $ZoneID
+     * @param int $Type
+     * @return int
+     */
     private function GetZoneInstanceID(int $ZoneID, int $Type): int
     {
         $id = 0;
@@ -338,6 +446,12 @@ class TadoConfigurator extends IPSModule
         return $id;
     }
 
+    /**
+     * Gets instance id of a device.
+     *
+     * @param string $SerialNumber
+     * @return int
+     */
     private function GetDeviceInstanceID(string $SerialNumber): int
     {
         $id = 0;
@@ -348,5 +462,32 @@ class TadoConfigurator extends IPSModule
             }
         }
         return $id;
+    }
+
+    /**
+     * Gets all connected instances.
+     *
+     * @return string
+     */
+    private function GetConnectedInstances(): string
+    {
+        $instanceTypes[] = ['type' => 'home', 'guid' => self::TADO_HOME_GUID, 'firstProperty' => 'homeID', 'firstPropertyName' => 'HomeID', 'secondProperty' => '', 'secondPropertyName' => ''];
+        $instanceTypes[] = ['type' => 'heating', 'guid' => self::TADO_HEATING_GUID, 'firstProperty' => 'homeID', 'firstPropertyName' => 'HoneID', 'secondProperty' => 'zoneID', 'secondPropertyName' => 'ZoneID'];
+        $instanceTypes[] = ['type' => 'ac', 'guid' => self::TADO_AC_GUID, 'firstProperty' => 'homeID', 'firstPropertyName' => 'HomeID', 'secondProperty' => 'zoneID', 'secondPropertyName' => 'ZoneID'];
+        $instanceTypes[] = ['type' => 'ac', 'guid' => self::TADO_COOLING_GUID, 'firstProperty' => 'homeID', 'firstPropertyName' => 'HomeID', 'secondProperty' => 'zoneID', 'secondPropertyName' => 'ZoneID'];
+        $instanceTypes[] = ['type' => 'device', 'guid' => self::TADO_DEVICE_GUID, 'firstProperty' => 'homeID', 'firstPropertyName' => 'HomeID', 'secondProperty' => 'serialNumber', 'secondPropertyName' => 'SerialNumber'];
+        $connectedInstanceIDs = [];
+        foreach ($instanceTypes as $instanceType) {
+            foreach (IPS_GetInstanceListByModuleID($instanceType['guid']) as $instanceID) {
+                if (IPS_GetInstance($instanceID)['ConnectionID'] === IPS_GetInstance($this->InstanceID)['ConnectionID']) {
+                    if ($instanceType['secondProperty'] == '') {
+                        $connectedInstanceIDs[$instanceType['type']][] = [$instanceType['firstProperty'] => IPS_GetProperty($instanceID, $instanceType['firstPropertyName']), 'objectID' => $instanceID];
+                    } else {
+                        $connectedInstanceIDs[$instanceType['type']][] = [$instanceType['firstProperty'] => IPS_GetProperty($instanceID, $instanceType['firstPropertyName']), $instanceType['secondProperty'] => IPS_GetProperty($instanceID, $instanceType['secondPropertyName']), 'objectID' => $instanceID];
+                    }
+                }
+            }
+        }
+        return json_encode($connectedInstanceIDs);
     }
 }

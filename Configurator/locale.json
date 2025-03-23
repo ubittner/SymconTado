@@ -1,8 +1,6 @@
 {
     "translations": {
         "de": {
-            "Please select a category": "Bitte wählen Sie eine Kategorie aus",
-            "Category": "Kategorie",
             "Home": "Zuhause",
             "Identifier": "ID / Seriennummer",
             "Description": "Beschreibung",
@@ -14,7 +12,10 @@
             "Devices": "Geräte",
             "Smart Thermostat": "Smartes Thermostat",
             "Smart Radiator-Thermostat": "Smartes Heizkörper-Thermostat",
-            "Smart Air Conditioning Control": "Smarte Klimaanlagen-Steuerung"
+            "Smart Air Conditioning Control": "Smarte Klimaanlagen-Steuerung",
+            "Does not exist anymore!": "Existiert nicht mehr!",
+            "Server not available!": "Server nicht erreichbar!",
+            "Unknown devices": "Unbekannte Geräte"
         }
     }
 }
