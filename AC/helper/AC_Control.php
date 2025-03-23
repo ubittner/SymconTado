@@ -804,6 +804,17 @@ trait AC_Control
                 }
                 $this->SetValue('CoolingTimer', $coolingTimer);
             }
+            //Link
+            if (array_key_exists('link', $result)) {
+                //  State
+                if (array_key_exists('state', $result['link'])) {
+                    $linkState = false;
+                    if ($result['link']['state'] == 'ONLINE') {
+                        $linkState = true;
+                    }
+                    $this->SetValue('Link', $linkState);
+                }
+            }
             //Sensor
             if (array_key_exists('sensorDataPoints', $result)) {
                 // Inside temperature

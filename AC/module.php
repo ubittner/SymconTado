@@ -260,7 +260,16 @@ class TadoAC extends IPSModule
         //Humidity
         $this->RegisterVariableFloat('AirHumidity', $this->Translate('Air humidity'), '~Humidity.F', 130);
 
-        ########## Variables
+        //Network status
+        $profile = self::MODULE_PREFIX . '.' . $this->InstanceID . '.Link';
+        if (!IPS_VariableProfileExists($profile)) {
+            IPS_CreateVariableProfile($profile, 0);
+        }
+        IPS_SetVariableProfileAssociation($profile, 0, 'Offline', 'Network', -1);
+        IPS_SetVariableProfileAssociation($profile, 1, 'Online', 'Network', 0x00FF00);
+        $this->RegisterVariableBoolean('Link', $this->Translate('Network status'), $profile, 140);
+
+        ########## Timer
 
         $this->RegisterTimer('UpdateCoolingState', 0, self::MODULE_PREFIX . '_UpdateCoolingZoneState(' . $this->InstanceID . ');');
 

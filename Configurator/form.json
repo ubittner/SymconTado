@@ -6,13 +6,7 @@
         },
         {
             "type": "Label",
-            "caption": "Please select a category"
-        },
-        {
-            "type": "SelectCategory",
-            "name": "CategoryID",
-            "caption": "Category",
-            "width": "600px"
+            "caption": "Version:"
         }
     ],
     "actions": [
