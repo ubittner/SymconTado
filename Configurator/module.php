@@ -472,7 +472,7 @@ class TadoConfigurator extends IPSModule
     private function GetConnectedInstances(): string
     {
         $instanceTypes[] = ['type' => 'home', 'guid' => self::TADO_HOME_GUID, 'firstProperty' => 'homeID', 'firstPropertyName' => 'HomeID', 'secondProperty' => '', 'secondPropertyName' => ''];
-        $instanceTypes[] = ['type' => 'heating', 'guid' => self::TADO_HEATING_GUID, 'firstProperty' => 'homeID', 'firstPropertyName' => 'HoneID', 'secondProperty' => 'zoneID', 'secondPropertyName' => 'ZoneID'];
+        $instanceTypes[] = ['type' => 'heating', 'guid' => self::TADO_HEATING_GUID, 'firstProperty' => 'homeID', 'firstPropertyName' => 'HomeID', 'secondProperty' => 'zoneID', 'secondPropertyName' => 'ZoneID'];
         $instanceTypes[] = ['type' => 'ac', 'guid' => self::TADO_AC_GUID, 'firstProperty' => 'homeID', 'firstPropertyName' => 'HomeID', 'secondProperty' => 'zoneID', 'secondPropertyName' => 'ZoneID'];
         $instanceTypes[] = ['type' => 'ac', 'guid' => self::TADO_COOLING_GUID, 'firstProperty' => 'homeID', 'firstPropertyName' => 'HomeID', 'secondProperty' => 'zoneID', 'secondPropertyName' => 'ZoneID'];
         $instanceTypes[] = ['type' => 'device', 'guid' => self::TADO_DEVICE_GUID, 'firstProperty' => 'homeID', 'firstPropertyName' => 'HomeID', 'secondProperty' => 'serialNumber', 'secondPropertyName' => 'SerialNumber'];
