@@ -7,7 +7,7 @@ Mit diesem Modul kann eine Klimaanlage smart gesteuert werden.
 Für dieses Modul besteht kein Anspruch auf Fehlerfreiheit, Weiterentwicklung, sonstige Unterstützung oder Support.  
 Bevor das Modul installiert wird, sollte unbedingt ein Backup von IP-Symcon durchgeführt werden.  
 Der Entwickler haftet nicht für eventuell auftretende Datenverluste oder sonstige Schäden.  
-Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen ausdrücklich zu.  
+Der Nutzer stimmt den oben angegebenen Bedingungen sowie den Lizenzbedingungen ausdrücklich zu.  
 
 ### Inhaltsverzeichnis
 
@@ -37,7 +37,7 @@ Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen 
 
 ### 2. Voraussetzungen
 
-- IP-Symcon ab Version 6.1
+- IP-Symcon ab Version 9.0
 
 ### 3. Software-Installation
 
@@ -93,13 +93,13 @@ Auswahl, welche Parameter für den jeweiligen Modus genutzt werden.
 | Lüfter   | Temperatur, Lüfter, Lamellenbewegung, Displaybeleuchtung |
 | Auto     | Temperatur, Lüfter, Lamellenbewegung, Displaybeleuchtung |
 
-Die Eigenschaften und den damit verbundenen Funktionsumfang kann je nach Gerät unterschiedlich sein.  
-Schauen Sie in der `tado° App` nach, welche Funktionen die Klimaanlage unterstützt oder  
+Die Eigenschaften und der damit verbundene Funktionsumfang können je nach Gerät unterschiedlich sein.  
+Schauen Sie in der `tado° App` nach, welche Funktionen die Klimaanlage unterstützt, oder  
 wählen Sie eine bereits vorhandene Konfiguration aus:
 
 ![Image](../imgs/ac_actions.png)
 
-Alternative können Sie auch die Eigenschaften auf Funktion ausprobieren.
+Als Alternative können Sie auch die Eigenschaften auf Funktion ausprobieren.
 
 ### 5. Statusvariablen und Profile
 

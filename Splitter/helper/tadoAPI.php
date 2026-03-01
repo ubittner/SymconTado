@@ -1,15 +1,15 @@
 <?php
 
-/** @noinspection PhpSwitchCanBeReplacedWithMatchExpressionInspection */
 /** @noinspection PhpUnhandledExceptionInspection */
-/** @noinspection PhpUnused */
+/** @noinspection SpellCheckingInspection */
+/** @noinspection GrazieInspection */
 
 declare(strict_types=1);
 
 trait tadoAPI
 {
     /**
-     * This endpoint provides general information about the authenticated users, the homes and the devices.
+     * This endpoint provides general information about the authenticated users, the homes, and the devices.
      *
      * @return string
      */
@@ -51,7 +51,7 @@ trait tadoAPI
 
     /**
      * This endpoint provides information about the hardware installed in the selected home.
-     * You will be able to see for example the battery state, software version, capabilities, etc.
+     * You will be able to see, for example, the battery state, software version, capabilities, etc.
      *
      * IB01 = Internet bridge
      * RU01 = Smart thermostat
@@ -368,19 +368,13 @@ trait tadoAPI
         $this->SendDebug(__FUNCTION__, $this->Translate($text), 0);
         $this->LogMessage($this->Translate($text), KL_WARNING);
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
-        switch ($DeviceMode) {
-            case 'DRY': # without temperature and fan speed
-                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'swing' => $Swing], 'termination' => ['type' => 'MANUAL']]);
-                break;
-
-            case 'FAN': # without temperature
-                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing], 'termination' => ['type' => 'MANUAL']]);
-                break;
-
-            default:
-                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing, 'temperature' =>['celsius' => $Temperature]], 'termination' => ['type' => 'MANUAL']]);
-
-        }
+        $postfields = match ($DeviceMode) {
+            // DRY = without temperature and fan speed
+            'DRY'   => json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'swing' => $Swing], 'termination' => ['type' => 'MANUAL']]),
+            // FAN = without temperature
+            'FAN'   => json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing], 'termination' => ['type' => 'MANUAL']]),
+            default => json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing, 'temperature' => ['celsius' => $Temperature]], 'termination' => ['type' => 'MANUAL']]),
+        };
         return $this->SendDataToTado($endpoint, 'PUT', $postfields);
     }
 
@@ -427,19 +421,13 @@ trait tadoAPI
         $this->SendDebug(__FUNCTION__, $this->Translate($text), 0);
         $this->LogMessage($this->Translate($text), KL_WARNING);
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
-        switch ($DeviceMode) {
-            case 'DRY': # without temperature and fan speed
-                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'swing' => $Swing], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]);
-                break;
-
-            case 'FAN': # without temperature
-                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]);
-                break;
-
-            default:
-                $postfields = json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing, 'temperature' =>['celsius' => $Temperature]], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]);
-
-        }
+        $postfields = match ($DeviceMode) {
+            // DRY = without temperature and fan speed
+            'DRY'   => json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'swing' => $Swing], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]),
+            // FAN = without temperature
+            'FAN'   => json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]),
+            default => json_encode(['setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing, 'temperature' => ['celsius' => $Temperature]], 'termination' => ['type' => 'TIMER', 'durationInSeconds' => $DurationInSeconds]]),
+        };
         return $this->SendDataToTado($endpoint, 'PUT', $postfields);
     }
 
@@ -484,19 +472,13 @@ trait tadoAPI
         $this->SendDebug(__FUNCTION__, $this->Translate($text), 0);
         $this->LogMessage($this->Translate($text), KL_WARNING);
         $endpoint = 'https://my.tado.com/api/v2/homes/' . $HomeID . '/zones/' . $ZoneID . '/overlay';
-        switch ($DeviceMode) {
-            case 'DRY': # without temperature and fan speed
-                $postfields = json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'swing' => $Swing], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]);
-                break;
-
-            case 'FAN': # without temperature
-                $postfields = json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]);
-                break;
-
-            default:
-                $postfields = json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing, 'temperature' =>['celsius' => $Temperature]], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]);
-
-        }
+        $postfields = match ($DeviceMode) {
+            // DRY = without temperature and fan speed
+            'DRY'   => json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'swing' => $Swing], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]),
+            // FAN = without temperature
+            'FAN'   => json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]),
+            default => json_encode(['type' => 'MANUAL', 'setting' => ['type' => 'AIR_CONDITIONING', 'power' => $PowerState, 'mode' => $DeviceMode, 'fanSpeed' => $FanSpeed, 'swing' => $Swing, 'temperature' => ['celsius' => $Temperature]], 'termination' => ['typeSkillBasedApp' => 'NEXT_TIME_BLOCK']]),
+        };
         return $this->SendDataToTado($endpoint, 'PUT', $postfields);
     }
 
@@ -514,7 +496,7 @@ trait tadoAPI
     }
 
     /**
-     * This endpoint is displaying HI! on the selected device.
+     * This endpoint is displaying "HI!" on the selected device.
      * Get the short serial number of your device from the "GetDevices" methode.
      *
      * @param string $DeviceShortSerialNumber
@@ -573,7 +555,6 @@ trait tadoAPI
             $error_msg = curl_error($ch);
             $this->SendDebug(__FUNCTION__, 'An error has occurred: ' . json_encode($error_msg), 0);
         }
-        curl_close($ch);
         return $body;
     }
 }

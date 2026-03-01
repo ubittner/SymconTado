@@ -1,5 +1,8 @@
 <?php
 
+/** @noinspection SpellCheckingInspection */
+/** @noinspection GrazieInspection */
+
 declare(strict_types=1);
 
 trait webOAuth
@@ -28,12 +31,11 @@ trait webOAuth
         $curlError = curl_errno($ch);
         $curlErrorMessage = curl_error($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
         if (!$curlError) {
             switch ($httpCode) {
                 case 200: //OK
                     $this->SendDebug(__FUNCTION__, $this->Translate('Response') . ': ' . $response, 0);
-                    //Check whether we have received a valid json string in response
+                    //Check whether we have received a valid JSON string in response
                     if (!$this->CheckJson($response)) {
                         die('Abort, json string expected');
                     }
@@ -108,12 +110,11 @@ trait webOAuth
         $curlError = curl_errno($ch);
         $curlErrorMessage = curl_error($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
         if (!$curlError) {
             switch ($httpCode) {
                 case 200: //OK
                     $this->SendDebug(__FUNCTION__, $this->Translate('Response') . ': ' . $response, 0);
-                    //Check whether we have received a valid json string in response
+                    //Check whether we have received a valid JSON string in response
                     if (!$this->CheckJson($response)) {
                         die('Abort, json string expected');
                     }
@@ -157,7 +158,7 @@ trait webOAuth
      */
     public function GetBearerToken(): string
     {
-        //Check if we already have a valid access token in cache
+        //Check if we already have a valid access token in the cache
         $expires = $this->ReadAttributeInteger('AccessTokenExpires');
         if ($expires > 0) {
             if (time() < $expires) {
@@ -165,7 +166,7 @@ trait webOAuth
                 return $this->ReadAttributeString('AccessToken');
             }
         }
-        //If we slipped here we need to fetch the new access token
+        //If we slipped here, we need to fetch the new access token
         $this->SendDebug(__FUNCTION__, $this->Translate('Expired! Get new access token!'), 0);
         $refreshToken = $this->ReadAttributeString('RefreshToken');
         if ($refreshToken == '') {
@@ -188,12 +189,11 @@ trait webOAuth
         $curlError = curl_errno($ch);
         $curlErrorMessage = curl_error($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
         if (!$curlError) {
             switch ($httpCode) {
                 case 200: //OK
                     $this->SendDebug(__FUNCTION__, $this->Translate('Response') . ': ' . $response, 0);
-                    //Check whether we have received a valid json string in response
+                    //Check whether we have received a valid JSON string in response
                     if (!$this->CheckJson($response)) {
                         return json_encode(['error' => 'Abort, json string expected']);
                     }
@@ -224,17 +224,16 @@ trait webOAuth
     ########## Private
 
     /**
-     * Checks if a sting is json encoded.
+     * Checks if a sting is JSON encoded.
      *
      * @param string $String
      * @return bool
-     * false:   no json string
-     * true:    json string
+     * false:   no JSON string
+     * true:    JSON string
      */
     private function CheckJson(string $String): bool
     {
-        json_decode($String);
-        return json_last_error() === JSON_ERROR_NONE;
+        return json_validate($String);
     }
 
     /**
@@ -298,7 +297,7 @@ trait webOAuth
      *
      * @return bool
      * false =  missing token(s)
-     * true =   tokens exists
+     * true =   tokens exist
      *
      * @throws Exception
      */

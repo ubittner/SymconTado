@@ -1,36 +1,16 @@
 <?php
 
-/** @noinspection PhpUnused */
+/** @noinspection SpellCheckingInspection */
 /** @noinspection DuplicatedCode */
-
-/*
- * @module      Tado Cooling
- *
- * @prefix      TADO
- *
- * @file        module.php
- *
- * @author      Ulrich Bittner
- * @copyright   (c) 2020, 2021
- * @license     CC BY-NC-SA 4.0
- *              https://creativecommons.org/licenses/by-nc-sa/4.0/
- *
- * @see         https://github.com/ubittner/SymconTado/
- *
- * @guids       Library
- *              {2C88856B-7D25-7502-1594-11F588E2C685}
- *
- *              Tado Cooling
- *             	{374753E5-0048-7EF7-43C5-D8AAB5CB317B}
- */
+/** @noinspection PhpUnused */
 
 declare(strict_types=1);
 
 include_once __DIR__ . '/../libs/constants.php';
 
-class TadoCooling extends IPSModule
+class TadoCooling extends IPSModuleStrict
 {
-    public function Create()
+    public function Create(): void
     {
         // Never delete this line!
         parent::Create();
@@ -150,15 +130,15 @@ class TadoCooling extends IPSModule
 
         // Timer
         $this->RegisterTimer('UpdateCoolingState', 0, 'TADO_UpdateCoolingZoneState(' . $this->InstanceID . ');');
-
-        // Connect to splitter
-        $this->ConnectParent(TADO_SPLITTER_GUID);
     }
 
-    public function ApplyChanges()
+    public function ApplyChanges(): void
     {
         // Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
+
+        //Register FM Connect message
+        $this->RegisterMessage($this->InstanceID, FM_CONNECT);
 
         // Never delete this line!
         parent::ApplyChanges();
@@ -167,15 +147,10 @@ class TadoCooling extends IPSModule
         $deviceType = @$this->ReadPropertyInteger('DeviceType');
         if (is_int($deviceType)) {
             if ($deviceType != 99999) {
-                switch ($deviceType) {
-                    case 1: # Fujitsu AUYG07LVLA
-                    case 2: # Fujitsu ASYG09LMCA
-                        $swing = true;
-                        break;
-
-                    default: # all other known devices
-                        $swing = false;
-                }
+                $swing = match ($deviceType) {
+                    1, 2 => true, // 1 = Fujitsu AUYG07LVLA, 2 = Fujitsu ASYG09LMCA
+                    default => false,
+                };
                 IPS_SetProperty($this->InstanceID, 'DeviceType', 99999);
                 IPS_SetProperty($this->InstanceID, 'UseSwing', $swing);
                 IPS_ApplyChanges($this->InstanceID);
@@ -196,10 +171,12 @@ class TadoCooling extends IPSModule
         $this->SetTimerInterval('UpdateCoolingState', $milliseconds);
 
         // Update state
-        $this->UpdateCoolingZoneState();
+        if ($this->HasActiveParent()) {
+            $this->UpdateCoolingZoneState();
+        }
     }
 
-    public function Destroy()
+    public function Destroy(): void
     {
         // Never delete this line!
         parent::Destroy();
@@ -214,30 +191,50 @@ class TadoCooling extends IPSModule
         }
     }
 
-    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    public function GetCompatibleParents(): string
+    {
+        //Connect to a new or existing tado° Splitter instance
+        return json_encode([
+            'type'      => 'connect',
+            'moduleIDs' => [
+                TADO_SPLITTER_GUID
+            ]
+        ]);
+    }
+
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data): void
     {
         $this->SendDebug('MessageSink', 'SenderID: ' . $SenderID . ', Message: ' . $Message, 0);
-        if ($Message == IPS_KERNELSTARTED) {
-            $this->KernelReady();
+        switch ($Message) {
+            case IPS_KERNELSTARTED:
+                $this->KernelReady();
+                break;
+
+            case FM_CONNECT:
+                $this->UpdateCoolingZoneState();
+                break;
+
         }
     }
 
-    public function GetConfigurationForm()
+    public function GetConfigurationForm(): string
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
         return json_encode($formData);
     }
 
-    public function ReceiveData($JSONString)
+    public function ReceiveData($JSONString): string
     {
-        // Received data from splitter, not used at the moment
+        //Receive data from splitter, not used at the moment
+        $this->SendDebug(__FUNCTION__, 'Incoming data: ' . $JSONString, 0);
         $data = json_decode($JSONString);
-        $this->SendDebug(__FUNCTION__, utf8_decode($data->Buffer), 0);
+        $this->SendDebug(__FUNCTION__, 'Buffer data:  ' . json_encode($data->Buffer), 0);
+        return '';
     }
 
     #################### Request action
 
-    public function RequestAction($Ident, $Value)
+    public function RequestAction($Ident, $Value): void
     {
         switch ($Ident) {
             case 'Power':
@@ -474,26 +471,13 @@ class TadoCooling extends IPSModule
                 // Device mode
                 if (array_key_exists('mode', $result['setting'])) {
                     $mode = $result['setting']['mode'];
-                    switch ($mode) {
-                        case 'DRY':
-                            $modeValue = 1;
-                            break;
-
-                        case 'FAN':
-                            $modeValue = 2;
-                            break;
-
-                        case 'HEAT':
-                            $modeValue = 3;
-                            break;
-
-                        case 'AUTO':
-                            $modeValue = 4;
-                            break;
-
-                        default:
-                            $modeValue = 0;
-                    }
+                    $modeValue = match ($mode) {
+                        'DRY'   => 1,
+                        'FAN'   => 2,
+                        'HEAT'  => 3,
+                        'AUTO'  => 4,
+                        default => 0,
+                    };
                     $this->SetValue('DeviceMode', $modeValue);
                 }
                 // Setpoint temperature
@@ -509,22 +493,12 @@ class TadoCooling extends IPSModule
                 // Fan speed
                 if (array_key_exists('fanSpeed', $result['setting'])) {
                     $fanSpeed = (string) $result['setting']['fanSpeed'];
-                    switch ($fanSpeed) {
-                        case 'LOW':
-                            $fanSpeedState = 0;
-                            break;
-
-                        case 'MIDDLE':
-                            $fanSpeedState = 1;
-                            break;
-
-                        case 'HIGH':
-                            $fanSpeedState = 2;
-                            break;
-
-                        default:
-                            $fanSpeedState = 3;
-                    }
+                    $fanSpeedState = match ($fanSpeed) {
+                        'LOW'    => 0,
+                        'MIDDLE' => 1,
+                        'HIGH'   => 2,
+                        default  => 3,
+                    };
                     $this->SetValue('FanSpeed', $fanSpeedState);
                 }
                 // Swing
@@ -576,7 +550,7 @@ class TadoCooling extends IPSModule
                 }
             }
         }
-        // Set next timer interval
+        // Set the next timer interval
         $milliseconds = $this->ReadPropertyInteger('UpdateInterval') * 1000;
         $this->SetTimerInterval('UpdateCoolingState', $milliseconds);
     }
@@ -621,48 +595,25 @@ class TadoCooling extends IPSModule
                 // Temperature
                 $postfields['setting']['temperature'] = ['celsius' => $this->GetValue('SetpointTemperature'), 'fahrenheit' => (float) (($this->GetValue('SetpointTemperature') * 9 / 5) + 32)];
                 // Device mode
-                switch ($this->GetValue('DeviceMode')) {
-                    case 1:
-                        $deviceMode = 'DRY';
-                        break;
-
-                    case 2:
-                        $deviceMode = 'FAN';
-                        break;
-
-                    case 3:
-                        $deviceMode = 'HEAT';
-                        break;
-
-                    case 4:
-                        $deviceMode = 'AUTO';
-                        break;
-
-                    default:
-                        $deviceMode = 'COOL';
-                }
+                $deviceMode = match ($this->GetValue('DeviceMode')) {
+                    1       => 'DRY',
+                    2       => 'FAN',
+                    3       => 'HEAT',
+                    4       => 'AUTO',
+                    default => 'COOL',
+                };
                 $postfields['setting']['mode'] = $deviceMode;
                 // Type
                 $postfields['setting']['type'] = 'AIR_CONDITIONING';
                 // Power
                 $postfields['setting']['power'] = 'ON';
                 // Fan speed
-                switch ($this->GetValue('FanSpeed')) {
-                    case 0:
-                        $fanSpeed = 'LOW';
-                        break;
-
-                    case 1:
-                        $fanSpeed = 'MIDDLE';
-                        break;
-
-                    case 2:
-                        $fanSpeed = 'HIGH';
-                        break;
-
-                    default:
-                        $fanSpeed = 'AUTO';
-                }
+                $fanSpeed = match ($this->GetValue('FanSpeed')) {
+                    0       => 'LOW',
+                    1       => 'MIDDLE',
+                    2       => 'HIGH',
+                    default => 'AUTO',
+                };
                 $postfields['setting']['fanSpeed'] = $fanSpeed;
                 // Swing
                 if ($this->ReadPropertyBoolean('UseSwing')) {
@@ -675,18 +626,18 @@ class TadoCooling extends IPSModule
 
                 ########## Check device mode
 
-                // COOL: we need teperature and fanspeed, if device has swing mode we also need swing mode
-                // DRY: without temperature and fan speed, if device has swing mode we also need swing mode
+                // COOL: we need teperature and fanspeed, if the device has swing mode, we also need swing mode
+                // DRY: without temperature and fan speed, if the device has swing mode, we also need swing mode
                 if ($deviceMode == 'DRY') {
                     unset($postfields['setting']['temperature']);
                     unset($postfields['setting']['fanSpeed']);
                 }
-                // FAN: without temperature and fanspeed, if device has swing mode we also need swing mode
+                // FAN: without temperature and fanspeed, if the device has swing mode, we also need swing mode
                 if ($deviceMode == 'FAN') {
                     unset($postfields['setting']['temperature']);
                     unset($postfields['setting']['fanSpeed']);
                 }
-                // HEAT: we need temperature and fanspeed, if device has swing mode we also need swing mode
+                // HEAT: we need temperature and fanspeed, if the device has swing mode, we also need swing mode
                 // AUTO: without temperature and fanspeed
                 if ($deviceMode == 'AUTO') {
                     unset($postfields['setting']['temperature']);
