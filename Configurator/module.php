@@ -1,56 +1,37 @@
 <?php
 
-/*
- * @module      Tado Configurator
- *
- * @prefix      TADO
- *
- * @file        module.php
- *
- * @author      Ulrich Bittner
- * @copyright   (c) 2020-2025
- * @license     CC BY-NC-SA 4.0
- *              https://creativecommons.org/licenses/by-nc-sa/4.0/
- *
- * @see         https://github.com/ubittner/SymconTado/
- *
- * @guids       Library
- *              {2C88856B-7D25-7502-1594-11F588E2C685}
- *
- *              Tado Configurator
- *             	{55862B9A-A9E9-2A1D-2EA9-C195C18A42EA}
- */
+/** @noinspection PhpRedundantMethodOverrideInspection */
+/** @noinspection SpellCheckingInspection */
+/** @noinspection DuplicatedCode */
+/** @noinspection PhpUnused */
 
 declare(strict_types=1);
 
-class TadoConfigurator extends IPSModule
+class TadoConfigurator extends IPSModuleStrict
 {
     //Constants
-    private const LIBRARY_GUID = '{2C88856B-7D25-7502-1594-11F588E2C685}';
-    private const TADO_SPLITTER_GUID = '{31C59151-0182-07DB-4D0D-7EDA0668186F}';
-    private const TADO_SPLITTER_DATA_GUID = '{9B0CC551-1523-14B7-8C56-39869942CF02}';
-    private const TADO_HOME_GUID = '{69F3B4F8-3A8E-BB23-FEFD-66BB7846CAEF}';
-    private const TADO_HEATING_GUID = '{F6D924F8-0CAB-2EB7-725D-2640B8F5556B}';
-    private const TADO_COOLING_GUID = '{374753E5-0048-7EF7-43C5-D8AAB5CB317B}';
-    private const TADO_AC_GUID = '{2EA2896C-8FB0-C565-EB69-F6FADECDC736}';
-    private const TADO_DEVICE_GUID = '{07B0E642-8AF4-0E49-5A5E-DA70531CCF7F}';
+    private const string LIBRARY_GUID = '{2C88856B-7D25-7502-1594-11F588E2C685}';
+    private const string TADO_SPLITTER_GUID = '{31C59151-0182-07DB-4D0D-7EDA0668186F}';
+    private const string TADO_SPLITTER_DATA_GUID = '{9B0CC551-1523-14B7-8C56-39869942CF02}';
+    private const string TADO_HOME_GUID = '{69F3B4F8-3A8E-BB23-FEFD-66BB7846CAEF}';
+    private const string TADO_HEATING_GUID = '{F6D924F8-0CAB-2EB7-725D-2640B8F5556B}';
+    private const string TADO_COOLING_GUID = '{374753E5-0048-7EF7-43C5-D8AAB5CB317B}';
+    private const string TADO_AC_GUID = '{2EA2896C-8FB0-C565-EB69-F6FADECDC736}';
+    private const string TADO_DEVICE_GUID = '{07B0E642-8AF4-0E49-5A5E-DA70531CCF7F}';
 
-    public function Create()
+    public function Create(): void
     {
         //Never delete this line!
         parent::Create();
-
-        //Connect to splitter
-        $this->ConnectParent(self::TADO_SPLITTER_GUID);
     }
 
-    public function Destroy()
+    public function Destroy(): void
     {
         //Never delete this line!
         parent::Destroy();
     }
 
-    public function ApplyChanges()
+    public function ApplyChanges(): void
     {
         //Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
@@ -59,7 +40,18 @@ class TadoConfigurator extends IPSModule
         parent::ApplyChanges();
     }
 
-    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    public function GetCompatibleParents(): string
+    {
+        //Connect to a new or existing tado° Splitter instance
+        return json_encode([
+            'type'      => 'connect',
+            'moduleIDs' => [
+                self::TADO_SPLITTER_GUID
+            ]
+        ]);
+    }
+
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data): void
     {
         $this->SendDebug('MessageSink', 'SenderID: ' . $SenderID . ', Message: ' . $Message, 0);
         if ($Message == IPS_KERNELSTARTED) {

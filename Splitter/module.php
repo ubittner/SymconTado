@@ -1,46 +1,24 @@
 <?php
 
-/** @noinspection PhpRedundantMethodOverrideInspection */
-/** @noinspection PhpUnhandledExceptionInspection */
-/** @noinspection PhpMissingReturnTypeInspection */
+/** @noinspection SpellCheckingInspection */
+/** @noinspection DuplicatedCode */
 /** @noinspection PhpUnused */
-
-/*
- * @module      Tado Splitter
- *
- * @prefix      TADO
- *
- * @file        module.php
- *
- * @author      Ulrich Bittner
- * @copyright   (c) 2020 - 2025
- * @license     CC BY-NC-SA 4.0
- *              https://creativecommons.org/licenses/by-nc-sa/4.0/
- *
- * @see         https://github.com/ubittner/SymconTado/
- *
- * @guids       Library
- *              {2C88856B-7D25-7502-1594-11F588E2C685}
- *
- *              Tado Splitter
- *              {31C59151-0182-07DB-4D0D-7EDA0668186F}
- */
 
 declare(strict_types=1);
 
 include_once __DIR__ . '/../libs/constants.php';
 include_once __DIR__ . '/helper/autoload.php';
 
-class TadoSplitter extends IPSModule
+class TadoSplitter extends IPSModuleStrict
 {
     //Helper
     use tadoAPI;
     use webOAuth;
 
     //Constants
-    private const LIBRARY_GUID = '{2C88856B-7D25-7502-1594-11F588E2C685}';
+    private const string LIBRARY_GUID = '{2C88856B-7D25-7502-1594-11F588E2C685}';
 
-    public function Create()
+    public function Create(): void
     {
         //Never delete this line!
         parent::Create();
@@ -72,13 +50,7 @@ class TadoSplitter extends IPSModule
         $this->RegisterAttributeString('Setup', '');
     }
 
-    public function Destroy()
-    {
-        //Never delete this line!
-        parent::Destroy();
-    }
-
-    public function ApplyChanges()
+    public function ApplyChanges(): void
     {
         //Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
@@ -94,7 +66,7 @@ class TadoSplitter extends IPSModule
         $this->ValidateConfiguration();
     }
 
-    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data): void
     {
         $this->SendDebug('MessageSink', 'SenderID: ' . $SenderID . ', Message: ' . $Message, 0);
         if ($Message == IPS_KERNELSTARTED) {
@@ -102,7 +74,7 @@ class TadoSplitter extends IPSModule
         }
     }
 
-    public function GetConfigurationForm()
+    public function GetConfigurationForm(): string
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
         $library = IPS_GetLibrary(self::LIBRARY_GUID);
@@ -112,7 +84,7 @@ class TadoSplitter extends IPSModule
         return json_encode($formData);
     }
 
-    public function ForwardData($JSONString)
+    public function ForwardData($JSONString): string
     {
         $this->SendDebug(__FUNCTION__, $JSONString, 0);
         $data = json_decode($JSONString);

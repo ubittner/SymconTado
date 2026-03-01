@@ -1,13 +1,7 @@
 <?php
 
-/**
- * @project       tado° AC
- * @file          module.php
- * @author        Ulrich Bittner
- * @copyright     2022 Ulrich Bittner
- * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
- */
-
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection SpellCheckingInspection */
 /** @noinspection DuplicatedCode */
 /** @noinspection PhpUnused */
 
@@ -15,20 +9,20 @@ declare(strict_types=1);
 
 include_once __DIR__ . '/helper/AC_autoload.php';
 
-class TadoAC extends IPSModule
+class TadoAC extends IPSModuleStrict
 {
     //Helper
     use AC_Control;
     use AC_Properties;
 
     //Constants
-    private const LIBRARY_GUID = '{2C88856B-7D25-7502-1594-11F588E2C685}';
-    private const MODULE_NAME = 'tado° AC';
-    private const MODULE_PREFIX = 'TADOAC';
-    private const TADO_SPLITTER_GUID = '{31C59151-0182-07DB-4D0D-7EDA0668186F}';
-    private const TADO_SPLITTER_DATA_GUID = '{9B0CC551-1523-14B7-8C56-39869942CF02}';
+    private const string LIBRARY_GUID = '{2C88856B-7D25-7502-1594-11F588E2C685}';
+    private const string MODULE_NAME = 'tado° AC';
+    private const string MODULE_PREFIX = 'TADOAC';
+    private const string TADO_SPLITTER_GUID = '{31C59151-0182-07DB-4D0D-7EDA0668186F}';
+    private const string TADO_SPLITTER_DATA_GUID = '{9B0CC551-1523-14B7-8C56-39869942CF02}';
 
-    public function Create()
+    public function Create(): void
     {
         //Never delete this line!
         parent::Create();
@@ -272,16 +266,15 @@ class TadoAC extends IPSModule
         ########## Timer
 
         $this->RegisterTimer('UpdateCoolingState', 0, self::MODULE_PREFIX . '_UpdateCoolingZoneState(' . $this->InstanceID . ');');
-
-        ##########  Connect to splitter
-
-        $this->ConnectParent(self::TADO_SPLITTER_GUID);
     }
 
-    public function ApplyChanges()
+    public function ApplyChanges(): void
     {
         //Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
+
+        //Register FM Connect message
+        $this->RegisterMessage($this->InstanceID, FM_CONNECT);
 
         //Never delete this line!
         parent::ApplyChanges();
@@ -303,10 +296,12 @@ class TadoAC extends IPSModule
         $this->SetTimerInterval('UpdateCoolingState', $this->ReadPropertyInteger('UpdateInterval') * 1000);
 
         //Update state
-        $this->UpdateCoolingZoneState();
+        if ($this->HasActiveParent()) {
+            $this->UpdateCoolingZoneState();
+        }
     }
 
-    public function Destroy()
+    public function Destroy(): void
     {
         //Never delete this line!
         parent::Destroy();
@@ -321,15 +316,33 @@ class TadoAC extends IPSModule
         }
     }
 
-    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    public function GetCompatibleParents(): string
+    {
+        //Connect to a new or existing tado° Splitter instance
+        return json_encode([
+            'type'      => 'connect',
+            'moduleIDs' => [
+                self::TADO_SPLITTER_GUID
+            ]
+        ]);
+    }
+
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data): void
     {
         $this->SendDebug('MessageSink', 'SenderID: ' . $SenderID . ', Message: ' . $Message, 0);
-        if ($Message == IPS_KERNELSTARTED) {
-            $this->KernelReady();
+        switch ($Message) {
+            case IPS_KERNELSTARTED:
+                $this->KernelReady();
+                break;
+
+            case FM_CONNECT:
+                $this->UpdateCoolingZoneState();
+                break;
+
         }
     }
 
-    public function GetConfigurationForm()
+    public function GetConfigurationForm(): string
     {
         $form['elements'][] = [
             'type'  => 'Image',
@@ -716,16 +729,18 @@ class TadoAC extends IPSModule
         return json_encode($form);
     }
 
-    public function ReceiveData($JSONString)
+    public function ReceiveData($JSONString): string
     {
         //Receive data from splitter, not used at the moment
+        $this->SendDebug(__FUNCTION__, 'Incoming data: ' . $JSONString, 0);
         $data = json_decode($JSONString);
-        $this->SendDebug(__FUNCTION__, utf8_decode($data->Buffer), 0);
+        $this->SendDebug(__FUNCTION__, 'Buffer data:  ' . json_encode($data->Buffer), 0);
+        return '';
     }
 
     #################### Request action
 
-    public function RequestAction($Ident, $Value)
+    public function RequestAction($Ident, $Value): void
     {
         switch ($Ident) {
             case 'Power':

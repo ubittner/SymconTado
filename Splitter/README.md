@@ -7,7 +7,7 @@ Mit diesem Modul wird die Kommunikation zu my.tado.com hergestellt.
 Für dieses Modul besteht kein Anspruch auf Fehlerfreiheit, Weiterentwicklung, sonstige Unterstützung oder Support.  
 Bevor das Modul installiert wird, sollte unbedingt ein Backup von IP-Symcon durchgeführt werden.  
 Der Entwickler haftet nicht für eventuell auftretende Datenverluste oder sonstige Schäden.  
-Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen ausdrücklich zu.  
+Der Nutzer stimmt den oben angegebenen Bedingungen sowie den Lizenzbedingungen ausdrücklich zu.  
 
 ### Inhaltsverzeichnis
 
@@ -25,7 +25,7 @@ Der Nutzer stimmt den oben angegebenen Bedingungen, sowie den Lizenzbedingungen 
 
 ### 2. Voraussetzungen
 
-- IP-Symcon ab Version 6.1
+- IP-Symcon ab Version 9.0
 
 ### 3. Software-Installation
 
@@ -168,7 +168,7 @@ Kühlmodus (Smartes Klimaanlagen-Thermostat):
 ```text
 string TADO_SetCoolingZone(interger $InstanceID, integer $HomeID, integer $ZoneID, string $Overlay);
 Setzt einen Raum (Zone) des Zuhauses (Home) auf die angegebene Werte.
-$Overlay muss für die entsprehcneden Parameter angegeben werden:
+$Overlay muss für die entsprechenden Parameter angegeben werden:
 
 ['setting']['power']        OFF | ON
 ['setting']['mode']         COOL | HEAT | DRY | FAN

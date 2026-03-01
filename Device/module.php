@@ -1,87 +1,88 @@
 <?php
 
+/** @noinspection SpellCheckingInspection */
 /** @noinspection PhpUnused */
-
-/*
- * @module      Tado Device
- *
- * @prefix      TADO
- *
- * @file        module.php
- *
- * @author      Ulrich Bittner
- * @copyright   (c) 2020
- * @license     CC BY-NC-SA 4.0
- *              https://creativecommons.org/licenses/by-nc-sa/4.0/
- *
- * @see         https://github.com/ubittner/SymconTado/
- *
- * @guids       Library
- *              {2C88856B-7D25-7502-1594-11F588E2C685}
- *
- *              Tado Device
- *             	{07B0E642-8AF4-0E49-5A5E-DA70531CCF7F}
- */
 
 declare(strict_types=1);
 
 include_once __DIR__ . '/../libs/constants.php';
 
-class TadoDevice extends IPSModule
+class TadoDevice extends IPSModuleStrict
 {
-    public function Create()
+    public function Create(): void
     {
         //Never delete this line!
         parent::Create();
         $this->RegisterProperties();
         $this->RegisterVariables();
         $this->RegisterTimers();
-        //Connect to splitter
-        $this->ConnectParent(TADO_SPLITTER_GUID);
     }
 
-    public function Destroy()
-    {
-        //Never delete this line!
-        parent::Destroy();
-    }
-
-    public function ApplyChanges()
+    public function ApplyChanges(): void
     {
         //Wait until IP-Symcon is started
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
+
+        //Register FM Connect message
+        $this->RegisterMessage($this->InstanceID, FM_CONNECT);
+
         //Never delete this line!
         parent::ApplyChanges();
+
         //Check kernel runlevel
         if (IPS_GetKernelRunlevel() != KR_READY) {
             return;
         }
+
         //Set update timer
         $milliseconds = $this->ReadPropertyInteger('UpdateInterval') * 1000;
         $this->SetTimerInterval('UpdateDeviceState', $milliseconds);
-        //Update state
-        $this->UpdateDeviceState();
-    }
 
-    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
-    {
-        $this->SendDebug('MessageSink', 'SenderID: ' . $SenderID . ', Message: ' . $Message, 0);
-        if ($Message == IPS_KERNELSTARTED) {
-            $this->KernelReady();
+        //Update state
+        if ($this->HasActiveParent()) {
+            $this->UpdateDeviceState();
         }
     }
 
-    public function GetConfigurationForm()
+    public function GetCompatibleParents(): string
+    {
+        //Connect to a new or existing tado° Splitter instance
+        return json_encode([
+            'type'      => 'connect',
+            'moduleIDs' => [
+                TADO_SPLITTER_GUID
+            ]
+        ]);
+    }
+
+    public function MessageSink($TimeStamp, $SenderID, $Message, $Data): void
+    {
+        $this->SendDebug('MessageSink', 'SenderID: ' . $SenderID . ', Message: ' . $Message, 0);
+        switch ($Message) {
+            case IPS_KERNELSTARTED:
+                $this->KernelReady();
+                break;
+
+            case FM_CONNECT:
+                $this->UpdateDeviceState();
+                break;
+
+        }
+    }
+
+    public function GetConfigurationForm(): string
     {
         $formData = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
         return json_encode($formData);
     }
 
-    public function ReceiveData($JSONString)
+    public function ReceiveData($JSONString): string
     {
-        //Received data from splitter, not used at the moment
+        //Receive data from splitter, not used at the moment
+        $this->SendDebug(__FUNCTION__, 'Incoming data: ' . $JSONString, 0);
         $data = json_decode($JSONString);
-        $this->SendDebug(__FUNCTION__, utf8_decode($data->Buffer), 0);
+        $this->SendDebug(__FUNCTION__, 'Buffer data:  ' . json_encode($data->Buffer), 0);
+        return '';
     }
 
     public function UpdateDeviceState(): void
